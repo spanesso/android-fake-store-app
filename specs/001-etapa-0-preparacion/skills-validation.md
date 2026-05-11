@@ -159,4 +159,35 @@ generador: midjourney_v6
 
 ## Skill 7 — `validar-manejo-errores`
 
-_(pendiente)_
+**Ruta**: `.claude/skills/validar-manejo-errores/SKILL.md`
+**Frontmatter validado**: ✅ YAML válido; triggers (post-`/speckit-implement`, "valida los errores", "audita manejo de errores") y anti-triggers (no errores de compilación, no Detekt genérico).
+**Script auxiliar**: ✅ `scripts/audit-errores.sh` ejecutable, cubre ERR-003, ERR-004, ERR-005, ERR-006, ERR-007 con grep + whitelist de barreras. ERR-001, ERR-002, ERR-008, ERR-009, ERR-010 quedan al razonamiento del modelo + Detekt.
+**Reglas documentadas**: ✅ 10 reglas ERR-001..ERR-010 con descripción, lugar, regex/heurística y sugerencia.
+**Registrado en Skill tool**: ✅.
+
+### Caso de prueba ejecutado
+
+**Entrada**: `./.claude/skills/validar-manejo-errores/scripts/audit-errores.sh repository/android-fake-store-app` en el estado actual del repo (ETAPA 0).
+
+**Salida real**:
+```json
+{"violaciones":[],"nota":"Sin código auditable todavía (ETAPA 0)."}
+```
+
+**Resultado**: ✅. El script reconoce el estado preliminar y termina con exit 0. Las reglas se reactivarán automáticamente cuando 0.5 cree la estructura de módulos y aparezcan archivos `.kt` bajo `features/` o `core/`.
+
+---
+
+## Resumen final 0.1
+
+| Skill | SKILL.md | Plantillas/scripts | Caso de prueba | Commit |
+|---|---|---|---|---|
+| `crear-modulo` | ✅ | 10 plantillas | conceptual (products feature) | `7e70f05` |
+| `crear-vista` | ✅ | 10 plantillas | conceptual (Productos screen) | `dd3b735` |
+| `validar-arquitectura` | ✅ | script bash | ejecutado: salida limpia ETAPA 0 | `e7e9742` |
+| `crear-pruebas-unitarias` | ✅ | 7 plantillas | conceptual (products todo) | `95db7a5` |
+| `documentar-modulo` | ✅ | 4 plantillas | conceptual (products) | `cd1e2bd` |
+| `prompts-de-diseno` | ✅ | 4 plantillas | conceptual (Productos Content móvil claro) | `c89cee2` |
+| `validar-manejo-errores` | ✅ | script bash | ejecutado: salida limpia ETAPA 0 | _pendiente commit_ |
+
+**0.1 listo para commit final y punto de control.**
