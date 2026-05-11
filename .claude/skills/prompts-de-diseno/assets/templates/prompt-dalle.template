@@ -1,0 +1,28 @@
+### DALL·E 3 — `{{Pantalla}}` ({{estado}}, {{dispositivo}}, {{modo}})
+
+```
+Create a high-fidelity mobile app screen mockup for a premium Spanish fashion brand
+inspired by Mango Fashion Group. The screen is "{{Pantalla}}" in its {{estadoIngles}} state.
+
+Layout:
+{{layoutIngles}}
+
+Visual direction:
+- Aesthetic: editorial fashion magazine, minimalist, generous negative space.
+- Background: {{fondoIngles}}
+- Typography: thin elegant serif (Playfair Display style) for titles, refined sans-serif
+  (Inter style) for body text, comfortable line height.
+- Color palette: {{paletaIngles}} with restrained brushed gold accents (#B08D57).
+- Lighting: soft natural daylight, no harsh shadows.
+- Product imagery: photographic, neutral backgrounds, premium fabric textures.
+- Mood: aspirational, calm, sophisticated.
+
+Specific to this state ({{estado}}): {{detallesEstado}}
+
+Format: vertical mobile screen mockup with realistic status bar at top, no system UI
+overlays, {{aspectRatio}} ratio, ultra clean composition.
+
+Avoid: neon colors, garish saturation, Instagram filters, overlapping text, watermarks,
+flat 2D cartoon illustration, anime, cluttered backgrounds, competitor logos, famous
+people, children, AI artifacts.
+```

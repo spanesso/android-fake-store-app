@@ -1,0 +1,25 @@
+# Prompts de diseño — Pantalla `{{Pantalla}}`
+
+**Estética**: Mango Fashion Group — minimalismo editorial premium.
+**Layout base**: {{descripcionLayout}}
+**Componentes del design system**: {{componentesMango}}
+**Última actualización**: {{fecha}}
+**Mantenedor**: skill `prompts-de-diseno`.
+
+> Los prompts a IA generativa están en inglés (los modelos están entrenados mayoritariamente en inglés). Esta es la única excepción a la regla R0.1; toda la doc del archivo permanece en español.
+
+---
+
+{{bloquesPorCombinacion}}
+
+---
+
+## Prompt negativo común
+
+> no neon, no garish colors, no Instagram filters, no overlapping text, no watermarks, no children, no cluttered backgrounds, no flat 2D illustration, no cartoon, no anime, no Unsplash overused props, no AI-generated artifacts, no competitor brands (Zara, H&M, Massimo Dutti), no famous models or celebrities.
+
+## Regenerar
+
+```
+/prompts-de-diseno pantalla={{Pantalla}}
+```

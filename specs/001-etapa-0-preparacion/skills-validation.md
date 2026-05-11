@@ -131,7 +131,31 @@ efectos: [ShowSnackbar(uiError), NavegarADetalle(productoId)]
 
 ## Skill 6 — `prompts-de-diseno`
 
-_(pendiente)_
+**Ruta**: `.claude/skills/prompts-de-diseno/SKILL.md`
+**Frontmatter validado**: ✅ YAML válido; triggers ("prompts de diseño", "mockups con IA", post-`/crear-vista`) y anti-triggers (no genera imágenes, no es mood board sin IA).
+**Plantillas**: ✅ 4 plantillas (pantalla.md, prompt-midjourney, prompt-sdxl, prompt-dalle).
+**Registrado en Skill tool**: ✅.
+
+### Caso de prueba conceptual
+
+**Entrada**:
+```
+pantalla: Productos
+estados: [Content]
+dispositivos: [movil]
+modos: [claro]
+generador: midjourney_v6
+```
+
+**Verificación**:
+- La paleta Mango (#FFFFFF, #F5F1EC, #B08D57, #0A0A0A) aparece en los descriptores: ✅
+- Tipografía especificada: "Playfair Display" + "Inter": ✅
+- Anti-triggers: no menciona competidores (Zara, H&M, Massimo Dutti): ✅
+- Excepción a R0.1 documentada: comentarios/encabezados en español, prompts a IA en inglés: ✅
+- `--ar 9:19 --style raw --s 100 --v 6` para Midjourney v6: ✅
+- Prompt negativo común reutilizable: ✅
+
+**Resultado**: ✅. Ejecución real diferida hasta ETAPAS 3+ (cuando existan pantallas reales).
 
 ## Skill 7 — `validar-manejo-errores`
 

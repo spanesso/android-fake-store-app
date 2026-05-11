@@ -1,0 +1,15 @@
+### Midjourney v6 — `{{Pantalla}}` ({{estado}}, {{dispositivo}}, {{modo}})
+
+```
+Editorial fashion mobile app UI mockup, {{Pantalla}} screen in {{estadoIngles}} state,
+{{layoutIngles}}, {{paletaIngles}} color palette,
+generous negative space, thin elegant serif typography (Playfair Display) for titles,
+refined sans-serif (Inter) for body, premium minimalist aesthetic,
+soft natural lighting, photographic product imagery with neutral backgrounds,
+restrained brushed gold accents (#B08D57), {{detallesEstado}},
+shot from above, centered composition, ultra clean, high-end fashion magazine vibe,
+no UI overlays from system, status bar at top, {{aspectRatio}} aspect ratio
+--ar {{ratioMJ}} --style raw --s 100 --v 6
+```
+
+**Prompt negativo (`--no`)**: `--no neon, garish colors, Instagram filters, overlapping text, watermarks, cluttered backgrounds, flat 2D illustration, cartoon, anime`

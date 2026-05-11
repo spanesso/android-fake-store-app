@@ -1,0 +1,27 @@
+### Stable Diffusion XL — `{{Pantalla}}` ({{estado}}, {{dispositivo}}, {{modo}})
+
+**Prompt positivo**:
+```
+editorial fashion mobile app UI mockup, {{Pantalla}} screen, {{estadoIngles}} state,
+{{layoutIngles}}, premium minimalist aesthetic, Mango Fashion Group brand inspired,
+{{paletaIngles}}, thin serif typography Playfair Display headlines,
+refined sans-serif Inter body text, generous negative space, soft warm lighting,
+photographic product imagery, neutral backgrounds, brushed gold accent #B08D57,
+high-end fashion magazine, centered composition, {{detallesEstado}},
+ultra clean modern UI, status bar visible at top
+```
+
+**Prompt negativo**:
+```
+neon colors, garish saturation, Instagram filter, overlapping text, watermark,
+cluttered background, flat 2D illustration, cartoon, anime, low resolution,
+blurry, distorted, glitchy, competitor brand logos, famous people, children,
+ai-artifacts, oversharpening
+```
+
+**Parámetros recomendados**:
+- `steps`: 35
+- `cfg_scale`: 7
+- `sampler`: `DPM++ 2M Karras`
+- `size`: {{tamanoSDXL}}
+- `seed`: aleatorio (anotar la semilla ganadora para reproducir)
