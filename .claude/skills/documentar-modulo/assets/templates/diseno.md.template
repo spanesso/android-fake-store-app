@@ -1,0 +1,40 @@
+# Diseño del módulo `{{rutaGradle}}`
+
+## Diagrama de capas
+
+```mermaid
+flowchart TB
+  subgraph presentation
+    R[Route] --> S[Screen]
+    R --> VM[ViewModel]
+    VM --> UC
+  end
+  subgraph domain
+    UC[UseCase] --> RepoI[Repository interface]
+  end
+  subgraph data
+    RepoImpl[Repository impl] -.implementa.-> RepoI
+    RepoImpl --> Net[Retrofit API]
+    RepoImpl --> Local[Room DAO]
+    Net --> ErrMap[{{Nombre}}ErrorMapper]
+    Local --> ErrMap
+  end
+```
+
+## Decisiones de diseño específicas del módulo
+
+{{decisiones}}
+
+## Puntos de extensión
+
+- Añadir un nuevo caso de uso: crear clase en `domain/casosdeuso/` con `operator fun invoke` que retorne `Either<DomainError, T>`. Registrar el binding en `{{Nombre}}DataModule` solo si requiere wiring.
+- Añadir una nueva fuente remota: extender la interfaz Retrofit en `data/red/` y registrar el servicio en `{{Nombre}}DataModule`.
+- Añadir una nueva pantalla: invocar `/crear-vista nombre=<NuevaPantalla> modulo={{nombre}}`.
+
+## Restricciones de la capa de errores
+
+Este módulo respeta §7 del prompt maestro:
+
+- Ningún `try/catch` genérico fuera de `data/error/{{Nombre}}ErrorMapper.kt`.
+- Los Composables nunca reciben `DomainError` ni `Throwable`; el ViewModel mapea a `UiError` mediante `DomainErrorToUiErrorMapper`.
+- Las excepciones de Retrofit/Room se capturan exclusivamente con `safeApiCall` / `safeDbCall`.

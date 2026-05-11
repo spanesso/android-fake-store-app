@@ -112,7 +112,22 @@ efectos: [ShowSnackbar(uiError), NavegarADetalle(productoId)]
 
 ## Skill 5 — `documentar-modulo`
 
-_(pendiente)_
+**Ruta**: `.claude/skills/documentar-modulo/SKILL.md`
+**Frontmatter validado**: ✅ YAML válido; triggers (post-`/speckit-implement`, "documenta el módulo X") y anti-triggers (no README raíz, no ADRs globales).
+**Plantillas**: ✅ 4 plantillas (`modulo.md`, `diseno.md`, `pruebas.md`, `errores.md`).
+**Registrado en Skill tool**: ✅.
+
+### Caso de prueba conceptual
+
+**Entrada**: `modulo=products, archivos=todos, modo=crear-o-sobrescribir`.
+
+**Verificación de plantillas**:
+- `modulo.md.template`: tabla de contratos públicos, dependencias, ejemplo de uso Kotlin, árbol de carpetas: ✅
+- `diseno.md.template`: diagrama Mermaid (presentation → domain → data) + capas de errores: ✅
+- `pruebas.md.template`: tabla de cobertura objetivo (100/80/70%), comandos Gradle, instrucciones snapshot Paparazzi: ✅
+- `errores.md.template`: tabla `DomainError × Condición × Severity × R.string`, tabla `Throwable → DomainError`, política telemetría, política reintentos: ✅
+
+**Resultado**: ✅. Ejecución real diferida hasta ETAPAS 1+ cuando existan módulos para documentar.
 
 ## Skill 6 — `prompts-de-diseno`
 

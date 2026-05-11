@@ -1,0 +1,57 @@
+# Estrategia de pruebas del módulo `{{rutaGradle}}`
+
+## Cobertura objetivo (§11.5)
+
+| Capa | Umbral mínimo |
+|---|---|
+| `domain` | 100% |
+| `data` | ≥ 80% |
+| `presentation` | ≥ 70% |
+| `design-system` | snapshot (sin métrica de Kover) |
+
+## Tests por capa
+
+### Capa `domain`
+
+- `<NombreCasoUso>Test`: happy path + un test por cada rama de `DomainError` que el caso de uso puede recibir del repositorio.
+
+### Capa `data`
+
+- `<NombreRepositorio>Test` con `MockWebServer` y `Room.inMemoryDatabaseBuilder`. Cubre 200, 401, 403, 404, 408, 429, 5xx, JSON inválido y timeout.
+- `{{Nombre}}ErrorMapperTest`: una rama por cada `Throwable → DomainError` declarada en §7.4.
+- `<NombreDto>MapperTest`: tres casos (campos completos, opcionales nulos, valores extremos).
+
+### Capa `presentation`
+
+- `<NombreViewModel>Test` con Turbine + `StandardTestDispatcher`: Loading → Content / Error, y Retry → Loading → Content.
+- `<NombreScreen>SnapshotTest` con Paparazzi: un snapshot por cada estado (Loading, Empty, Error, Content) en claro y oscuro.
+- `<NombreScreen>ComposeTest` con `createAndroidComposeRule`: smoke + flujo principal + verificación de `Retry`.
+
+## Comandos
+
+```bash
+cd repository/android-fake-store-app
+
+# Compilar tests sin ejecutar
+./gradlew :{{rutaGradle}}:domain:compileTestKotlin
+
+# Ejecutar tests por capa
+./gradlew :{{rutaGradle}}:domain:test
+./gradlew :{{rutaGradle}}:data:test
+./gradlew :{{rutaGradle}}:presentation:test
+
+# Cobertura agregada (Kover)
+./gradlew koverHtmlReport
+open build/reports/kover/html/index.html
+
+# Snapshots (regenerar referencia)
+./gradlew :{{rutaGradle}}:presentation:recordPaparazziDebug
+# Validar contra la referencia
+./gradlew :{{rutaGradle}}:presentation:verifyPaparazziDebug
+```
+
+## Cómo regenerar la batería completa
+
+```
+/crear-pruebas-unitarias modulo={{nombre}} objetivo=todo
+```

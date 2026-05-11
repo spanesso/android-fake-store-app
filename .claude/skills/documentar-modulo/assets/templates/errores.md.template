@@ -1,0 +1,43 @@
+# Errores del módulo `{{rutaGradle}}`
+
+Esta documentación lista cada `DomainError` que el módulo puede emitir, la condición que lo dispara y el `UiError` localizado correspondiente. Mantenerla sincronizada cuando se añaden nuevas ramas a `domain/errors/{{Nombre}}Error.kt`.
+
+## Tabla de errores
+
+| `DomainError` | Condición | `UiError.severity` | `R.string` | Acciones UI |
+|---|---|---|---|---|
+{{tablaErrores}}
+
+## Mapeo desde la frontera `data`
+
+| Excepción capturada | `DomainError` | Lugar |
+|---|---|---|
+| `UnknownHostException` | `Network.NoConnection` | `core:network` |
+| `SocketTimeoutException` | `Network.Timeout` | `core:network` |
+| `HttpException(401)` | `Network.Unauthorized` | `core:network` |
+| `HttpException(404)` | `Network.NotFound` | `core:network` |
+| `HttpException(500..599)` | `Network.Server(code)` | `core:network` |
+| `SerializationException` | `Network.Parsing` | `core:network` |
+| `SQLiteConstraintException` | `Database.IntegrityViolation` | `core:database` |
+| `SQLiteException` | `Database.ReadFailed` o `WriteFailed` según operación | `core:database` |
+| _específicas del módulo_ | `{{Nombre}}Error.*` | `{{rutaGradle}}/data/error/{{Nombre}}ErrorMapper.kt` |
+
+## Política de telemetría
+
+- Todos los errores anteriores se reportan como **no fatales** a Firebase Crashlytics, excepto `DomainError.Validation` (input del usuario) y `Security.BiometricLockout` (esperado).
+- Custom keys obligatorias: `module={{nombre}}`, `useCase`, `errorType`, `errorCode`, `httpCode?`, `sessionId`, `flavor`, `appVersion`.
+- Rate-limit: máx. 60 eventos por minuto por `errorCode` antes de degradar a "muestreado".
+
+## Reintentos automáticos
+
+- 5xx y timeout: backoff exponencial con jitter, máximo 3 intentos (configurado en `core:network`).
+- 4xx (excepto 408 y 429): no se reintenta.
+- 408 y 429 con `Retry-After`: respeta el header.
+
+## Cómo añadir un nuevo error
+
+1. Añadir el caso a `domain/errors/{{Nombre}}Error.kt` con KDoc explicando cuándo se produce.
+2. Cubrirlo en `{{Nombre}}ErrorMapper` si proviene de una excepción nueva.
+3. Añadir `R.string.error_<modulo>_<caso>` en `res/values/strings.xml` y `res/values-en/strings.xml`.
+4. Añadir un test en `{{Nombre}}ErrorMapperTest` y otro en el `ViewModelTest` correspondiente.
+5. Actualizar la tabla de arriba con `/documentar-modulo modulo={{nombre}}`.

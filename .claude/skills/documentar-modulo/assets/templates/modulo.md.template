@@ -1,0 +1,33 @@
+# Módulo `{{rutaGradle}}`
+
+**Propósito**: {{descripcionBreve}}
+
+## Contratos públicos
+
+Símbolos exportados en `{{rutaGradle}}:api` y `{{rutaGradle}}:domain`:
+
+| Símbolo | Tipo | Descripción | Retorno |
+|---|---|---|---|
+{{tablaContratos}}
+
+## Dependencias de proyecto
+
+{{listaDependencias}}
+
+## Ejemplos de uso
+
+```kotlin
+{{ejemploUso}}
+```
+
+## Estructura interna
+
+```
+{{arbolModulo}}
+```
+
+## Cómo regenerar esta documentación
+
+```
+/documentar-modulo modulo={{nombre}}
+```
