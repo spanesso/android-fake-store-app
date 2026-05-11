@@ -1,0 +1,33 @@
+package {{paqueteRaiz}}.data.mappers
+
+import com.google.common.truth.Truth.assertThat
+import org.junit.Test
+
+/**
+ * Pruebas del mapper `{{NombreMapper}}` (DTO ↔ Domain o Entity ↔ Domain).
+ *
+ * Tres casos por mapper: campos completos, campos opcionales nulos, valores extremos.
+ */
+class {{NombreMapper}}Test {
+
+    @Test
+    fun `dado DTO con todos los campos cuando se mapea entonces produce dominio equivalente`() {
+        val dto = {{dtoCompleto}}
+        val dominio = dto.aDominio()
+        assertThat(dominio.{{campoPrincipal}}).isEqualTo(dto.{{campoPrincipal}})
+    }
+
+    @Test
+    fun `dado DTO con campos opcionales en null cuando se mapea entonces aplica defaults`() {
+        val dto = {{dtoOpcionalNulo}}
+        val dominio = dto.aDominio()
+        assertThat(dominio.{{campoOpcional}}).isEqualTo({{valorPorDefecto}})
+    }
+
+    @Test
+    fun `dado DTO con valor extremo cuando se mapea entonces preserva el valor`() {
+        val dto = {{dtoExtremo}}
+        val dominio = dto.aDominio()
+        assertThat(dominio.{{campoExtremo}}).isEqualTo(dto.{{campoExtremo}})
+    }
+}

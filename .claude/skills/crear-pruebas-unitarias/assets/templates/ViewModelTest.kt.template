@@ -1,0 +1,93 @@
+package {{paqueteRaiz}}.viewmodel
+
+import app.cash.turbine.test
+import arrow.core.left
+import arrow.core.right
+import com.google.common.truth.Truth.assertThat
+import com.mango.fakestore.core.error.DomainError
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import {{paqueteRaiz}}.ui.screens.{{Nombre}}UiEvent
+import {{paqueteRaiz}}.ui.screens.{{Nombre}}UiState
+
+/**
+ * Pruebas del `{{Nombre}}ViewModel` con Turbine y `StandardTestDispatcher`.
+ *
+ * Cubre: Loading inicial, Loading → Content, Loading → Error por cada DomainError
+ * que el caso de uso pueda emitir, y la transición Retry → Loading → Content.
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+class {{Nombre}}ViewModelTest {
+
+    private val dispatcher = StandardTestDispatcher()
+    private val obtener{{Nombre}}: {{NombreCasoUso}} = mockk()
+    private val telemetry = mockk<com.mango.fakestore.core.analytics.Telemetry>(relaxed = true)
+    private val domainErrorMapper = mockk<com.mango.fakestore.core.error.DomainErrorToUiErrorMapper>(relaxed = true)
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(dispatcher)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `caso de uso retorna Right entonces transiciona a Content`() = runTest {
+        coEvery { obtener{{Nombre}}() } returns {{datosFixture}}.right()
+        val viewModel = {{Nombre}}ViewModel(obtener{{Nombre}}, telemetry, domainErrorMapper)
+
+        viewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo({{Nombre}}UiState.Loading)
+            advanceUntilIdle()
+            assertThat(awaitItem()).isInstanceOf({{Nombre}}UiState.Content::class.java)
+        }
+    }
+
+    @Test
+    fun `caso de uso retorna NoConnection entonces transiciona a Error`() = runTest {
+        coEvery { obtener{{Nombre}}() } returns DomainError.Network.NoConnection().left()
+        val viewModel = {{Nombre}}ViewModel(obtener{{Nombre}}, telemetry, domainErrorMapper)
+
+        viewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo({{Nombre}}UiState.Loading)
+            advanceUntilIdle()
+            assertThat(awaitItem()).isInstanceOf({{Nombre}}UiState.Error::class.java)
+        }
+    }
+
+    @Test
+    fun `Retry tras Error vuelve a Loading y luego a Content si caso de uso recupera`() = runTest {
+        coEvery { obtener{{Nombre}}() } returnsMany listOf(
+            DomainError.Network.NoConnection().left(),
+            {{datosFixture}}.right(),
+        )
+        val viewModel = {{Nombre}}ViewModel(obtener{{Nombre}}, telemetry, domainErrorMapper)
+
+        viewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo({{Nombre}}UiState.Loading)
+            advanceUntilIdle()
+            assertThat(awaitItem()).isInstanceOf({{Nombre}}UiState.Error::class.java)
+
+            viewModel.onEvent({{Nombre}}UiEvent.Retry)
+            assertThat(awaitItem()).isEqualTo({{Nombre}}UiState.Loading)
+            advanceUntilIdle()
+            assertThat(awaitItem()).isInstanceOf({{Nombre}}UiState.Content::class.java)
+        }
+    }
+
+    // TODO: añadir tests para Timeout, Server, Database.ReadFailed, Unknown y errores
+    //       específicos del módulo conforme aparezcan en la firma del UseCase.
+}

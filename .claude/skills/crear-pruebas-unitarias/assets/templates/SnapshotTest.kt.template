@@ -1,0 +1,42 @@
+package {{paqueteRaiz}}.componentes
+
+import app.cash.paparazzi.DeviceConfig
+import app.cash.paparazzi.Paparazzi
+import com.android.resources.NightMode
+import com.mango.fakestore.core.designsystem.tema.MangoTema
+import org.junit.Rule
+import org.junit.Test
+
+/**
+ * Snapshot tests del componente `{{NombreComponente}}` del design system.
+ *
+ * Captura cada estado en claro y oscuro. Las imágenes de referencia viven en
+ * `src/test/snapshots/images/` (creadas/actualizadas con
+ * `./gradlew :core:design-system:recordPaparazziDebug`).
+ */
+class {{NombreComponente}}SnapshotTest {
+
+    @get:Rule
+    val paparazzi = Paparazzi(deviceConfig = DeviceConfig.PIXEL_5)
+
+    @Test
+    fun {{nombreComponente}}_idle_claro() {
+        paparazzi.snapshot {
+            MangoTema {
+                {{NombreComponente}}({{argsIdle}})
+            }
+        }
+    }
+
+    @Test
+    fun {{nombreComponente}}_idle_oscuro() {
+        paparazzi.unsafeUpdateConfig(deviceConfig = DeviceConfig.PIXEL_5.copy(nightMode = NightMode.NIGHT))
+        paparazzi.snapshot {
+            MangoTema {
+                {{NombreComponente}}({{argsIdle}})
+            }
+        }
+    }
+
+    // TODO: añadir un test por cada estado adicional (pressed, disabled, loading, error, etc.).
+}

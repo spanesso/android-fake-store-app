@@ -1,0 +1,95 @@
+package {{paqueteRaiz}}.data.repositorios
+
+import com.google.common.truth.Truth.assertThat
+import com.mango.fakestore.core.error.DomainError
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.SocketPolicy
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
+
+/**
+ * Pruebas unitarias del repositorio `{{NombreRepositorio}}` con `MockWebServer`.
+ *
+ * Cubre 200, 4xx, 5xx, JSON inválido y timeout. Verifica que cada respuesta HTTP se
+ * traduce al `DomainError` esperado por el `ErrorMapper` del módulo (§7.14).
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+class {{NombreRepositorio}}Test {
+
+    private lateinit var server: MockWebServer
+    private lateinit var api: {{NombreApi}}
+    private lateinit var repositorio: {{NombreRepositorio}}
+
+    @Before
+    fun setUp() {
+        server = MockWebServer().apply { start() }
+        // TODO: construir Retrofit apuntando a server.url("/") con el converter de kotlinx.serialization.
+        // api = Retrofit.Builder().baseUrl(server.url("/")).build().create({{NombreApi}}::class.java)
+        // repositorio = {{NombreRepositorio}}Impl(api, /* errorMapper = */ ...)
+    }
+
+    @After
+    fun tearDown() {
+        server.shutdown()
+    }
+
+    @Test
+    fun `dado respuesta 200 cuando se invoca entonces retorna Right con los datos`() = runTest {
+        server.enqueue(MockResponse().setResponseCode(200).setBody("{{jsonHappy}}"))
+
+        val resultado = repositorio.{{metodo}}()
+
+        assertThat(resultado.isRight()).isTrue()
+    }
+
+    @Test
+    fun `dado respuesta 401 cuando se invoca entonces retorna Network Unauthorized`() = runTest {
+        server.enqueue(MockResponse().setResponseCode(401))
+
+        val resultado = repositorio.{{metodo}}()
+
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.Unauthorized::class.java)
+    }
+
+    @Test
+    fun `dado respuesta 404 cuando se invoca entonces retorna Network NotFound`() = runTest {
+        server.enqueue(MockResponse().setResponseCode(404))
+
+        val resultado = repositorio.{{metodo}}()
+
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.NotFound::class.java)
+    }
+
+    @Test
+    fun `dado respuesta 500 cuando se invoca entonces retorna Network Server`() = runTest {
+        server.enqueue(MockResponse().setResponseCode(500))
+
+        val resultado = repositorio.{{metodo}}()
+
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.Server::class.java)
+    }
+
+    @Test
+    fun `dado JSON invalido cuando se invoca entonces retorna Network Parsing`() = runTest {
+        server.enqueue(MockResponse().setResponseCode(200).setBody("{ no-es-json }"))
+
+        val resultado = repositorio.{{metodo}}()
+
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.Parsing::class.java)
+    }
+
+    @Test
+    fun `dado timeout cuando se invoca entonces retorna Network Timeout`() = runTest {
+        server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE))
+
+        val resultado = repositorio.{{metodo}}()
+
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.Timeout::class.java)
+    }
+}

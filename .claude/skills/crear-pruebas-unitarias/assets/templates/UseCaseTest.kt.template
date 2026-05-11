@@ -1,0 +1,66 @@
+package {{paqueteRaiz}}.domain.casosdeuso
+
+import app.cash.turbine.test
+import arrow.core.left
+import arrow.core.right
+import com.google.common.truth.Truth.assertThat
+import com.mango.fakestore.core.error.DomainError
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Test
+
+/**
+ * Pruebas unitarias de `{{NombreCasoUso}}`.
+ *
+ * Cubre el happy path y una rama por cada `DomainError` que el repositorio puede emitir
+ * (§7.14 del prompt maestro y §11.1 de cobertura: 100% del módulo domain).
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+class {{NombreCasoUso}}Test {
+
+    private val repositorio: {{NombreRepositorio}} = mockk()
+    private val casoUso = {{NombreCasoUso}}(repositorio)
+
+    @Test
+    fun `dado repositorio retorna Right cuando invoke entonces retorna Right con los datos esperados`() = runTest {
+        val datosEsperados = {{datosFixture}}
+        coEvery { repositorio.{{metodoRepo}}() } returns datosEsperados.right()
+
+        val resultado = casoUso()
+
+        assertThat(resultado).isEqualTo(datosEsperados.right())
+    }
+
+    @Test
+    fun `dado repositorio retorna NoConnection cuando invoke entonces retorna NoConnection`() = runTest {
+        coEvery { repositorio.{{metodoRepo}}() } returns DomainError.Network.NoConnection().left()
+
+        val resultado = casoUso()
+
+        assertThat(resultado).isEqualTo(DomainError.Network.NoConnection().left())
+    }
+
+    @Test
+    fun `dado repositorio retorna Timeout cuando invoke entonces retorna Timeout`() = runTest {
+        coEvery { repositorio.{{metodoRepo}}() } returns DomainError.Network.Timeout().left()
+
+        val resultado = casoUso()
+
+        assertThat(resultado).isEqualTo(DomainError.Network.Timeout().left())
+    }
+
+    @Test
+    fun `dado repositorio retorna Server 500 cuando invoke entonces retorna Server 500`() = runTest {
+        val error = DomainError.Network.Server(httpCode = 500)
+        coEvery { repositorio.{{metodoRepo}}() } returns error.left()
+
+        val resultado = casoUso()
+
+        assertThat(resultado).isEqualTo(error.left())
+    }
+
+    // TODO: añadir un test por cada rama adicional de DomainError que el caso de uso
+    //       pueda recibir (Database.ReadFailed, Validation, Unknown, errores propios del modulo, etc.).
+}

@@ -1,0 +1,34 @@
+package {{paqueteRaiz}}.fixtures
+
+import com.mango.fakestore.core.error.DomainError
+import com.mango.fakestore.core.error.UiError
+
+/**
+ * Builders reutilizables para pruebas del módulo `{{nombre}}`. Mantén estos fixtures sin
+ * lógica: solo datos por defecto + parámetros opcionales para variaciones.
+ */
+object {{Nombre}}Fixtures {
+
+    fun {{Nombre}}Defecto(): {{NombreEntidad}} = {{NombreEntidad}}(
+        // TODO: rellenar con valores por defecto representativos.
+    )
+
+    fun {{Nombre}}DtoDefecto() = {{NombreDto}}(
+        // TODO: rellenar con valores por defecto.
+    )
+
+    fun {{Nombre}}EntityDefecto() = {{NombreEntity}}(
+        // TODO: rellenar con valores por defecto.
+    )
+
+    fun domainErrorNoConnection(): DomainError = DomainError.Network.NoConnection()
+    fun domainErrorTimeout(): DomainError = DomainError.Network.Timeout()
+    fun domainErrorServer(http: Int = 500): DomainError = DomainError.Network.Server(http)
+
+    fun uiErrorRedSinConexion(): UiError = UiError(
+        messageRes = 0, // TODO: enlazar a R.string.error_red_sin_conexion
+        severity = UiError.Severity.Warning,
+        actions = listOf(UiError.UiErrorAction.Retry),
+        errorCode = "NET-OFF",
+    )
+}

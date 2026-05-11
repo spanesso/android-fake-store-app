@@ -92,7 +92,23 @@ efectos: [ShowSnackbar(uiError), NavegarADetalle(productoId)]
 
 ## Skill 4 — `crear-pruebas-unitarias`
 
-_(pendiente)_
+**Ruta**: `.claude/skills/crear-pruebas-unitarias/SKILL.md`
+**Frontmatter validado**: ✅ YAML válido; triggers (post-/speckit-implement, "genera tests", "cubre ramas de error") y anti-triggers (no E2E con dispositivo, no carga/rendimiento).
+**Plantillas**: ✅ 7 plantillas (UseCaseTest, RepositoryTest, MapperTest, ErrorMapperTest, ViewModelTest, SnapshotTest, Fixtures).
+**Registrado en Skill tool**: ✅.
+
+### Caso de prueba conceptual
+
+**Entrada**: `modulo=products, objetivo=todo`.
+
+**Verificación**:
+- `UseCaseTest.kt.template` incluye happy path + ramas NoConnection, Timeout, Server: ✅
+- `RepositoryTest.kt.template` cubre 200, 401, 404, 500, JSON inválido, timeout (via SocketPolicy.NO_RESPONSE): ✅
+- `ErrorMapperTest.kt.template` cubre 7 ramas de §7.4 (UnknownHost, IOException, SocketTimeout, HttpException 401/500, SerializationException, RuntimeException → Unknown): ✅
+- `ViewModelTest.kt.template` cubre Loading → Content, Loading → Error, Retry → Loading → Content con Turbine + StandardTestDispatcher: ✅
+- `SnapshotTest.kt.template` con Paparazzi en claro y oscuro: ✅
+
+**Resultado**: ✅. Ejecución real diferida hasta ETAPA 1 (módulos núcleo) y ETAPAS 2-5 (features).
 
 ## Skill 5 — `documentar-modulo`
 

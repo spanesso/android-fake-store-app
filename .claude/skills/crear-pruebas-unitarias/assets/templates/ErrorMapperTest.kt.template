@@ -1,0 +1,73 @@
+package {{paqueteRaiz}}.data.error
+
+import com.google.common.truth.Truth.assertThat
+import com.mango.fakestore.core.error.DomainError
+import io.mockk.mockk
+import kotlinx.serialization.SerializationException
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+
+/**
+ * Pruebas del mapper `{{NombreErrorMapper}}`. Cubre una rama por cada excepción declarada en
+ * §7.4 del prompt maestro.
+ */
+class {{NombreErrorMapper}}Test {
+
+    private val mapper = {{NombreErrorMapper}}(
+        networkErrorMapper = mockk(relaxed = true),
+        databaseErrorMapper = mockk(relaxed = true),
+    )
+
+    @Test
+    fun `UnknownHostException se mapea a Network NoConnection`() {
+        val resultado = mapper.mapException<Unit>(UnknownHostException("dns falla"))
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.NoConnection::class.java)
+    }
+
+    @Test
+    fun `IOException se mapea a Network NoConnection`() {
+        val resultado = mapper.mapException<Unit>(IOException("io falla"))
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.NoConnection::class.java)
+    }
+
+    @Test
+    fun `SocketTimeoutException se mapea a Network Timeout`() {
+        val resultado = mapper.mapException<Unit>(SocketTimeoutException())
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.Timeout::class.java)
+    }
+
+    @Test
+    fun `HttpException 401 se mapea a Network Unauthorized`() {
+        val http = HttpException(Response.error<Any>(401, "".toResponseBody(null)))
+        val resultado = mapper.mapException<Unit>(http)
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.Unauthorized::class.java)
+    }
+
+    @Test
+    fun `HttpException 500 se mapea a Network Server`() {
+        val http = HttpException(Response.error<Any>(500, "".toResponseBody(null)))
+        val resultado = mapper.mapException<Unit>(http)
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.Server::class.java)
+    }
+
+    @Test
+    fun `SerializationException se mapea a Network Parsing`() {
+        val resultado = mapper.mapException<Unit>(SerializationException("json malo"))
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Network.Parsing::class.java)
+    }
+
+    @Test
+    fun `Excepcion desconocida se mapea a Unknown`() {
+        val resultado = mapper.mapException<Unit>(RuntimeException("inesperado"))
+        assertThat(resultado.leftOrNull()).isInstanceOf(DomainError.Unknown::class.java)
+    }
+
+    // TODO: añadir tests para las excepciones de BD (SQLiteConstraintException, SQLiteException)
+    //       cuando el mapper deba cubrirlas.
+}
