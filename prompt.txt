@@ -1,0 +1,1097 @@
+================================================================================
+PROMPT MAESTRO — PRUEBA TÉCNICA ANDROID · MANGO FASHION GROUP
+Destinatario: Claude Code (claude.ai/code)
+Objetivo: Construir una app Android profesional, modular, segura, observable y
+testeada, lista para entrega como prueba técnica con calidad de producción.
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+0. REGLAS INVIOLABLES (leer antes de ejecutar cualquier acción)
+────────────────────────────────────────────────────────────────────────────────
+
+R0.1  IDIOMA — Todos los documentos, comentarios de alto nivel, mensajes de
+      commit, descripciones de PR, especificaciones, planes, tareas, READMEs y
+      documentación técnica se escriben en ESPAÑOL. El código fuente (nombres
+      de clases, funciones, variables) sigue convenciones de Kotlin/Android en
+      inglés.
+
+R0.2  ARQUITECTURA — Clean Architecture estricta en TODOS los módulos de
+      feature, con tres capas separadas en submódulos o paquetes:
+        · data    → fuentes de datos (red, BD), DTOs, mappers, repositorios.
+        · domain  → entidades, casos de uso (interactors), contratos
+                    (interfaces de repositorio).
+        · presentation → MVVM (ViewModel + UiState + UiEvent + UiEffect).
+      Las dependencias APUNTAN HACIA EL DOMINIO. data y presentation NUNCA se
+      conocen entre sí. La comunicación entre capas y módulos SIEMPRE va por
+      INTERFACES (contratos). Esto es no negociable: facilita testeo, mocking
+      y reemplazo de implementaciones.
+
+R0.3  VISTAS SIN VIEWMODEL — Los Composables que renderizan UI (carpeta
+      `ui/components` o `ui/screens`) NUNCA reciben ni instancian un
+      ViewModel. Reciben:
+        · Un `UiState` (data class inmutable) como parámetro.
+        · Lambdas `(Event) -> Unit` para notificar acciones del usuario.
+      Existe SIEMPRE un Composable wrapper "Route" o "Container" en una capa
+      superior que sí conoce el ViewModel y conecta el state/eventos al
+      Composable puro. Esto permite previews completos y reutilización total.
+
+R0.4  PREVIEWS OBLIGATORIOS — Cada Composable de vista DEBE tener `@Preview`
+      para CADA estado de UI posible (Loading, Error, Empty, Content,
+      Content+favoritos, etc.) y en variantes claro/oscuro.
+
+R0.5  TESTS POR MÓDULO — Cada módulo creado lleva sus pruebas unitarias en el
+      mismo PR. Cobertura mínima 80% en domain y data; presentation 70%;
+      design-system con snapshot tests.
+
+R0.6  DESIGN SYSTEM PRIMERO — Ningún componente visual (botón, input, label,
+      card, badge, dialog, etc.) se usa directamente desde Material3 en las
+      pantallas de feature. Todo pasa por wrappers del módulo `:core:design-system`
+      configurables vía parámetros.
+
+R0.7  SECRETS FUERA DEL CÓDIGO — Ninguna API key, endpoint privado, token de
+      Amplify o credencial vive en el repositorio. Se usan `local.properties`
+      + `BuildConfig`, NDK para strings críticos, y para producción se
+      inyectan vía CI/CD desde un vault. Documentar la estrategia en
+      `docs/seguridad.md`.
+
+R0.8  COMMITS — Conventional Commits en español: `feat:`, `fix:`, `docs:`,
+      `test:`, `refactor:`, `chore:`, `ci:`. Mensajes claros, scope por
+      módulo (`feat(products): añade caso de uso ObtenerProductos`).
+
+R0.9  WORKFLOW — Usar Spec Kit. Para cada feature/módulo nuevo seguir el
+      ciclo: `/speckit-specify` → `/speckit-clarify` → `/speckit-plan` →
+      `/speckit-tasks` → `/speckit-analyze` → `/speckit-implement`. Los
+      artefactos generados (`spec.md`, `plan.md`, `tasks.md`) están en
+      español.
+
+R0.10 NO IMPROVISAR — Antes de codificar una pantalla o módulo, leer su
+      `spec.md` y `plan.md`. Si algo no está claro, ejecutar
+      `/speckit-clarify`, no asumir.
+
+R0.11 ERRORES TIPADOS — Ninguna capa propaga `Throwable` o `Exception` cruda
+      hacia arriba. Toda salida de un repositorio o caso de uso devuelve
+      `Either<DomainError, T>` (o equivalente). Las excepciones se capturan
+      en la frontera data y se traducen a `DomainError`. La UI nunca muestra
+      `throwable.message`: muestra mensajes vía `stringResource(...)` desde
+      un `UiError` tipado. Detalle completo en §7.
+
+R0.12 SOLO HERRAMIENTAS CON TIER GRATUITO — No se incorpora al proyecto
+      ninguna herramienta, SDK o servicio externo que NO tenga un tier
+      gratuito viable para esta prueba técnica. Cualquier servicio "trial"
+      (Datadog, Bitrise pago, SonarCloud privado, etc.) queda marcado como
+      OPCIONAL y solo se activa si la empresa lo provee. La pila por
+      defecto está compuesta exclusivamente por:
+        · Observabilidad: Firebase Crashlytics + Firebase Analytics +
+          Firebase Performance Monitoring (todo gratis). Opcional: Sentry
+          (free tier 5K eventos/mes).
+        · CI/CD: GitHub Actions (2000 min/mes en repos privados, ilimitado
+          en públicos). Espejo opcional: Azure Pipelines (1800 min/mes).
+        · Distribución interna: Firebase App Distribution (gratis).
+        · Pruebas en dispositivo: Firebase Test Lab (cuota gratis diaria).
+        · Calidad: Detekt + ktlint + Kover (locales, gratis). SonarQube
+          Community Edition self-hosted o SonarCloud SOLO si el repo es
+          público — opcional.
+      Si una sección de este documento menciona una herramienta de pago,
+      DEBE leerse como "opcional, solo si está disponible"; la
+      implementación obligatoria usa la alternativa gratuita equivalente.
+
+R0.13 SKILL-CREATOR — Los skills definidos en §13 se generan UTILIZANDO el
+      skill `example-skills:skill-creator` (plugin instalado). No se
+      escriben manualmente los SKILL.md ni se inventa su estructura: se
+      invoca `skill-creator` con el propósito de cada skill, y se itera
+      sobre los outputs hasta que cumplan los criterios de §13. Esto
+      garantiza consistencia, validación de frontmatter y descripciones
+      bien formadas.
+
+────────────────────────────────────────────────────────────────────────────────
+1. CONTEXTO DEL PROYECTO
+────────────────────────────────────────────────────────────────────────────────
+
+Empresa objetivo: Mango Fashion Group (mangofashiongroup.com) — moda premium
+española. La aplicación debe transmitir la estética de la marca: elegancia,
+sobriedad, líneas finas, mucho espacio negativo, tipografía con personalidad,
+paleta neutra (negros, blancos, tierras, beige) con acentos puntuales.
+
+Producto: app Android (Kotlin + Jetpack Compose) que consume Fake Store API
+(https://fakestoreapi.com) y permite:
+  · Listar productos.
+  · Marcar/desmarcar favoritos (persistencia local).
+  · Ver pantalla de favoritos.
+  · Ver perfil del usuario (endpoint /users/8) con contador de favoritos. /users/8 es un ejemplo
+
+Repositorio Android existente: `repository/android-fake-store-app/` (scaffold
+mínimo con Compose). Se debe MIGRAR a la nueva estructura modular descrita
+en §4.
+
+────────────────────────────────────────────────────────────────────────────────
+2. STACK TECNOLÓGICO (definitivo)
+────────────────────────────────────────────────────────────────────────────────
+
+Lenguaje y UI
+  · Kotlin 2.0.x
+  · Jetpack Compose + Material3
+  · Compose Navigation (type-safe con kotlinx.serialization)
+  · Coil 2.x para imágenes
+
+Concurrencia
+  · Kotlin Coroutines + Flow (StateFlow para UiState, SharedFlow para UiEffect)
+  · Turbine para test de Flows
+
+Red
+  · Retrofit 2 + OkHttp 4
+  · kotlinx.serialization (preferida sobre Moshi/Gson por integración nativa)
+  · OkHttp Interceptors: logging (solo debug), auth, retry, cache
+
+Persistencia
+  · Room 2.6+ con KSP
+  · SQLCipher para encriptación de BD local
+  · DataStore (Preferences) + EncryptedDataStore para tokens y preferencias
+
+Inyección de dependencias
+  · Hilt (estándar Android) — módulos Hilt por feature module
+
+Paginación
+  · Paging 3 para el listado de productos
+
+Manejo de errores
+  · Arrow `Either<DomainError, T>` (preferido) o sealed Result propio.
+  · Mappers explícitos en cada capa.
+  · Detalle completo en §7.
+
+Seguridad
+  · Biometría: androidx.biometric (BiometricPrompt)
+  · Detección root/jailbreak: RootBeer o detección manual
+  · Anti-screenshot: FLAG_SECURE configurable por pantalla
+  · Network Security Config + Certificate Pinning
+  · ProGuard/R8 con reglas agresivas
+  · Tink para criptografía cuando sea necesario
+
+Observabilidad (todo con tier gratuito — ver R0.12)
+  · Firebase Crashlytics (crashes y errores no fatales) — GRATIS.
+  · Firebase Analytics (eventos de producto) — GRATIS.
+  · Firebase Performance Monitoring (traces de red y arranque) — GRATIS.
+  · Logging estructurado: Timber con tree propio (consola en debug,
+    Crashlytics non-fatal + Analytics event en release).
+  · Opcional si la empresa lo provee: Datadog Mobile RUM/Logs/APM
+    (sustituye o complementa Firebase, no obligatorio).
+  · Opcional gratis: Sentry (free tier 5K eventos/mes) como alternativa
+    a Crashlytics si se prefiere stack ajeno a Google.
+
+Calidad (todo gratis y local)
+  · Detekt + ktlint con reglas personalizadas; ver §10.
+  · Kover para cobertura (preferido sobre JaCoCo).
+  · Opcional si el repo es público: SonarCloud (gratis para open source).
+  · Opcional self-hosted: SonarQube Community Edition (gratis, requiere
+    infra propia).
+  · Konsist (o ArchUnit-Kotlin) para reglas de arquitectura — gratis.
+
+CI/CD (gratis)
+  · GitHub Actions como pipeline PRINCIPAL (free tier 2000 min/mes en
+    repos privados, ilimitado en públicos).
+  · Azure Pipelines como espejo opcional (1800 min/mes free).
+  · Bitrise marcado como opcional — solo si la empresa lo provee.
+  · Workflows: PR (lint+test+build debug), main (build+test+deploy
+    interno via Firebase App Distribution), release (firmado + Play
+    Internal Testing).
+  · Gestión de secretos: GitHub Actions Secrets / Azure KeyVault.
+
+Testing
+  · JUnit 4/5 (estandarizar en JUnit 5 si es viable)
+  · MockK para mocks
+  · Turbine para Flows
+  · Truth o Kotest assertions
+  · Robolectric para tests JVM con dependencias Android
+  · Compose UI tests (`createAndroidComposeRule`)
+  · Espresso para flujos end-to-end
+  · Paparazzi o Roborazzi para snapshot tests del design system
+
+Configuración
+  · Build flavors: `dev` / `staging` / `prod` con BuildConfig y endpoints
+    separados.
+
+────────────────────────────────────────────────────────────────────────────────
+3. ARQUITECTURA — CLEAN + MVVM
+────────────────────────────────────────────────────────────────────────────────
+
+Capa Domain (pura Kotlin, sin Android)
+  · Entidades: data classes inmutables, sin anotaciones de framework.
+  · UseCases: una clase con `operator fun invoke(...)`, una responsabilidad,
+    devuelve `Either<DomainError, T>`.
+  · Repository interfaces: contratos puros, definidos aquí, implementados en
+    data; firmas devuelven `Either<DomainError, T>` o `Flow<Either<...>>`.
+  · Errors tipados: `sealed class DomainError` (ver §7.2).
+  · Result wrapper: `Either<DomainError, T>` (Arrow). Decisión registrada
+    en `docs/adr/0001-manejo-errores.md`.
+
+Capa Data
+  · Repositorios: implementan contratos de domain. Coordinan fuentes (remote
+    + local). Capturan excepciones en su frontera y mapean a `DomainError`
+    con un `ErrorMapper` testeado.
+  · Remote: Retrofit services + DTOs + Mappers (DTO→Domain).
+  · Local: Room DAOs + Entities + Mappers (Entity↔Domain).
+  · Single Source of Truth: para favoritos y productos cacheados → Room.
+    NetworkBoundResource pattern o equivalente con Flow.
+  · Mappers explícitos: NUNCA exponer DTOs ni Entities fuera de data.
+
+Capa Presentation (MVVM)
+  · ViewModel:
+      - Expone `val uiState: StateFlow<UiState>`.
+      - Expone `val uiEffect: SharedFlow<UiEffect>` para efectos one-shot
+        (snackbar, navegación).
+      - Recibe `fun onEvent(event: UiEvent)`.
+      - NUNCA referencia tipos Compose.
+      - Recibe casos de uso por constructor (Hilt).
+      - Tiene `CoroutineExceptionHandler` raíz que reporta a telemetría
+        cualquier excepción no esperada y emite `UiState.Error` o
+        `UiEffect.ShowError`.
+  · UiState: data class inmutable con sub-estados (loading, error, content).
+    Preferir sealed para el modo:
+        sealed interface UiState {
+          data object Loading : UiState
+          data class Error(val error: UiError) : UiState
+          data class Content(val items: List<ProductoUi>) : UiState
+        }
+  · UiEvent: sealed interface con acciones del usuario (incluye `Retry`).
+  · UiEffect: sealed interface con efectos one-shot (incluye
+    `ShowSnackbar(uiError)`).
+  · Composable Route (con ViewModel) → Composable Screen (puro) → Composables
+    granulares del design system.
+
+Comunicación entre módulos
+  · Solo a través de interfaces expuestas en módulos `:*:api`.
+  · Las implementaciones viven en módulos `:*:impl` y se inyectan con Hilt
+    `@Binds`.
+
+────────────────────────────────────────────────────────────────────────────────
+4. MODULARIZACIÓN
+────────────────────────────────────────────────────────────────────────────────
+
+Estructura propuesta (Gradle modules, kotlin-dsl):
+
+  :app                                  → ensamblaje, NavHost raíz, Hilt App.
+
+  :core
+    :core:design-system                 → tokens, tema, componentes UI.
+    :core:ui                            → utilidades Compose comunes
+                                          (modifiers, extensions, previews,
+                                          composables de error/empty/loading).
+    :core:common                        → dispatchers, Either helpers,
+                                          extensions Kotlin.
+    :core:error                         → DomainError, UiError, ErrorMapper
+                                          base, contratos de reportería.
+    :core:network                       → OkHttp/Retrofit base, interceptors,
+                                          certificate pinning, BuildConfig
+                                          de endpoints, NetworkErrorMapper.
+    :core:database                      → Room base, encriptación, migrations,
+                                          DatabaseErrorMapper.
+    :core:datastore                     → DataStore encriptado.
+    :core:analytics                     → contrato Analytics + impl Datadog/
+                                          Firebase.
+    :core:security                      → biometría, anti-screenshot, root
+                                          detection, secret obfuscation.
+    :core:testing                       → utilidades de test compartidas
+                                          (fakes, rules, dispatchers test,
+                                          builders de DomainError/UiError).
+
+  :features
+    :features:products
+      :features:products:api            → interfaces y modelos públicos.
+      :features:products:domain         → entities + usecases + repo
+                                          interface.
+      :features:products:data           → repo impl + Retrofit + Room.
+      :features:products:presentation   → ViewModels + UiState + Composables
+                                          Route + Screen.
+    :features:favorites
+      (misma estructura: api / domain / data / presentation)
+    :features:profile
+      (misma estructura)
+    :features:auth                      → login biométrico, gestión de sesión.
+
+  :build-logic                          → convention plugins Gradle
+                                          (android-library, android-feature,
+                                          android-test, jacoco, detekt).
+
+Reglas de dependencias
+  · :app depende de :features:*:presentation y :core:*.
+  · :features:*:presentation depende de :features:*:domain y :core:*.
+  · :features:*:data depende de :features:*:domain y :core:network/database/
+    error.
+  · :features:*:domain depende SOLO de :core:common y :core:error.
+  · Nunca dependencias circulares. Validar con un script Gradle o regla de
+    Detekt/Konsist.
+
+────────────────────────────────────────────────────────────────────────────────
+5. DESIGN SYSTEM (estética Mango)
+────────────────────────────────────────────────────────────────────────────────
+
+Inspiración visual
+  · mangofashiongroup.com — minimalismo editorial, tipografía sans/serif
+    fina, mucho espacio en blanco, fotografía protagonista, transiciones
+    suaves.
+
+Tokens (en :core:design-system)
+  · MangoColors:
+      neutro_blanco = #FFFFFF
+      neutro_hueso  = #F5F1EC
+      neutro_arena  = #E6DED3
+      neutro_piedra = #B8AEA2
+      neutro_grafito= #2B2B2B
+      neutro_negro  = #0A0A0A
+      acento_oro    = #B08D57
+      acento_rojo   = #8B1E1E
+      semantico_exito  = #2E7D32
+      semantico_error  = #B00020
+      semantico_aviso  = #B26500
+    Variantes claro/oscuro con `lightColorScheme` y `darkColorScheme`.
+
+  · MangoTypography:
+      display, h1, h2, h3, titleLarge, titleMedium, bodyLarge, bodyMedium,
+      bodySmall, label, caption. Fuente principal: serif elegante
+      (Playfair, Cormorant o similar) para titulares; sans-serif fina
+      (Inter, Manrope) para cuerpo.
+
+  · MangoSpacing:
+      xxs=4, xs=8, sm=12, md=16, lg=24, xl=32, xxl=48, xxxl=64.
+
+  · MangoShapes:
+      none=0, sm=4, md=8, lg=16, pill=50%.
+
+  · MangoElevations: 0, 1, 2, 4, 8 dp.
+
+  · MangoMotion:
+      easings (StandardEasing, EmphasizedEasing), durations
+      (fast=150ms, medium=300ms, slow=500ms).
+
+Componentes (todos parametrizables, con preview de cada estado)
+  · MangoButton (Primary, Secondary, Outline, Text, Destructive) — tamaños
+    (Small, Medium, Large), estados (idle, loading, pressed, disabled),
+    icono opcional izquierda/derecha.
+  · MangoTextField (Outlined, Filled, Underlined) — leading/trailing icons,
+    helper, error state, supporting text, contadores, password toggle.
+  · MangoLabel / MangoText (variantes de typography).
+  · MangoCard (Elevated, Filled, Outlined).
+  · MangoProductCard (composición del design system para producto).
+  · MangoIconButton, MangoIcon.
+  · MangoChip (Filter, Assist, Input, Suggestion).
+  · MangoDivider.
+  · MangoTopAppBar (Centered, Small, Medium, Large) con scroll behavior.
+  · MangoBottomBar / MangoNavigationBar.
+  · MangoDialog, MangoBottomSheet.
+  · MangoLoadingIndicator (circular, lineal, skeleton shimmer).
+  · MangoEmptyState, MangoErrorState (recibe UiError + onRetry).
+  · MangoBadge (para contador de favoritos).
+  · MangoSnackbar (con severidad: info, success, warning, error).
+  · MangoOfflineBanner (banner persistente cuando no hay red).
+
+Cada componente acompañado de:
+  · `@Preview` claro y oscuro.
+  · `@Preview` por cada estado.
+  · Test de snapshot con Paparazzi/Roborazzi.
+
+────────────────────────────────────────────────────────────────────────────────
+6. SEGURIDAD
+────────────────────────────────────────────────────────────────────────────────
+
+6.1 Anti-ingeniería inversa
+    · R8 con reglas agresivas: `-allowaccessmodification`,
+      `-repackageclasses`, `-overloadaggressively`.
+    · ProGuard rules específicas por módulo en `consumer-rules.pro`.
+    · Ofuscación de strings sensibles: mover a NDK (C/C++) o usar
+      `StringFog`/`Paranoid` plugin.
+    · DEX shrinking en release.
+    · Documentar lo que NO se ofusca (Compose, Hilt, Retrofit interfaces)
+      y por qué.
+
+6.2 Detección de root/jailbreak
+    · Integrar RootBeer + checks propios (build tags, magisk, su binary).
+    · Detección de emulador en producción.
+    · Política configurable: bloquear, advertir, o solo loggear.
+    · Implementar en `:core:security` con interfaz `IntegrityChecker`.
+
+6.3 Anti-screenshot
+    · `FLAG_SECURE` configurable por pantalla vía un Composable
+      `SecureScreen { content }` que aplica el flag al window de la
+      Activity.
+    · Aplicar a Profile y a cualquier pantalla con datos sensibles.
+
+6.4 Autenticación biométrica fuerte
+    · BiometricPrompt con `BIOMETRIC_STRONG`.
+    · Fallback a PIN/contraseña del dispositivo solo si está disponible.
+    · Re-autenticación tras tiempo de inactividad configurable.
+    · Vinculación a Keystore: las claves criptográficas que protegen tokens
+      requieren autenticación biométrica reciente.
+
+6.5 Protección de servicios web
+    · Certificate pinning con OkHttp `CertificatePinner` (pines primario +
+      backup).
+    · `network_security_config.xml` con dominios permitidos y pins.
+    · No claves de Amplify en código: usar AWS Cognito Identity Pool +
+      roles IAM o un BFF (Backend for Frontend) que firme requests; si no
+      es posible, mover claves al backend o usar tokens efímeros.
+    · TLS 1.2+ mínimo.
+    · OkHttp interceptor que firma requests con HMAC (si aplica).
+
+6.6 Almacenamiento seguro
+    · Room cifrado con SQLCipher.
+    · EncryptedSharedPreferences / EncryptedDataStore para tokens.
+    · Android Keystore para claves de cifrado.
+    · No PII en logs en release.
+
+6.7 Hardening adicional
+    · Validar firma APK en runtime (anti-tampering).
+    · Detección de debugger en release (`Debug.isDebuggerConnected`).
+    · Hooks anti-Frida/Xposed (best effort).
+    · Documentar todo en `docs/seguridad.md` con threat model.
+
+────────────────────────────────────────────────────────────────────────────────
+7. MANEJO DE ERRORES (estrategia profesional, transversal)
+────────────────────────────────────────────────────────────────────────────────
+
+7.1 Principios
+    · Errores explícitos y tipados — nunca strings ni excepciones genéricas
+      filtradas a la UI.
+    · Cada capa habla SU propio idioma de errores; los traduce al pasar a
+      la siguiente capa.
+    · Fail-fast en bugs (precondiciones con `require`/`check`); fail-soft
+      en errores esperados (red, validación, BD).
+    · Telemetría obligatoria: todo error mapeado se loguea con contexto
+      (module, useCase, code, sessionId), SIN PII.
+    · Los mensajes para el usuario son cortos, claros, accionables y
+      localizados.
+
+7.2 Modelo de DomainError (en `:core:error` y/o `:domain` por feature)
+
+    sealed interface DomainError {
+      val cause: Throwable?
+      sealed interface Network : DomainError {
+        data class NoConnection(override val cause: Throwable? = null) : Network
+        data class Timeout(override val cause: Throwable? = null) : Network
+        data class Server(val httpCode: Int, override val cause: Throwable? = null) : Network
+        data class Unauthorized(override val cause: Throwable? = null) : Network
+        data class Forbidden(override val cause: Throwable? = null) : Network
+        data class NotFound(override val cause: Throwable? = null) : Network
+        data class Parsing(override val cause: Throwable? = null) : Network
+      }
+      sealed interface Database : DomainError {
+        data class ReadFailed(override val cause: Throwable? = null) : Database
+        data class WriteFailed(override val cause: Throwable? = null) : Database
+        data class NotFound(override val cause: Throwable? = null) : Database
+        data class IntegrityViolation(override val cause: Throwable? = null) : Database
+      }
+      sealed interface Security : DomainError {
+        data object BiometricUnavailable : Security { override val cause = null }
+        data object BiometricLockout    : Security { override val cause = null }
+        data object RootDetected        : Security { override val cause = null }
+        data object IntegrityFailed     : Security { override val cause = null }
+        data object SessionExpired      : Security { override val cause = null }
+      }
+      data class Validation(val fields: Map<String, String>) : DomainError {
+        override val cause: Throwable? = null
+      }
+      data class Unknown(override val cause: Throwable? = null) : DomainError
+    }
+
+7.3 Wrapper de resultado
+    · Usar Arrow `Either<DomainError, T>` en domain (preferido) o un
+      `sealed class DomainResult<out T>` propio si se evita Arrow.
+    · Composición con `fold`, `map`, `flatMap` — prohibido `when` exhaustivo
+      anidado salvo en la frontera de presentación.
+    · Para flujos: `Flow<Either<DomainError, T>>`.
+    · Decisión registrada en `docs/adr/0001-manejo-errores.md`.
+
+7.4 Mapeo de excepciones (frontera data)
+    · Centralizado en `NetworkErrorMapper` y `DatabaseErrorMapper`.
+    · Reglas mínimas:
+        IOException, UnknownHostException        → Network.NoConnection
+        SocketTimeoutException, TimeoutException → Network.Timeout
+        HttpException(401)                       → Network.Unauthorized
+        HttpException(403)                       → Network.Forbidden
+        HttpException(404)                       → Network.NotFound
+        HttpException(in 500..599)               → Network.Server(code)
+        SerializationException                   → Network.Parsing
+        SQLiteConstraintException                → Database.IntegrityViolation
+        SQLiteException                          → Database.ReadFailed/WriteFailed
+        cualquier otra                           → Unknown(cause)
+    · Cada repositorio envuelve sus llamadas con un helper único:
+        suspend fun <T> safeApiCall(block: suspend () -> T): Either<DomainError, T>
+        suspend fun <T> safeDbCall(block: suspend () -> T): Either<DomainError, T>
+    · Tests de mapper por cada rama.
+
+7.5 UiError (capa de presentación)
+    · `UiError` es una data class diseñada para UI:
+
+        data class UiError(
+          @StringRes val messageRes: Int,
+          val severity: Severity,           // Info, Warning, Blocking, Fatal
+          val actions: List<UiErrorAction>, // Retry, Dismiss, Login, OpenSettings
+          val errorCode: String,            // p.ej. "NET-401", para soporte
+        ) {
+          enum class Severity { Info, Warning, Blocking, Fatal }
+          sealed interface UiErrorAction {
+            data object Retry : UiErrorAction
+            data object Dismiss : UiErrorAction
+            data object Login : UiErrorAction
+            data object OpenSettings : UiErrorAction
+          }
+        }
+
+    · `DomainErrorToUiErrorMapper` convierte cada `DomainError` en `UiError`
+      con `messageRes` localizable (`R.string.error_red_sin_conexion`,
+      `R.string.error_servidor`, etc.).
+    · La UI NUNCA recibe un `DomainError` ni un `Throwable`.
+
+7.6 Estados de error en UI
+    · `UiState.Error(uiError)` para fallos bloqueantes de pantalla → render
+      `MangoErrorState(uiError, onRetry)`.
+    · `UiEffect.ShowSnackbar(uiError)` para errores no bloqueantes →
+      `MangoSnackbar` con severidad y acción.
+    · `MangoOfflineBanner` global cuando no hay red (escucha
+      `ConnectivityObserver` de `:core:network`).
+    · Distinguir SIEMPRE Empty de Error.
+    · Botón Retry visible y accionable en cualquier `UiState.Error`
+      recuperable.
+
+7.7 Reintentos y resiliencia (data)
+    · OkHttp `Interceptor` con backoff exponencial para errores transitorios
+      (timeouts, 5xx) — máx. 3 intentos, jitter incluido.
+    · No reintentar 4xx (excepto 408, 429 con `Retry-After`).
+    · Circuit breaker simple para endpoints repetidamente caídos.
+    · Operaciones idempotentes solamente; las no idempotentes (POST sin
+      idempotency-key) NO se reintentan.
+
+7.8 Coroutines y excepciones
+    · `CoroutineExceptionHandler` raíz en cada ViewModel — reporta a
+      telemetría y emite `UiState.Error(Unknown)`.
+    · `SupervisorJob` en `viewModelScope` para que un hijo fallido no
+      cancele hermanos.
+    · Cancelación cooperativa: `ensureActive()` antes de operaciones
+      costosas.
+    · NUNCA `try/catch` genérico en domain — solo en frontera data y en
+      handlers raíz.
+
+7.9 Errores de seguridad y autenticación
+    · 401 / `SessionExpired` → invalidar sesión, lanzar `UiEffect.NavigateTo
+      (LoginBiometrico)`.
+    · 403 → mensaje genérico ("No tienes permiso"), no revelar existencia
+      del recurso.
+    · `BiometricLockout` → bloqueo con cuenta atrás; tras N fallos exigir
+      credencial del dispositivo.
+    · `RootDetected` / `IntegrityFailed` → política configurable
+      (block / warn / log) decidida en `IntegrityPolicy`.
+
+7.10 Reportería y observabilidad de errores
+     · Todo `DomainError` (excepto `Validation` y `BiometricLockout`
+       esperados) se reporta como NON-FATAL a Firebase Crashlytics.
+       Datadog Logs es destino OPCIONAL solo si está disponible (R0.12).
+     · Tags estándar (Crashlytics custom keys): `module`, `useCase`,
+       `errorType`, `errorCode`, `httpCode?`, `sessionId`, `flavor`,
+       `appVersion`.
+     · Rate-limit por `errorCode` para no saturar telemetría (máx. N por
+       minuto).
+     · Errores fatales (uncaught) → Crashlytics con symbolication subida en
+       el job de release.
+     · NUNCA loguear: tokens, contraseñas, datos biométricos, PII de perfil.
+
+7.11 Internacionalización de mensajes
+     · Todo mensaje al usuario vive en `res/values/strings.xml` y
+       `res/values-en/strings.xml`.
+     · Convención: `error_<dominio>_<causa>` (ej.
+       `error_red_sin_conexion`, `error_red_servidor`,
+       `error_bd_lectura`).
+     · Plurales con `<plurals>` y formatos por locale.
+
+7.12 Validación de datos (entrada del usuario)
+     · Validadores en domain: `interface Validator<T> { fun validate(value: T): Either<DomainError.Validation, T> }`.
+     · Composición con `traverse` para validar formularios completos.
+     · La UI muestra el mapa `fields` resaltando inputs y mensajes
+       localizados; el botón submit se deshabilita si hay errores.
+
+7.13 Reglas Detekt específicas para errores
+     · Prohibir `catch (e: Exception)` y `catch (e: Throwable)` salvo en
+       barreras documentadas (mappers, CoroutineExceptionHandler raíz, init
+       de SDK) — anotar con `@SuppressWithReason`.
+     · Prohibir `runCatching` en repositorios y usecases sin un `.fold` que
+       devuelva `Either<DomainError, T>`.
+     · Prohibir lanzar `RuntimeException`/`IllegalStateException` desde
+       domain salvo precondiciones (`require`/`check`).
+     · Prohibir uso de `throwable.message` en Composables.
+     · Prohibir strings hardcoded en `MangoErrorState`, `MangoSnackbar`,
+       diálogos — debe pasarse por `stringResource`.
+
+7.14 Tests de errores (obligatorio por módulo)
+     · UseCase: happy path + UN test por cada `DomainError` que pueda
+       devolver.
+     · Repository: con MockWebServer simular 200, 4xx, 5xx, JSON inválido,
+       timeout, sin red. Con InMemoryRoom simular constraint violation.
+     · ViewModel con Turbine: verificar transición Loading → Error
+       (con UiError correcto) y que `Retry` produce Loading → Content/Error.
+     · Snapshot tests del `MangoErrorState`, `MangoSnackbar` y
+       `MangoOfflineBanner` para cada severidad.
+
+7.15 Skill de auditoría
+     · El skill `validar-manejo-errores` (§13) audita todo lo anterior y
+       reporta violaciones por archivo:línea.
+
+────────────────────────────────────────────────────────────────────────────────
+8. OBSERVABILIDAD Y ANÁLISIS (suite gratuita por defecto)
+────────────────────────────────────────────────────────────────────────────────
+
+Stack obligatorio (gratis): Firebase Crashlytics + Analytics + Performance.
+Stack opcional (solo si la empresa lo provee): Datadog Mobile RUM/Logs/APM.
+Alternativa opcional gratis: Sentry.
+
+8.1 Telemetría base (Firebase, GRATIS)
+    · Firebase Performance Monitoring: traces de red (HttpMetric) y
+      arranque automático; custom traces para flujos críticos (carga de
+      productos, toggle de favorito).
+    · Firebase Analytics: eventos de producto (ver 8.4).
+    · Aislar todo detrás de la interfaz `Telemetry` en `:core:analytics`
+      para poder cambiar de proveedor sin tocar features.
+
+8.2 Crashes y errores no fatales (Firebase Crashlytics, GRATIS)
+    · `setUserId` tras login (hash anonimizado del id, NUNCA el id real).
+    · Custom keys: `flavor`, `appVersion`, `buildNumber`, `device`,
+      `sessionId`.
+    · Receptor de `DomainError` no fatales (ver §7.10) →
+      `FirebaseCrashlytics.recordException(...)` con los tags estándar.
+    · Subida de mapping files de R8/ProGuard automatizada en el workflow
+      de release.
+
+8.3 Análisis estático y cobertura (gratis, en CI)
+    · Detekt + ktlint en cada PR (obligatorio, gratis y local).
+    · Kover genera reporte de cobertura unificado por módulo.
+    · SonarQube/SonarCloud son OPCIONALES (ver R0.12):
+        - SonarCloud gratis solo si el repo es público.
+        - SonarQube Community Edition self-hosted como alternativa.
+        - Si ninguno está disponible, basta con Detekt + Kover + Konsist
+          + las reglas custom; documentar la decisión en
+          `docs/observabilidad.md`.
+    · Quality gate equivalente (manual o vía Sonar):
+        bugs=0, vulnerabilities=0, coverage>=75%, duplication<=3%,
+        smells por debajo del umbral del baseline de Detekt.
+
+8.4 Métricas de producto (Firebase Analytics, GRATIS)
+    · Eventos clave: `product_viewed`, `product_favorited`,
+      `product_unfavorited`, `profile_viewed`, `login_success`,
+      `login_failure`.
+    · Interface única `EventTracker` con impls: `FirebaseAnalyticsTracker`,
+      `ConsoleTracker` (debug). `DatadogTracker` y `SentryTracker`
+      opcionales solo si están disponibles.
+
+8.5 Logging (Timber)
+    · `DebugTree` solo en debug; en release un `CrashlyticsTree` que
+      envía errores no fatales y respeta R0.12 (no PII).
+    · Tag por módulo para facilitar filtrado.
+
+────────────────────────────────────────────────────────────────────────────────
+9. CI/CD (gratis por defecto)
+────────────────────────────────────────────────────────────────────────────────
+
+Pipeline PRINCIPAL: GitHub Actions (gratis — ilimitado en repos públicos,
+2000 min/mes en privados). Espejo OPCIONAL: Azure Pipelines (1800 min/mes
+free). Bitrise queda OPCIONAL solo si la empresa lo provee (R0.12).
+
+Workflows (archivos `.github/workflows/*.yml`)
+  · `pr.yml`: detekt, ktlint, unit tests, Kover, snapshot tests, build
+    debug. Subir reporte de cobertura como artifact. SonarCloud SOLO si
+    el repo es público.
+  · `main.yml`: todo lo anterior + instrumentation tests en Firebase Test
+    Lab (cuota gratis), build de staging, deploy a Firebase App
+    Distribution (gratis).
+  · `release.yml`: build signed release, subida a Google Play Internal
+    Testing, subida de mapping files a Crashlytics (gratis), crear tag y
+    release notes automáticas.
+
+Caché
+  · `actions/cache` para `~/.gradle/caches` y `~/.gradle/wrapper`.
+  · KSP/Kotlin build cache habilitado.
+
+Secretos (GitHub Actions Secrets, gratis)
+  · `KEYSTORE_B64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
+  · `FIREBASE_SERVICE_ACCOUNT_JSON` (App Distribution + Crashlytics +
+    Test Lab).
+  · `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` para subir a Play Console.
+  · `SONAR_TOKEN` solo si Sonar está activo (opcional).
+  · `DATADOG_*` solo si Datadog está activo (opcional).
+
+Distribución
+  · Firebase App Distribution para builds internos (gratis, ilimitado).
+  · Google Play Internal Testing para release candidates.
+
+Versioning
+  · `versionCode` autogenerado desde el número de run de GitHub Actions
+    (`github.run_number`).
+  · `versionName` desde tag git (semver: `v1.2.3` → `1.2.3`).
+
+Documentación obligatoria
+  · `docs/ci-cd.md` explica:
+      - Cómo regenerar y rotar cada secreto.
+      - Cómo correr cada workflow localmente con `act`.
+      - Mapeo Bitrise → GitHub Actions por si la empresa exige Bitrise.
+
+────────────────────────────────────────────────────────────────────────────────
+10. CALIDAD DE CÓDIGO
+────────────────────────────────────────────────────────────────────────────────
+
+  · Detekt con baseline; reglas personalizadas:
+      - prohibir `viewModel()` o `hiltViewModel()` dentro de Composables
+        que no estén en paquete `route`.
+      - prohibir uso directo de `androidx.compose.material3.Button` fuera
+        de `:core:design-system`.
+      - prohibir import de DTO/Entity fuera de su capa.
+      - reglas de §7.13 sobre manejo de errores.
+  · ktlint con config de Mango (4 espacios, max line 120, trailing comma).
+  · Konsist (o ArchUnit-Kotlin) para reglas de arquitectura: validar
+    direcciones de dependencias y separación de capas.
+  · Pre-commit hooks (Lefthook): ktlint format + detekt + tests rápidos.
+
+────────────────────────────────────────────────────────────────────────────────
+11. TESTING
+────────────────────────────────────────────────────────────────────────────────
+
+11.1 Pruebas unitarias (por módulo)
+     · domain: 100% de usecases, sin mocks innecesarios; happy path + cada
+       rama de error.
+     · data: repositorios con MockWebServer + InMemoryRoom; mappers con
+       tests por cada rama (§7.14).
+     · presentation: ViewModels con `runTest`, Turbine para StateFlow,
+       cubrir Loading/Error/Content/Retry.
+
+11.2 Snapshot tests (design system)
+     · Paparazzi/Roborazzi por componente, claro y oscuro, cada estado
+       (incluye estados de error, snackbar, banner offline).
+
+11.3 UI tests
+     · Compose UI test por pantalla (smoke + flujo principal + flujo de
+       error con Retry).
+
+11.4 Instrumentation tests (extra)
+     · Espresso para flujo: abrir app → listar productos → marcar favorito
+       → cerrar/abrir → favorito persiste.
+     · Hilt test runner.
+
+11.5 Cobertura
+     · Kover global con merge de módulos.
+     · Umbrales: domain 90%, data 80%, presentation 70%, design-system
+       (cobertura medida por snapshot).
+
+────────────────────────────────────────────────────────────────────────────────
+12. DOCUMENTACIÓN
+────────────────────────────────────────────────────────────────────────────────
+
+Por proyecto (raíz `/docs`)
+  · `arquitectura.md` — diagrama de capas y módulos.
+  · `seguridad.md` — threat model y controles.
+  · `manejo-errores.md` — modelo, mappers, política de reintentos,
+    convenciones de mensajes.
+  · `observabilidad.md` — qué se mide y dónde.
+  · `ci-cd.md` — pipelines y secretos.
+  · `guia-contribucion.md` — Conventional Commits, ramas, PRs.
+  · `adr/` — Architecture Decision Records numerados.
+      - `0001-manejo-errores.md`
+      - `0002-modularizacion.md`
+      - `0003-design-system.md`
+      - …
+
+Por módulo (`/<modulo>/docs`)
+  · `modulo.md` — propósito, contratos públicos, dependencias.
+  · `diseno.md` — wireframes/diagramas si aplica.
+  · `pruebas.md` — qué se testea y cómo ejecutarlo.
+  · `errores.md` — qué `DomainError` puede emitir y por qué.
+
+Toda la documentación en ESPAÑOL.
+
+────────────────────────────────────────────────────────────────────────────────
+13. SKILLS A CREAR ANTES DE PROGRAMAR (PRIORIDAD MÁXIMA)
+────────────────────────────────────────────────────────────────────────────────
+
+Ubicación: `.claude/skills/<nombre-skill>/SKILL.md`
+Cada skill incluye descripción YAML frontmatter y un cuerpo con
+instrucciones detalladas + plantillas. Todos los outputs de los skills
+están en español.
+
+PROCEDIMIENTO OBLIGATORIO DE CREACIÓN (R0.13)
+  Cada uno de los 7 skills se genera invocando el skill
+  `example-skills:skill-creator` (plugin instalado).
+
+  Por cada skill a crear:
+    1. Invocar `example-skills:skill-creator` con un brief que incluya:
+         - Nombre exacto del skill (kebab-case, en español).
+         - Descripción una-línea (qué hace, cuándo dispararlo).
+         - Triggers / cuándo Claude debe invocarlo.
+         - Inputs esperados.
+         - Outputs esperados (archivos, ubicación).
+         - Restricciones de idioma (siempre español) y de arquitectura
+           (referenciar §0, §3, §7 cuando aplique).
+         - Plantillas que el skill debe contener internamente.
+    2. Revisar el `SKILL.md` generado: validar frontmatter (`name`,
+       `description`), longitud y especificidad de la descripción
+       (debe disparar correctamente sin falsos positivos).
+    3. Si el skill creado no cumple los criterios listados abajo,
+       iterar con `skill-creator` (modo "edit/optimize") hasta que sí.
+    4. Ejecutar el skill en un caso de prueba antes de darlo por
+       terminado.
+    5. Hacer commit del skill con `feat(skills): añade skill <nombre>`.
+
+  PROHIBIDO escribir manualmente el `SKILL.md` de un skill sin pasar por
+  `skill-creator`. PROHIBIDO inventar la estructura del archivo.
+
+SKILL 1 — `crear-modulo`
+  Propósito: scaffolding completo de un nuevo módulo de feature siguiendo
+  la estructura api/domain/data/presentation, build.gradle.kts por
+  convención plugin, paquetes vacíos correctos, Hilt module stub, README
+  del módulo, y stubs de test en cada submódulo. Incluye stubs de
+  ErrorMapper y registro de DomainError específicos del módulo.
+  Inputs: nombre del módulo, tipo (feature o core), dependencias iniciales.
+  Outputs: árbol de archivos creado y registro en `settings.gradle.kts`.
+
+SKILL 2 — `crear-vista`
+  Propósito: generar una pantalla Compose con:
+    · Composable puro `XxxScreen(state, onEvent)` SIN ViewModel.
+    · Composable wrapper `XxxRoute(viewModel = hiltViewModel())`.
+    · `XxxUiState` (sealed interface incluyendo `Error(uiError)`).
+    · `XxxUiEvent` (sealed interface incluyendo `Retry`).
+    · `XxxUiEffect` (incluye `ShowSnackbar(uiError)` cuando aplique).
+    · `@Preview` por cada estado (Loading, Empty, Error, Content) en
+      claro y oscuro.
+    · Uso obligatorio de componentes de `:core:design-system`
+      (`MangoErrorState`, `MangoLoadingIndicator`, etc.).
+    · Stub de test Compose y snapshot.
+  Validar antes de escribir: si el Composable de UI importa `hiltViewModel`,
+  `viewModel`, `DomainError` o `Throwable`, RECHAZAR y corregir.
+
+SKILL 3 — `validar-arquitectura`
+  Propósito: auditar el repositorio y reportar violaciones:
+    · Composables de feature importando ViewModel directamente.
+    · Capa data exponiendo DTOs/Entities a presentation.
+    · Comunicación entre módulos sin pasar por `:api`.
+    · UseCases con lógica de UI o de framework Android.
+    · Imports prohibidos (Material3 fuera del design-system).
+    · Reglas de dependencia entre módulos.
+  Outputs: informe en español con lista de violaciones, archivo:línea, y
+  sugerencia de corrección.
+  Ejecutar tras cada feature.
+
+SKILL 4 — `crear-pruebas-unitarias`
+  Propósito: para un módulo dado, generar:
+    · Tests de UseCases (cubrir happy path + cada `DomainError` posible).
+    · Tests de Repository con MockWebServer e InMemoryRoom (incluye casos
+      de timeout, 4xx, 5xx, JSON inválido, sin red).
+    · Tests de Mappers (DTO↔Domain, Entity↔Domain, Throwable→DomainError,
+      DomainError→UiError).
+    · Tests de ViewModel con Turbine y dispatcher de test, cubriendo
+      Loading/Error/Content/Retry.
+    · Snapshot tests para Composables del design system (incluye estados
+      de error).
+  Reportar cobertura esperada y comandos para ejecutar.
+
+SKILL 5 — `documentar-modulo`
+  Propósito: por cada módulo, generar en `/<modulo>/docs/`:
+    · `modulo.md` — propósito, contratos, ejemplos de uso, dependencias.
+    · `diseno.md` — capas, decisiones, diagramas en mermaid.
+    · `pruebas.md` — estrategia de testing y comandos.
+    · `errores.md` — `DomainError` que el módulo puede emitir, mapeo a
+      `UiError`, mensajes localizados.
+  Lenguaje: español. Formato consistente; usar plantillas del skill.
+
+SKILL 6 — `prompts-de-diseno`
+  Propósito: para cada Composable de pantalla, generar un prompt de
+  generación de imagen (compatible con generadores tipo Midjourney,
+  Stable Diffusion, DALL·E) que describa:
+    · Estilo Mango (paleta, tipografía, composición).
+    · Layout exacto de la pantalla en su estado de contenido.
+    · Variantes solicitadas (claro/oscuro, móvil, tablet).
+  Outputs: archivos en `/docs/diseno/prompts/<pantalla>.md`, uno por
+  estado, todos en español.
+
+SKILL 7 — `validar-manejo-errores`
+  Propósito: auditar el repositorio y reportar:
+    · Repositorios sin `safeApiCall` / `safeDbCall` (o equivalente).
+    · UseCases que devuelven tipos crudos en vez de `Either<DomainError, T>`.
+    · Composables que muestran `throwable.message` o reciben `DomainError`.
+    · `try/catch` genérico fuera de las barreras permitidas (mappers,
+      CoroutineExceptionHandler raíz, init de SDK).
+    · Strings de error hardcoded (deben usar `stringResource`).
+    · UseCases sin tests por cada rama de `DomainError`.
+    · `runCatching` sin `.fold` a `Either`.
+    · Falta de `CoroutineExceptionHandler` en algún `viewModelScope`
+      crítico.
+    · Mappers `Throwable → DomainError` o `DomainError → UiError` sin
+      tests para cada rama.
+  Outputs: informe en español con archivo:línea y corrección sugerida.
+  Ejecutar tras cada PR de feature.
+
+Todos los skills se invocan vía la herramienta Skill de Claude Code y se
+usan obligatoriamente durante el desarrollo. Antes de cualquier código
+de feature, ejecutar los skills correspondientes.
+
+────────────────────────────────────────────────────────────────────────────────
+14. PLAN POR ETAPAS (ejecutar EN ORDEN)
+────────────────────────────────────────────────────────────────────────────────
+
+ETAPA 0 — Preparación (un solo PR)
+  0.1 Crear los 7 skills (§13) usando OBLIGATORIAMENTE el skill
+      `example-skills:skill-creator` (R0.13). Validar cada uno con un
+      caso de prueba antes de continuar.
+  0.2 Ejecutar `/speckit-constitution` y registrar como principios:
+      Clean+MVVM, vistas sin VM, idioma español, modularización, Design
+      System primero, seguridad, errores tipados, observabilidad solo con
+      tier gratuito (R0.12), testing por módulo.
+  0.3 Configurar Gradle build-logic con convention plugins.
+  0.4 Configurar Detekt (incluyendo reglas de §7.13), ktlint, Konsist,
+      Kover.
+  0.5 Crear estructura de carpetas vacía de módulos.
+  0.6 Documentar arquitectura en `/docs/arquitectura.md`.
+  0.7 Crear `docs/adr/0001-manejo-errores.md` con la decisión de Either +
+      DomainError.
+  0.8 Crear `docs/adr/0002-stack-tier-gratuito.md` registrando la
+      decisión de R0.12 (qué se usa, qué se omite, alternativas
+      opcionales).
+  Entregable: repo con scaffolding modular, calidad configurada, skills
+  listos (creados vía skill-creator).
+
+ETAPA 1 — Núcleo (core modules)
+  1.1 `:core:common` — dispatchers, Either helpers, extensions.
+  1.2 `:core:error` — DomainError, UiError, ErrorMapper base, contratos
+      de reportería; `safeApiCall`/`safeDbCall`; tests por rama.
+  1.3 `:core:design-system` — tokens, tema, componentes con previews +
+      snapshot tests (incluye `MangoErrorState`, `MangoSnackbar`,
+      `MangoOfflineBanner`).
+  1.4 `:core:ui` — utilidades Compose; composables auxiliares
+      `ErrorContent`, `EmptyContent`, `LoadingContent`.
+  1.5 `:core:network` — Retrofit, OkHttp, interceptors, certificate
+      pinning, BuildConfig por flavor, `NetworkErrorMapper` con tests,
+      interceptor de retry con backoff (§7.7), `ConnectivityObserver`.
+  1.6 `:core:database` — Room base + SQLCipher + `DatabaseErrorMapper`.
+  1.7 `:core:datastore` — DataStore encriptado.
+  1.8 `:core:analytics` — interfaz `Telemetry` + `EventTracker`;
+      implementaciones Firebase (obligatoria, gratis) y Console (debug).
+      Datadog/Sentry SOLO como impls opcionales detrás de flag (R0.12).
+      Receptor de DomainError no fatales → Crashlytics.
+  1.9 `:core:security` — biometría, anti-screenshot, root detection.
+  1.10 `:core:testing` — utilidades de test, builders de DomainError/
+       UiError.
+  Para cada uno: skill `crear-modulo` → spec/plan/tasks → implement →
+  pruebas unitarias → documentación → `validar-arquitectura` +
+  `validar-manejo-errores`.
+
+ETAPA 2 — Auth
+  2.1 Pantalla de login biométrico con `BiometricPrompt`.
+  2.2 Manejo de sesión y rotación de claves.
+  2.3 Mapeo de errores biométricos a `DomainError.Security.*`.
+  2.4 Tests unitarios y de UI (incluye lockout, unavailable).
+  2.5 Documentación.
+
+ETAPA 3 — Productos
+  3.1 Spec + plan + tasks (`/speckit-*`).
+  3.2 Skill `crear-modulo` → `:features:products`.
+  3.3 Domain: entidad Producto, usecase `ObtenerProductos` devolviendo
+      `Either<DomainError, List<Producto>>`.
+  3.4 Data: Retrofit ProductsApi, ProductoDto, Room cache, mappers,
+      repositorio con Single Source of Truth + `safeApiCall`.
+  3.5 Presentation: ViewModel + UiState (Loading/Error/Empty/Content) +
+      Composables Route/Screen + previews por cada estado + uso del design
+      system (`MangoErrorState` con Retry).
+  3.6 Paging 3 si el endpoint creciera (preparar interfaces para escalar).
+  3.7 Tests de cada rama de error + documentación + `errores.md` del
+      módulo.
+  3.8 Prompts de diseño con skill `prompts-de-diseno`.
+
+ETAPA 4 — Favoritos
+  4.1 Igual estructura que productos.
+  4.2 Persistencia en Room (tabla favoritos vinculada a producto).
+  4.3 Toggle desde pantalla de productos y desde favoritos; feedback
+      mediante `UiEffect.ShowSnackbar` ante error.
+  4.4 Tests de persistencia (cierre/apertura) + ramas de error de BD.
+  4.5 Documentación.
+
+ETAPA 5 — Perfil
+  5.1 Endpoint /users/8 → entidad Usuario.
+  5.2 Mostrar info + contador de favoritos (observado del repo de
+      favoritos por Flow).
+  5.3 Pantalla protegida con `FLAG_SECURE`.
+  5.4 Manejo de `Network.NotFound` con UiState.Error específico.
+  5.5 Tests + documentación.
+
+ETAPA 6 — Navegación raíz y app
+  6.1 NavHost en `:app` con type-safe routes.
+  6.2 BottomBar con Productos, Favoritos, Perfil.
+  6.3 Deep linking básico.
+  6.4 `MangoOfflineBanner` global escuchando `ConnectivityObserver`.
+  6.5 `CoroutineExceptionHandler` raíz en MainActivity → telemetría.
+  6.6 Tests instrumentados end-to-end.
+
+ETAPA 7 — Seguridad reforzada
+  7.1 R8/ProGuard rules afinados.
+  7.2 Ofuscación de strings y secrets fuera del binario.
+  7.3 Network Security Config + Certificate Pinning real.
+  7.4 Threat model documentado en `docs/seguridad.md`.
+
+ETAPA 8 — Observabilidad (stack gratis)
+  8.1 Firebase Crashlytics + receptor de DomainError no fatales (§7.10).
+  8.2 Firebase Analytics con eventos clave (§8.4).
+  8.3 Firebase Performance Monitoring (HttpMetric + custom traces).
+  8.4 Rate-limiting de errores ruidosos.
+  8.5 Datadog/Sentry SOLO si están disponibles — documentar la decisión
+      en `docs/observabilidad.md`.
+
+ETAPA 9 — CI/CD (gratis)
+  9.1 `.github/workflows/pr.yml`, `main.yml`, `release.yml` (§9).
+  9.2 Espejo opcional `azure-pipelines.yml`.
+  9.3 Firebase App Distribution para QA interno.
+  9.4 SonarCloud SOLO si el repo es público (opcional).
+  9.5 Documentación `docs/ci-cd.md`.
+
+ETAPA 10 — Pulido y entrega
+  10.1 Skills `validar-arquitectura` y `validar-manejo-errores` finales →
+       cero violaciones.
+  10.2 Cobertura agregada >= 80%.
+  10.3 README raíz con: visión, cómo correr, cómo testear, cómo desplegar.
+  10.4 Vídeo o GIFs de la app (opcional).
+  10.5 Tag v1.0.0 y release notes.
+
+────────────────────────────────────────────────────────────────────────────────
+15. CRITERIOS DE ACEPTACIÓN (DEFINITION OF DONE)
+────────────────────────────────────────────────────────────────────────────────
+
+Una etapa solo se cierra si:
+  · El skill `validar-arquitectura` reporta 0 violaciones.
+  · El skill `validar-manejo-errores` reporta 0 violaciones.
+  · Detekt y ktlint pasan sin warnings.
+  · Cobertura del módulo >= umbral definido.
+  · Cada Composable de vista tiene previews para todos sus estados, en
+    claro y oscuro (incluye estado Error con Retry).
+  · Ningún Composable de vista importa ViewModel, DomainError ni
+    Throwable.
+  · Cada UseCase tiene test por cada rama de DomainError que puede emitir.
+  · Cada mapper (Throwable→DomainError, DomainError→UiError) tiene tests
+    por rama.
+  · Documentación del módulo en español está presente y actualizada
+    (incluye `errores.md`).
+  · CI verde.
+  · PR revisado (auto-review usando `/review` antes de fusionar).
+
+────────────────────────────────────────────────────────────────────────────────
+16. INSTRUCCIONES INMEDIATAS PARA CLAUDE CODE
+────────────────────────────────────────────────────────────────────────────────
+
+A) Confirmar este prompt como contexto vinculante para todo el proyecto.
+B) Generar los 7 skills de §13 usando OBLIGATORIAMENTE el skill
+   `example-skills:skill-creator` (R0.13). Un skill por invocación,
+   validado con caso de prueba antes de pasar al siguiente.
+C) Ejecutar la ETAPA 0 al completo en un único PR.
+D) A partir de ETAPA 1, abrir un PR por módulo, siguiendo el ciclo Spec
+   Kit completo: specify → clarify → plan → tasks → analyze → implement.
+E) Tras cada PR, ejecutar `validar-arquitectura`, `validar-manejo-errores`
+   y `crear-pruebas-unitarias`.
+F) Mantener todos los documentos en español en todo momento.
+G) Para cualquier herramienta o SDK externo: verificar R0.12 (tier
+   gratuito). Si no aplica, usar la alternativa gratuita o marcar como
+   opcional.
+H) Si algo de este prompt entra en conflicto con una instrucción puntual
+   del usuario, preguntar antes de desviarse — este prompt es la
+   constitución del proyecto.
+
+================================================================================
+FIN DEL PROMPT
+================================================================================

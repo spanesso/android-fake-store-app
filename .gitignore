@@ -1,0 +1,6 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Proyecto Android (vive en su propio repo git)
+repository/
