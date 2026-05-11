@@ -1,0 +1,15 @@
+// Módulo :core:{{nombre}} — utilidades transversales reutilizadas por features y otros core.
+// Si requiere Android (Compose, Room, etc.), cambiar a "mango.android.library".
+plugins {
+    id("mango.kotlin.library")
+}
+
+dependencies {
+{{dependenciasGradle}}
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.truth)
+}

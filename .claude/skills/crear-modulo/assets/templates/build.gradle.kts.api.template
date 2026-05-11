@@ -1,0 +1,11 @@
+// Submódulo :features:{{nombre}}:api — contratos públicos del módulo (interfaces y modelos).
+// Solo Kotlin puro; sin Android, sin dependencias de framework.
+plugins {
+    id("mango.kotlin.library")
+}
+
+dependencies {
+    implementation(project(":core:common"))
+    implementation(project(":core:error"))
+{{dependenciasGradle}}
+}

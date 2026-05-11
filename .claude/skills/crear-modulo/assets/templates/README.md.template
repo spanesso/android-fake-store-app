@@ -1,0 +1,31 @@
+# Módulo `{{ruta}}`
+
+{{descripcion}}
+
+## Propósito
+
+Describe la responsabilidad única de esta capa dentro del módulo `{{nombre}}`. Mantenerla acotada y respetar las reglas de §3 y §4 del prompt maestro (Clean Architecture estricta, comunicación inter-módulos vía `:api`).
+
+## Contratos públicos
+
+> Documenta aquí las interfaces que esta capa expone hacia el resto del proyecto. Si la capa es `domain`, lista los casos de uso. Si es `api`, lista los modelos públicos. Si es `data`, no debería exponer nada hacia presentation.
+
+| Contrato | Descripción | Devuelve |
+|---|---|---|
+| _(pendiente)_ | _(pendiente)_ | `Either<DomainError, T>` |
+
+## Dependencias
+
+Dependencias de proyecto declaradas en `build.gradle.kts`. Cualquier cambio debe respetar la matriz de dependencias documentada en `docs/arquitectura.md`.
+
+## Cómo probarlo
+
+```bash
+cd repository/android-fake-store-app
+./gradlew :{{rutaGradle}}:test
+./gradlew :{{rutaGradle}}:koverHtmlReport
+```
+
+## Errores que esta capa puede emitir
+
+Ver `domain/errors/{{Nombre}}Error.kt` para la lista de ramas específicas del módulo. La mensajería al usuario se centraliza en `:core:error` mediante `DomainErrorToUiErrorMapper`.

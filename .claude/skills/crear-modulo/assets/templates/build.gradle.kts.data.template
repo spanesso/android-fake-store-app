@@ -1,0 +1,36 @@
+// Submódulo :features:{{nombre}}:data — implementaciones de repositorios, Retrofit, Room.
+// Frontera de captura de excepciones: mapea Throwable → {{Nombre}}Error mediante safeApiCall / safeDbCall.
+plugins {
+    id("mango.android.library")
+    id("mango.android.hilt")
+}
+
+android {
+    namespace = "com.mango.fakestore.features.{{nombrePaquete}}.data"
+}
+
+dependencies {
+    implementation(project(":core:common"))
+    implementation(project(":core:error"))
+    implementation(project(":core:network"))
+    implementation(project(":core:database"))
+    implementation(project(":features:{{nombre}}:api"))
+    implementation(project(":features:{{nombre}}:domain"))
+
+    implementation(libs.arrow.core)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+{{dependenciasGradle}}
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.truth)
+    testImplementation(libs.mockwebserver)
+    testImplementation(libs.androidx.room.testing)
+}

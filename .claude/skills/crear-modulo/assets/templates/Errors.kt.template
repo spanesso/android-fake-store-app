@@ -1,0 +1,20 @@
+package {{paqueteRaiz}}.domain.errors
+
+import com.mango.fakestore.core.error.DomainError
+
+/**
+ * Errores propios del módulo `{{nombre}}`.
+ *
+ * Cada caso de uso del módulo debe poder devolver únicamente los errores genéricos de
+ * `DomainError` o las ramas específicas listadas aquí. Documentar cada nueva rama con
+ * KDoc explicando bajo qué condición se produce.
+ */
+sealed interface {{Nombre}}Error : DomainError {
+
+    // TODO: cuando aparezcan errores específicos del módulo, declararlos aquí, p. ej.:
+    //
+    // data object NoHayProductos : {{Nombre}}Error { override val cause: Throwable? = null }
+    // data class StockInsuficiente(val productoId: Long) : {{Nombre}}Error {
+    //     override val cause: Throwable? = null
+    // }
+}

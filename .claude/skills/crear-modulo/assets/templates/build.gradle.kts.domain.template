@@ -1,0 +1,21 @@
+// Submódulo :features:{{nombre}}:domain — capa de dominio (entidades, casos de uso, contratos).
+// Pura Kotlin, sin Android, sin framework. Devuelve siempre Either<DomainError, T>.
+plugins {
+    id("mango.kotlin.library")
+}
+
+dependencies {
+    implementation(project(":core:common"))
+    implementation(project(":core:error"))
+    implementation(project(":features:{{nombre}}:api"))
+
+    implementation(libs.arrow.core)
+    implementation(libs.kotlinx.coroutines.core)
+{{dependenciasGradle}}
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+    testImplementation(libs.truth)
+}

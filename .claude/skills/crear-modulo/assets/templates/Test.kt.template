@@ -1,0 +1,18 @@
+package {{paqueteRaiz}}.{{capa}}
+
+import org.junit.Test
+import com.google.common.truth.Truth.assertThat
+
+/**
+ * Smoke test del submódulo `{{ruta}}`.
+ *
+ * Verifica que el módulo compila y que la infraestructura de tests (JUnit + Truth) está
+ * correctamente conectada. Sustituir/ampliar cuando aparezcan clases concretas.
+ */
+class {{Nombre}}{{Capa}}SmokeTest {
+
+    @Test
+    fun `el modulo carga y la infraestructura de test funciona`() {
+        assertThat(true).isTrue()
+    }
+}

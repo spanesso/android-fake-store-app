@@ -1,0 +1,18 @@
+package {{paqueteRaiz}}.{{capa}}.di
+
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+
+/**
+ * Módulo de inyección de dependencias para la capa `{{capa}}` del módulo `{{nombre}}`.
+ *
+ * Aquí se enlazan implementaciones a sus contratos definidos en `:features:{{nombre}}:api` o
+ * `:features:{{nombre}}:domain`. Mantener este módulo libre de lógica de negocio: solo
+ * provee/binda dependencias.
+ */
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class {{Nombre}}{{Capa}}Module {
+    // TODO: añadir @Binds o @Provides cuando se implementen las clases concretas.
+}

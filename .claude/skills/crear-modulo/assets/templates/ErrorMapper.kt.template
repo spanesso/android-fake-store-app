@@ -1,0 +1,41 @@
+package {{paqueteRaiz}}.data.error
+
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import com.mango.fakestore.core.error.DomainError
+import com.mango.fakestore.core.error.NetworkErrorMapper
+import com.mango.fakestore.core.error.DatabaseErrorMapper
+import {{paqueteRaiz}}.domain.errors.{{Nombre}}Error
+
+/**
+ * Convierte excepciones de la frontera `data` del módulo `{{nombre}}` en `DomainError`.
+ *
+ * Estrategia (§7.4 del prompt maestro):
+ * 1. Delegar primero en mappers comunes (red y BD) para los casos genéricos.
+ * 2. Capturar excepciones específicas del dominio del módulo y mapearlas a su `sealed interface`.
+ * 3. Caer en `DomainError.Unknown(cause)` solo cuando ninguna rama anterior aplica.
+ *
+ * Este mapper se invoca exclusivamente desde `safeApiCall` / `safeDbCall` del repositorio;
+ * nunca lanza, siempre devuelve `Either<DomainError, T>`.
+ */
+class {{Nombre}}ErrorMapper(
+    private val networkErrorMapper: NetworkErrorMapper,
+    private val databaseErrorMapper: DatabaseErrorMapper,
+) {
+
+    fun <T> mapException(throwable: Throwable, valor: T? = null): Either<DomainError, T> {
+        val mapeado: DomainError = when (val especifico = mapEspecifico(throwable)) {
+            null -> networkErrorMapper.map(throwable)
+                ?: databaseErrorMapper.map(throwable)
+                ?: DomainError.Unknown(throwable)
+            else -> especifico
+        }
+        return mapeado.left()
+    }
+
+    private fun mapEspecifico(throwable: Throwable): DomainError? {
+        // TODO: añadir ramas específicas de {{Nombre}}Error cuando existan excepciones propias.
+        return null
+    }
+}
