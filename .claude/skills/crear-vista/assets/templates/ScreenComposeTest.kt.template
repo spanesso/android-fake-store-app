@@ -1,0 +1,45 @@
+package {{paqueteRaiz}}.ui.screens
+
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.performClick
+import com.mango.fakestore.core.error.UiError
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Rule
+import org.junit.Test
+
+/**
+ * Smoke test Compose de la pantalla `{{Nombre}}`. Valida que cada estado se renderiza y
+ * que el evento `Retry` se dispara correctamente desde `{{Nombre}}UiState.Error`.
+ */
+@HiltAndroidTest
+class {{Nombre}}ScreenComposeTest {
+
+    @get:Rule(order = 0)
+    val hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val composeRule = createAndroidComposeRule<dagger.hilt.android.testing.HiltTestActivity>()
+
+    @Test
+    fun renderiza_estado_loading() {
+        composeRule.setContent {
+            {{Nombre}}Screen(state = {{Nombre}}UiState.Loading, onEvent = {})
+        }
+        composeRule.onNodeWithContentDescription("loading").assertExists()
+    }
+
+    @Test
+    fun renderiza_estado_error_con_retry_clickeable() {
+        var retryDisparado = false
+        composeRule.setContent {
+            {{Nombre}}Screen(
+                state = {{Nombre}}UiState.Error(uiError = UiError.previewSinConexion()),
+                onEvent = { if (it is {{Nombre}}UiEvent.Retry) retryDisparado = true },
+            )
+        }
+        composeRule.onNodeWithContentDescription("reintentar").performClick()
+        assert(retryDisparado) { "El botón Retry no disparó {{Nombre}}UiEvent.Retry" }
+    }
+}

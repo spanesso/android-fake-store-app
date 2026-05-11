@@ -1,0 +1,50 @@
+package {{paqueteRaiz}}.viewmodel
+
+import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
+import com.mango.fakestore.core.analytics.Telemetry
+import com.mango.fakestore.core.error.DomainErrorToUiErrorMapper
+import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import {{paqueteRaiz}}.ui.screens.{{Nombre}}UiState
+
+/**
+ * Pruebas unitarias del `{{Nombre}}ViewModel` con Turbine. Cubre el ciclo Loading →
+ * Content / Error y la transición Retry → Loading → Content.
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+class {{Nombre}}ViewModelTest {
+
+    private val dispatcher = StandardTestDispatcher()
+    private val telemetry: Telemetry = mockk(relaxed = true)
+    private val domainErrorMapper: DomainErrorToUiErrorMapper = mockk(relaxed = true)
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(dispatcher)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `emite Loading al construirse`() = runTest {
+        val viewModel = {{Nombre}}ViewModel(telemetry, domainErrorMapper)
+        viewModel.uiState.test {
+            assertThat(awaitItem()).isEqualTo({{Nombre}}UiState.Loading)
+        }
+    }
+
+    // TODO: añadir un test por cada rama de DomainError que el ViewModel pueda recibir.
+    //       Cubrir también el evento Retry: Loading → Error → Retry → Loading → Content.
+}

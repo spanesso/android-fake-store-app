@@ -1,0 +1,81 @@
+package {{paqueteRaiz}}.ui.screens
+
+import android.content.res.Configuration
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import com.mango.fakestore.core.designsystem.tema.MangoTema
+import com.mango.fakestore.core.error.UiError
+
+/**
+ * Previews para cada estado de la pantalla `{{Nombre}}` en claro y oscuro (R0.4).
+ */
+
+@Preview(name = "Loading - claro", showBackground = true)
+@Composable
+private fun {{Nombre}}ScreenLoadingPreview() {
+    MangoTema {
+        {{Nombre}}Screen(state = {{Nombre}}UiState.Loading, onEvent = {})
+    }
+}
+
+@Preview(name = "Loading - oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun {{Nombre}}ScreenLoadingDarkPreview() {
+    MangoTema {
+        {{Nombre}}Screen(state = {{Nombre}}UiState.Loading, onEvent = {})
+    }
+}
+
+@Preview(name = "Empty - claro", showBackground = true)
+@Composable
+private fun {{Nombre}}ScreenEmptyPreview() {
+    MangoTema {
+        {{Nombre}}Screen(state = {{Nombre}}UiState.Empty, onEvent = {})
+    }
+}
+
+@Preview(name = "Empty - oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun {{Nombre}}ScreenEmptyDarkPreview() {
+    MangoTema {
+        {{Nombre}}Screen(state = {{Nombre}}UiState.Empty, onEvent = {})
+    }
+}
+
+@Preview(name = "Error - claro", showBackground = true)
+@Composable
+private fun {{Nombre}}ScreenErrorPreview() {
+    MangoTema {
+        {{Nombre}}Screen(
+            state = {{Nombre}}UiState.Error(uiError = UiError.previewSinConexion()),
+            onEvent = {},
+        )
+    }
+}
+
+@Preview(name = "Error - oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun {{Nombre}}ScreenErrorDarkPreview() {
+    MangoTema {
+        {{Nombre}}Screen(
+            state = {{Nombre}}UiState.Error(uiError = UiError.previewSinConexion()),
+            onEvent = {},
+        )
+    }
+}
+
+@Preview(name = "Content - claro", showBackground = true)
+@Composable
+private fun {{Nombre}}ScreenContentPreview() {
+    MangoTema {
+        {{Nombre}}Screen(state = {{Nombre}}UiState.Content(), onEvent = {})
+    }
+}
+
+@Preview(name = "Content - oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun {{Nombre}}ScreenContentDarkPreview() {
+    MangoTema {
+        {{Nombre}}Screen(state = {{Nombre}}UiState.Content(), onEvent = {})
+    }
+}

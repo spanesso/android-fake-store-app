@@ -1,0 +1,22 @@
+package {{paqueteRaiz}}.ui.screens
+
+import com.mango.fakestore.core.error.UiError
+
+/**
+ * Estados que puede atravesar la pantalla `{{Nombre}}`. Inmutable y exhaustivo: cada estado
+ * se renderiza con un único Composable del design system.
+ */
+sealed interface {{Nombre}}UiState {
+
+    data object Loading : {{Nombre}}UiState
+
+    data object Empty : {{Nombre}}UiState
+
+    data class Error(val uiError: UiError) : {{Nombre}}UiState
+
+    data class Content(
+        // TODO: declarar los campos concretos del estado Content
+        //       (p. ej. val items: List<{{Nombre}}Ui>, val favoritos: Set<Long>).
+        val placeholder: Unit = Unit,
+    ) : {{Nombre}}UiState
+}

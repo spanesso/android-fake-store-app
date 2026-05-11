@@ -1,0 +1,14 @@
+package {{paqueteRaiz}}.ui.screens
+
+/**
+ * Acciones del usuario sobre la pantalla `{{Nombre}}`. Cada evento describe una intención;
+ * la traducción a llamadas de dominio vive en `{{Nombre}}ViewModel`.
+ */
+sealed interface {{Nombre}}UiEvent {
+
+    data object Retry : {{Nombre}}UiEvent
+
+    // TODO: añadir el resto de eventos del usuario, p. ej.:
+    // data class AbrirDetalle(val productoId: Long) : {{Nombre}}UiEvent
+    // data class ToggleFavorito(val productoId: Long) : {{Nombre}}UiEvent
+}

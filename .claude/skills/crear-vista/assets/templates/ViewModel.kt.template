@@ -1,0 +1,67 @@
+package {{paqueteRaiz}}.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.mango.fakestore.core.analytics.Telemetry
+import com.mango.fakestore.core.error.DomainErrorToUiErrorMapper
+import com.mango.fakestore.core.error.UiError
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import {{paqueteRaiz}}.ui.screens.{{Nombre}}UiEffect
+import {{paqueteRaiz}}.ui.screens.{{Nombre}}UiEvent
+import {{paqueteRaiz}}.ui.screens.{{Nombre}}UiState
+import javax.inject.Inject
+
+/**
+ * ViewModel de la pantalla `{{Nombre}}`. Aplica el patrón unidireccional descrito en §3
+ * del prompt maestro: expone `uiState` (StateFlow) y `uiEffect` (SharedFlow), y recibe
+ * intenciones a través de `onEvent`.
+ *
+ * `CoroutineExceptionHandler` raíz reporta cualquier excepción no esperada a telemetría
+ * y emite un estado de error tipado (R0.11, §7.8). El ViewModel **no** ejecuta `try/catch`
+ * genérico: las excepciones esperadas se traducen en `DomainError` desde la frontera `data`.
+ */
+@HiltViewModel
+class {{Nombre}}ViewModel @Inject constructor(
+    private val telemetry: Telemetry,
+    private val domainErrorMapper: DomainErrorToUiErrorMapper,
+    // TODO: inyectar los casos de uso necesarios.
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<{{Nombre}}UiState>({{Nombre}}UiState.Loading)
+    val uiState: StateFlow<{{Nombre}}UiState> = _uiState.asStateFlow()
+
+    private val _uiEffect = MutableSharedFlow<{{Nombre}}UiEffect>(extraBufferCapacity = 1)
+    val uiEffect: SharedFlow<{{Nombre}}UiEffect> = _uiEffect.asSharedFlow()
+
+    private val errorHandler = CoroutineExceptionHandler { _, throwable ->
+        telemetry.reportarNoFatal(throwable, mapOf("modulo" to "{{modulo}}", "viewModel" to "{{Nombre}}"))
+        _uiState.value = {{Nombre}}UiState.Error(uiError = UiError.generico())
+    }
+
+    init {
+        cargar()
+    }
+
+    fun onEvent(event: {{Nombre}}UiEvent) {
+        when (event) {
+            is {{Nombre}}UiEvent.Retry -> cargar()
+            // TODO: cubrir el resto de eventos.
+        }
+    }
+
+    private fun cargar() {
+        _uiState.value = {{Nombre}}UiState.Loading
+        viewModelScope.launch(errorHandler) {
+            // TODO: invocar el caso de uso correspondiente y aplicar fold sobre
+            //       el Either<DomainError, T> resultante.
+        }
+    }
+}

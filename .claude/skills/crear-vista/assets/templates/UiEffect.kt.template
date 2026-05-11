@@ -1,0 +1,15 @@
+package {{paqueteRaiz}}.ui.screens
+
+import com.mango.fakestore.core.error.UiError
+
+/**
+ * Efectos one-shot que la pantalla `{{Nombre}}` puede emitir hacia el wrapper Route:
+ * snackbars, navegación, diálogos. Nunca se almacenan en el estado.
+ */
+sealed interface {{Nombre}}UiEffect {
+
+    data class ShowSnackbar(val uiError: UiError) : {{Nombre}}UiEffect
+
+    // TODO: añadir efectos adicionales según necesidad, p. ej.:
+    // data class NavegarADetalle(val productoId: Long) : {{Nombre}}UiEffect
+}

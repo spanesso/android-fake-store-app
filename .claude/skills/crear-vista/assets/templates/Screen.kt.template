@@ -1,0 +1,49 @@
+package {{paqueteRaiz}}.ui.screens
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import com.mango.fakestore.core.designsystem.componentes.MangoEmptyState
+import com.mango.fakestore.core.designsystem.componentes.MangoErrorState
+import com.mango.fakestore.core.designsystem.componentes.MangoLoadingIndicator
+
+/**
+ * Composable puro de la pantalla `{{Nombre}}`.
+ *
+ * No conoce a su `ViewModel`. Recibe el estado completo y notifica acciones del usuario
+ * mediante `onEvent`. Esta separación permite previews exhaustivos, reutilización en otros
+ * contextos y testeo aislado (regla R0.3 del prompt maestro).
+ */
+@Composable
+fun {{Nombre}}Screen(
+    state: {{Nombre}}UiState,
+    onEvent: ({{Nombre}}UiEvent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        when (state) {
+            is {{Nombre}}UiState.Loading -> MangoLoadingIndicator()
+            is {{Nombre}}UiState.Empty -> MangoEmptyState(
+                tituloRes = {{rEmptyTitulo}},
+                descripcionRes = {{rEmptyDescripcion}},
+            )
+            is {{Nombre}}UiState.Error -> MangoErrorState(
+                uiError = state.uiError,
+                onRetry = { onEvent({{Nombre}}UiEvent.Retry) },
+            )
+            is {{Nombre}}UiState.Content -> {{Nombre}}Content(state = state, onEvent = onEvent)
+        }
+    }
+}
+
+@Composable
+private fun {{Nombre}}Content(
+    state: {{Nombre}}UiState.Content,
+    onEvent: ({{Nombre}}UiEvent) -> Unit,
+) {
+    // TODO: pintar el contenido real del estado Content usando componentes
+    //       de `:core:design-system`. Mantener este Composable puro: no llamar
+    //       a APIs de framework Android, no instanciar ViewModel ni Hilt.
+}

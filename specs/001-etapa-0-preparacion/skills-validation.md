@@ -44,7 +44,32 @@ dependencias: [":core:common", ":core:error"]
 
 ## Skill 2 — `crear-vista`
 
-_(pendiente)_
+**Ruta**: `.claude/skills/crear-vista/SKILL.md`
+**Frontmatter validado**: ✅ YAML parseable, `name=crear-vista`, `description` de 1112 caracteres con triggers + anti-triggers explícitos.
+**Plantillas**: ✅ 10 plantillas en `assets/templates/` (Screen, Route, UiState, UiEvent, UiEffect, ViewModel, Previews, ScreenComposeTest, ScreenSnapshotTest, ViewModelTest).
+**Registrado en Skill tool**: ✅ aparece en la lista de skills disponibles.
+
+### Caso de prueba ejecutado
+
+**Entrada**:
+```
+nombre: Productos
+modulo: products
+estados: [Loading, Empty, Error, Content]
+eventos_usuario: [AbrirDetalle(productoId), ToggleFavorito(productoId), Retry]
+efectos: [ShowSnackbar(uiError), NavegarADetalle(productoId)]
+```
+
+**Verificación de plantillas**:
+- `Screen.kt.template` no importa `hiltViewModel`, `DomainError`, `Throwable` ni usa `.message`: ✅
+- `Route.kt.template` usa `hiltViewModel<ProductosViewModel>()` y `collectAsStateWithLifecycle`: ✅
+- `UiState.kt.template` incluye Loading, Empty, Error(uiError), Content: ✅
+- `UiEvent.kt.template` incluye `Retry`: ✅
+- `UiEffect.kt.template` incluye `ShowSnackbar(uiError: UiError)`: ✅
+- `ViewModel.kt.template` declara `errorHandler = CoroutineExceptionHandler { ... }`: ✅
+- `Previews.kt.template` cubre Loading/Empty/Error/Content × claro/oscuro: ✅ (8 previews)
+
+**Resultado**: ✅ Skill funcionalmente correcto; ejecución real diferida hasta ETAPA 3 (productos) o ETAPA 2 (auth).
 
 ## Skill 3 — `validar-arquitectura`
 

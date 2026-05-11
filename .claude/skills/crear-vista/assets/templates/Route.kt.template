@@ -1,0 +1,45 @@
+package {{paqueteRaiz}}.ui.route
+
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mango.fakestore.core.designsystem.componentes.MangoSnackbarHost
+import {{paqueteRaiz}}.ui.screens.{{Nombre}}Screen
+import {{paqueteRaiz}}.ui.screens.{{Nombre}}UiEffect
+import {{paqueteRaiz}}.viewmodel.{{Nombre}}ViewModel
+
+/**
+ * Wrapper de navegación de la pantalla `{{Nombre}}`. Es la única capa que conoce el
+ * `ViewModel`: lee `uiState`, traduce efectos a UI (snackbar, navegación) y delega
+ * el render al Composable puro `{{Nombre}}Screen`.
+ */
+@Composable
+fun {{Nombre}}Route(
+    modifier: Modifier = Modifier,
+    viewModel: {{Nombre}}ViewModel = hiltViewModel(),
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModel) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is {{Nombre}}UiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(
+                    message = effect.uiError.errorCode,
+                )
+                // TODO: completar el resto de efectos (navegación, etc.).
+            }
+        }
+    }
+
+    {{Nombre}}Screen(
+        state = state,
+        onEvent = viewModel::onEvent,
+        modifier = modifier,
+    )
+    MangoSnackbarHost(hostState = snackbarHostState)
+}
