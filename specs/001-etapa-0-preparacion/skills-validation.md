@@ -73,7 +73,22 @@ efectos: [ShowSnackbar(uiError), NavegarADetalle(productoId)]
 
 ## Skill 3 — `validar-arquitectura`
 
-_(pendiente)_
+**Ruta**: `.claude/skills/validar-arquitectura/SKILL.md`
+**Frontmatter validado**: ✅ YAML válido, descripción con triggers (post-implement, antes de PR, cierre de etapa) y anti-triggers (no es Detekt, no es validar-manejo-errores).
+**Script auxiliar**: ✅ `scripts/audit.sh` (bash con grep) que aplica las reglas ARQ-001, ARQ-002 y ARQ-007 de inmediato. ARQ-003..006, ARQ-008..010 quedan delegadas a Konsist (configurado en 0.4).
+**Reglas documentadas**: ✅ 10 reglas ARQ-001..ARQ-010, cada una con descripción, regex/heurística y sugerencia de corrección.
+**Registrado en Skill tool**: ✅.
+
+### Caso de prueba ejecutado
+
+**Entrada**: ejecutar `./.claude/skills/validar-arquitectura/scripts/audit.sh repository/android-fake-store-app` en el estado actual del repo (ETAPA 0, sin módulos `features/` ni `core/` aún).
+
+**Salida real**:
+```json
+{"violaciones": [], "nota": "Sin módulos auditables todavía (ETAPA 0)."}
+```
+
+**Resultado**: ✅ El script reconoce el estado preliminar y termina con exit 0, sin reportar falsos positivos sobre el scaffold del `app/` único. Las reglas se reactivarán automáticamente cuando 0.5 cree la estructura de módulos.
 
 ## Skill 4 — `crear-pruebas-unitarias`
 
