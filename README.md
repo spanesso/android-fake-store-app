@@ -3,7 +3,7 @@
 [![Android](https://img.shields.io/badge/Android-24%2B-green.svg)](https://developer.android.com/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-blue.svg)](https://kotlinlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
-[![CI](https://github.com/spanesso/android-fake-store-app/actions/workflows/pr.yml/badge.svg)](https://github.com/spanesso/android-fake-store-app/actions/workflows/pr.yml)
+[![CI](https://github.com/spanesso/android-fake-store-app/actions/workflows/pr.yml/badge.svg?branch=develop)](https://github.com/spanesso/android-fake-store-app/actions/workflows/pr.yml)
 
 Aplicación Android para la prueba técnica de Mango Fashion Group. Consume la [Fake Store API](https://fakestoreapi.com/) y sigue una arquitectura multi-módulo con Clean Architecture + MVVM + Jetpack Compose.
 
