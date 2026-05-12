@@ -967,7 +967,7 @@ ETAPA 1 — Núcleo (core modules)
   1.8 `:core:analytics` — interfaz `Telemetry` + `EventTracker`;
       implementaciones Firebase (obligatoria, gratis) y Console (debug).
       Datadog/Sentry SOLO como impls opcionales detrás de flag (R0.12).
-      Receptor de DomainError no fatales → Crashlytics.
+      Receptor de DomainError no fatales → Crashlytics. instrucciones de como debo implementar del dashboard en la pagina de Firebase
   1.9 `:core:security` — biometría, anti-screenshot, root detection.
   1.10 `:core:testing` — utilidades de test, builders de DomainError/
        UiError.
