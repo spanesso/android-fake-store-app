@@ -1,7 +1,6 @@
 package com.mango.fakestore.core.analytics
 
 import com.mango.fakestore.core.analytics.impl.FirebaseEventTrackerImpl
-import com.mango.fakestore.core.analytics.impl.NoOpTelemetryImpl
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test
