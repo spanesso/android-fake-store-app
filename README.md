@@ -58,6 +58,17 @@ Aplicación Android para la prueba técnica de Mango Fashion Group. Consume la [
 
 **Total tests acumulado**: 153 ✅
 
+### ETAPA 3 — Catálogo de productos
+
+| Módulo | Descripción | Tests |
+|--------|-------------|-------|
+| `:features:products:domain` | Entidad `Producto`, `ProductosRepository` interface, `ObtenerProductos` use case | 7 |
+| `:features:products:data` | `ProductosRepositoryImpl` SSOT (Room + Retrofit), mappers DTO↔Entity↔Domain, `ProductosDao` | — |
+| `:features:products:presentation` | `ProductosViewModel` (MVVM), `UiState` sealed (Loading/Content/Empty/Error), `ProductosRoute` + `ProductosScreen` | 8 |
+
+**Nuevos tests ETAPA 3**: 15 ✅  
+**Total tests acumulado**: 168 ✅
+
 ## Cómo ejecutar
 
 ```bash
@@ -89,6 +100,10 @@ cd android-fake-store-app
 ./gradlew :core:security:testDebugUnitTest        # core:security  (8 tests)
 ./gradlew :core:logging:testDebugUnitTest         # core:logging   (14 tests)
 
+# Tests features:products
+./gradlew :features:products:domain:testDebugUnitTest        # products:domain       (7 tests)
+./gradlew :features:products:presentation:testDebugUnitTest  # products:presentation (8 tests)
+
 # Snapshots Paparazzi (core:design-system)
 ./gradlew :core:design-system:recordPaparazziDebug   # Grabar golden images
 ./gradlew :core:design-system:verifyPaparazziDebug   # Verificar snapshots
@@ -115,8 +130,8 @@ core/
   testing/     ✅              — CoroutineTestRule, TestAppDispatchers, builders
   logging/     ✅              — Logger interface; TimberLogger (debug) + NoOpLogger (prod)
 features/
-  auth/                        — pendiente ETAPA 3
-  products/                    — pendiente ETAPA 4
+  products/    ✅              — catálogo SSOT (Room + Retrofit), MVVM, Either tipado, 15 tests
+  auth/                        — pendiente ETAPA 4
   favorites/                   — pendiente ETAPA 5
   profile/                     — pendiente ETAPA 6
 ```
@@ -157,3 +172,4 @@ Ver el catálogo completo en [`core/error/docs/errores.md`](core/error/docs/erro
 | `:core:security` | [`core/security/docs/`](core/security/docs/) |
 | `:core:testing` | [`core/testing/docs/`](core/testing/docs/) |
 | `:core:logging` | [`core/logging/docs/`](core/logging/docs/) |
+| `:features:products` | [`features/products/docs/`](features/products/docs/) |

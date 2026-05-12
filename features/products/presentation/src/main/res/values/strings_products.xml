@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="productos_lista_vacia">No hay productos disponibles en este momento.</string>
+    <string name="productos_titulo_pantalla">Productos</string>
+</resources>
