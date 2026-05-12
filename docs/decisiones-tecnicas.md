@@ -128,3 +128,38 @@ Dos UseCases son usados por más de un ViewModel:
 **Esto no es redundancia**: cada ViewModel tiene una responsabilidad diferente. Compartir UseCases es precisamente el beneficio de extraerlos: la lógica de negocio vive una sola vez en `domain` y múltiples capas de presentación la reutilizan.
 
 **Lo que sería redundancia** (y no existe aquí): dos ViewModels que hacen exactamente lo mismo sin diferencia de contexto, o un UseCase que duplica la lógica de otro.
+
+---
+
+## §6 — `ObservarConteoFavoritos` devuelve `Flow<Int>`, no `Flow<Either<DomainError, Int>>`
+
+**Referencia**: `features/favorites/domain/src/main/kotlin/.../usecase/ObservarConteoFavoritos.kt`
+
+```kotlin
+operator fun invoke(): Flow<Int> = repository.observarConteo()
+```
+
+**Por qué `Flow<Int>` y no `Flow<Either<DomainError, Int>>`**: La operación `SELECT COUNT(*) FROM favoritos` de Room es una consulta de lectura local que **nunca falla** en condiciones normales de operación:
+- Si la tabla está vacía, Room emite `0` (no lanza excepción).
+- Si hay N elementos, Room emite `N`.
+- Room no puede "no encontrar" la tabla porque es creada al inicializar la base de datos.
+
+Envolver el conteo en `Either<DomainError, Int>` añadiría complejidad sintáctica en todos los consumidores (`AppViewModel`, `PerfilViewModel`) sin aportar valor real. El patrón `Either` se reserva para operaciones que genuinamente pueden fallar: llamadas a red, lecturas de entidades que podrían no existir o escrituras que podrían ser rechazadas.
+
+**Consistencia**: `FavoritosRepository.observarConteo()` tiene la misma firma (`Flow<Int>`) por el mismo motivo.
+
+---
+
+## §7 — `:app` depende de `:features:*:domain` y `:features:*:data` (Hilt wiring)
+
+**Referencia**: `app/build.gradle.kts`, líneas de dependencias de features
+
+**Por qué `:app` declara dependencias en módulos `domain` y `data`**: Este es el comportamiento estándar de Hilt en proyectos Android multi-módulo. El módulo `:app` actúa como **compositor del grafo de inyección de dependencias**:
+
+1. **`AppModule.kt`** (en `:app:di`) provee `ProductosDao` y `FavoritosDao` — necesita importar clases de `:features:products:data` y `:features:favorites:data`.
+2. **Hilt ksp processor** (`ksp(hilt.compiler)`) necesita ver todos los `@Module`/`@InstallIn` al momento de generar el `ApplicationComponent`. Aunque los módulos Hilt de `data` y `domain` están anotados con `@InstallIn(SingletonComponent::class)`, el procesador de Hilt en `:app` los descubre solo si están en el classpath de compilación de `:app`.
+3. Las dependencias en `domain` son transitivamente necesarias para que el compilador Kotlin resuelva los tipos referenciados en los `@Binds` de los módulos `data`.
+
+**Esto es la excepción documentada en ARQ-010**: "Excepto para wiring de Hilt, `:app` debe depender solo de `:features:*:presentation` y `:core:*`." Todas las dependencias en `data` y `domain` desde `:app` son exclusivamente para el grafo DI de Hilt.
+
+**Path hacia producción**: Con Hilt 2.52+ y el plugin de agregación habilitado (`hilt.enableAggregatingTask = true`), los módulos de sub-proyectos se agregan automáticamente y estas dependencias explícitas pueden eliminarse. Ver la [guía oficial de Hilt multi-módulo](https://dagger.dev/hilt/gradle-setup.html#using-hilt-with-multiple-gradle-modules).

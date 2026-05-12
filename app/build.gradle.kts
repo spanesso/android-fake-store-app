@@ -130,6 +130,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp.core)
     implementation(libs.retrofit.core)
+    // Hilt wiring — el módulo :app ensambla el grafo DI completo (ARQ-010 exception)
+    // data: contiene los @Module Hilt que ligan interfaces domain → implementaciones Room/Retrofit
+    // domain: transitivo necesario para que ksp(hilt.compiler) resuelva bindings correctamente
     implementation(project(":features:products:domain"))
     implementation(project(":features:products:data"))
     implementation(project(":features:products:presentation"))
