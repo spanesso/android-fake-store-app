@@ -10,7 +10,6 @@ import com.mango.fakestore.core.analytics.SessionIdProvider
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.logging.Logger
 import io.mockk.every
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
@@ -74,7 +73,12 @@ class FirebaseTelemetryImplTest {
     fun `rate-limiter bloquea el reporte mas alla del limite`() {
         val limiter = ErrorRateLimiter(maxPorVentana = 2)
         val t = FirebaseTelemetryImpl(
-            crashlytics, analytics, performance, logger, sessionIdProvider, limiter,
+            crashlytics,
+            analytics,
+            performance,
+            logger,
+            sessionIdProvider,
+            limiter,
         )
         t.reportarNoFatal(DomainError.Network.Timeout())
         t.reportarNoFatal(DomainError.Network.Timeout())

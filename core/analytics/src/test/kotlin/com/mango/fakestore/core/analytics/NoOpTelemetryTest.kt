@@ -2,7 +2,6 @@ package com.mango.fakestore.core.analytics
 
 import com.mango.fakestore.core.analytics.impl.NoOpTelemetryImpl
 import com.mango.fakestore.core.error.DomainError
-import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class NoOpTelemetryTest {
