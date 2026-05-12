@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:analytics"))
     implementation(project(":features:products:domain"))
+    implementation(project(":features:favorites:domain"))
 
     implementation(libs.arrow.core)
     implementation(libs.coil.compose)
