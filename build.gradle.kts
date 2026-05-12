@@ -1,6 +1,4 @@
-// Build file raíz del proyecto Mango Fake Store. Solo declara los plugins disponibles para
-// los subproyectos (sin aplicarlos aquí) y configura las tareas agregadas de calidad
-// (Detekt y Kover) que se ejecutan sobre todos los módulos a la vez.
+
 
 plugins {
     alias(libs.plugins.android.application) apply false
