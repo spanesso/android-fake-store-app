@@ -43,7 +43,8 @@ class IntegrityCheckerImpl @Inject constructor(
         )
     }
 
-    private fun esRoot(): Boolean = runCatching { RootBeer(context).isRooted }.getOrDefault(false)
+    private fun esRoot(): Boolean = runCatching { RootBeer(context).isRooted }
+        .fold(onSuccess = { it }, onFailure = { false })
 
     private fun esDepuradorActivo(): Boolean = Debug.isDebuggerConnected()
 

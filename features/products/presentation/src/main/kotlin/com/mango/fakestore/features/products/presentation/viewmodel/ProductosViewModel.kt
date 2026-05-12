@@ -8,9 +8,9 @@ import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
-import com.mango.fakestore.features.favorites.domain.model.Favorito
-import com.mango.fakestore.features.favorites.domain.usecase.ObservarFavoritos
-import com.mango.fakestore.features.favorites.domain.usecase.ToggleFavorito
+import com.mango.fakestore.features.favorites.api.Favorito
+import com.mango.fakestore.features.favorites.api.ObservarFavoritos
+import com.mango.fakestore.features.favorites.api.ToggleFavorito
 import com.mango.fakestore.features.products.domain.usecase.ObtenerProductos
 import com.mango.fakestore.features.products.presentation.mapper.toUi
 import com.mango.fakestore.features.products.presentation.model.ProductoUi

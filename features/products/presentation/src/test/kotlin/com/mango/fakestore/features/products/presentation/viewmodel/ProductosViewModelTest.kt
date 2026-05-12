@@ -12,8 +12,8 @@ import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.UiError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
 import com.mango.fakestore.core.testing.CoroutineTestRule
-import com.mango.fakestore.features.favorites.domain.usecase.ObservarFavoritos
-import com.mango.fakestore.features.favorites.domain.usecase.ToggleFavorito
+import com.mango.fakestore.features.favorites.api.ObservarFavoritos
+import com.mango.fakestore.features.favorites.api.ToggleFavorito
 import com.mango.fakestore.features.products.domain.model.Producto
 import com.mango.fakestore.features.products.domain.model.Valoracion
 import com.mango.fakestore.features.products.domain.usecase.ObtenerProductos

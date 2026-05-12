@@ -1,7 +1,11 @@
 plugins {
-    id("mango.kotlin.library")
+    id("mango.android.library")
+}
+
+android {
+    namespace = "com.mango.fakestore.features.favorites.api"
 }
 
 dependencies {
-    implementation(project(":features:favorites:domain"))
+    api(project(":features:favorites:domain"))
 }
