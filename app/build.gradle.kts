@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
     // firebase-perf plugin (1.4.2) uses the removed AGP Transform API and is incompatible with AGP 9+.
     // Custom traces via FirebasePerformance SDK are still fully functional.
+    alias(libs.plugins.gradle.play.publisher)
 }
 
 android {
@@ -15,6 +16,18 @@ android {
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            val keystorePath = System.getenv("KEYSTORE_PATH") ?: ""
+            if (keystorePath.isNotEmpty()) {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+                keyAlias = System.getenv("KEY_ALIAS") ?: ""
+                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            }
         }
     }
 
@@ -60,6 +73,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -78,6 +92,14 @@ android {
 ksp {
     arg("dagger.hilt.android.internal.disableAndroidSuperclassValidation", "true")
     arg("dagger.hilt.android.internal.projectType", "APP")
+}
+
+play {
+    track.set("internal")
+    defaultToAppBundles.set(true)
+    serviceAccountCredentials.set(
+        file(System.getenv("ANDROID_PUBLISHER_CREDENTIALS_FILE") ?: "non-existent-credentials.json")
+    )
 }
 
 dependencies {
