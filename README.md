@@ -44,12 +44,19 @@ Aplicación Android para la prueba técnica de Mango Fashion Group. Consume la [
 | `:core:network` | Retrofit + OkHttp, certificate pinning, `RetryInterceptor`, `ConnectivityObserver`, `safeRetrofitCall`, flavors dev/staging/prod | 22 |
 | `:core:database` | Room base abstracta cifrada con SQLCipher, `DatabaseKeyManager` con Android Keystore | 6 |
 | `:core:datastore` | DataStore cifrado con Tink AES-256-GCM para tokens (`SessionData`) y preferencias (`UserPreferences`) | 8 |
-| `:core:logging` | `Logger` interface; `TimberLogger` (debug) + `NoOpLogger` (producción — silencioso); DI via `BuildConfig.DEBUG` | 14 |
 | `:core:analytics` | `Telemetry` + `EventTracker` interfaces; Firebase impl (Crashlytics/Analytics/Performance); Console + NoOp | 13 |
 | `:core:security` | `BiometricAuthenticator` (BIOMETRIC_STRONG), `IntegrityChecker` (RootBeer), `SecureScreen` (FLAG_SECURE) | 8 |
 | `:core:testing` | `CoroutineTestRule`, `TestAppDispatchers`, builders de `DomainError` y `UiError` | 0 |
 
-**Total tests**: 139 ✅
+**Total tests ETAPA 1**: 139 ✅
+
+### ETAPA 2 — Logging
+
+| Módulo | Descripción | Tests |
+|--------|-------------|-------|
+| `:core:logging` | `Logger` interface; `TimberLogger` (debug) + `NoOpLogger` (producción — silencioso); DI via `BuildConfig.DEBUG` | 14 |
+
+**Total tests acumulado**: 153 ✅
 
 ## Cómo ejecutar
 
@@ -80,6 +87,7 @@ cd android-fake-store-app
 ./gradlew :core:datastore:testDebugUnitTest       # core:datastore (8 tests)
 ./gradlew :core:analytics:testDebugUnitTest       # core:analytics (13 tests)
 ./gradlew :core:security:testDebugUnitTest        # core:security  (8 tests)
+./gradlew :core:logging:testDebugUnitTest         # core:logging   (14 tests)
 
 # Snapshots Paparazzi (core:design-system)
 ./gradlew :core:design-system:recordPaparazziDebug   # Grabar golden images
@@ -102,11 +110,15 @@ core/
   network/     ✅              — HTTP: Retrofit, pinning, retry, ConnectivityObserver
   database/    ✅              — Room + SQLCipher + Android Keystore
   datastore/   ✅              — DataStore cifrado con Tink AES-256-GCM
+  analytics/   ✅              — Telemetry + EventTracker; Firebase impl; Console + NoOp
+  security/    ✅              — BiometricPrompt, IntegrityChecker (RootBeer), SecureScreen
+  testing/     ✅              — CoroutineTestRule, TestAppDispatchers, builders
+  logging/     ✅              — Logger interface; TimberLogger (debug) + NoOpLogger (prod)
 features/
-  auth/                        — pendiente ETAPA 2
-  products/                    — pendiente ETAPA 3
-  favorites/                   — pendiente ETAPA 4
-  profile/                     — pendiente ETAPA 5
+  auth/                        — pendiente ETAPA 3
+  products/                    — pendiente ETAPA 4
+  favorites/                   — pendiente ETAPA 5
+  profile/                     — pendiente ETAPA 6
 ```
 
 Cada feature se organiza en submódulos `:api`, `:domain`, `:data`, `:presentation`.
@@ -144,3 +156,4 @@ Ver el catálogo completo en [`core/error/docs/errores.md`](core/error/docs/erro
 | `:core:analytics` | [`core/analytics/docs/`](core/analytics/docs/) |
 | `:core:security` | [`core/security/docs/`](core/security/docs/) |
 | `:core:testing` | [`core/testing/docs/`](core/testing/docs/) |
+| `:core:logging` | [`core/logging/docs/`](core/logging/docs/) |
