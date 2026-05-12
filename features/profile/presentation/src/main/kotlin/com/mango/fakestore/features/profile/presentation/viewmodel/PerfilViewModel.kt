@@ -6,6 +6,8 @@ import com.mango.fakestore.core.analytics.AnalyticsEvent
 import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
+import com.mango.fakestore.features.auth.domain.usecase.CerrarSesion
+import com.mango.fakestore.features.auth.domain.usecase.ObtenerSesionActiva
 import com.mango.fakestore.features.favorites.api.ObservarConteoFavoritos
 import com.mango.fakestore.features.profile.domain.usecase.ObtenerPerfil
 import com.mango.fakestore.features.profile.presentation.mapper.PerfilUiErrorMapper
@@ -23,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,6 +34,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PerfilViewModel @Inject constructor(
     private val obtenerPerfil: ObtenerPerfil,
+    private val obtenerSesionActiva: ObtenerSesionActiva,
+    private val cerrarSesion: CerrarSesion,
     private val observarConteoFavoritos: ObservarConteoFavoritos,
     private val telemetry: Telemetry,
     private val eventTracker: EventTracker,
@@ -62,6 +67,7 @@ class PerfilViewModel @Inject constructor(
     fun onEvent(event: PerfilUiEvent) {
         when (event) {
             is PerfilUiEvent.Retry -> cargarPerfil()
+            is PerfilUiEvent.CerrarSesion -> ejecutarCerrarSesion()
         }
     }
 
@@ -69,18 +75,16 @@ class PerfilViewModel @Inject constructor(
         cargaJob?.cancel()
         cargaJob = viewModelScope.launch(errorHandler) {
             _uiState.update { PerfilUiState.Loading }
+            val userId = obtenerSesionActiva().first { it != null } ?: return@launch
             combine(
-                flow { emit(obtenerPerfil(PERFIL_USER_ID)) },
+                flow { emit(obtenerPerfil(userId)) },
                 observarConteoFavoritos(),
             ) { perfilResult, conteo ->
                 perfilResult.fold(
                     ifLeft = { error ->
                         telemetry.reportarNoFatal(
                             error = error,
-                            contexto = mapOf(
-                                "vm" to "PerfilViewModel",
-                                "accion" to "cargarPerfil",
-                            ),
+                            contexto = mapOf("vm" to "PerfilViewModel", "accion" to "cargarPerfil"),
                         )
                         PerfilUiState.Error(errorMapper.map(error))
                     },
@@ -95,6 +99,7 @@ class PerfilViewModel @Inject constructor(
                                 telefono = usuario.telefono,
                                 ciudad = usuario.ciudad,
                                 calle = usuario.calle,
+                                numeroCalle = usuario.numeroCalle,
                                 codigoPostal = usuario.codigoPostal,
                                 contadorFavoritos = conteo,
                             ),
@@ -107,7 +112,10 @@ class PerfilViewModel @Inject constructor(
         }
     }
 
-    companion object {
-        private const val PERFIL_USER_ID = 8
+    private fun ejecutarCerrarSesion() {
+        viewModelScope.launch(errorHandler) {
+            cerrarSesion()
+            _uiEffect.emit(PerfilUiEffect.NavLogin)
+        }
     }
 }

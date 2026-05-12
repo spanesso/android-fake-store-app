@@ -13,6 +13,7 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:error"))
+    implementation(project(":core:database"))
     implementation(project(":features:profile:domain"))
 
     implementation(libs.retrofit.core)
@@ -20,6 +21,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.arrow.core)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

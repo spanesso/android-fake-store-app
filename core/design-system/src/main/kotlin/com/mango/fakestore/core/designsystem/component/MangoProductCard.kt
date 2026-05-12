@@ -1,20 +1,38 @@
 package com.mango.fakestore.core.designsystem.component
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.mango.fakestore.core.designsystem.theme.MangoColorTokens
 import com.mango.fakestore.core.designsystem.theme.MangoColors
 import com.mango.fakestore.core.designsystem.theme.MangoSpacing
+import com.mango.fakestore.core.designsystem.theme.MangoTextStyles
 import com.mango.fakestore.core.designsystem.theme.MangoTheme
 
 @Composable
@@ -22,30 +40,170 @@ fun MangoProductCard(
     title: String,
     price: String,
     modifier: Modifier = Modifier,
+    imagenUrl: String = "",
+    descripcion: String = "",
+    categoria: String = "",
+    puntuacion: Float = 0f,
+    numVotaciones: Int = 0,
+    esFavorito: Boolean = false,
+    onFavoritoClick: (() -> Unit)? = null,
     isLoading: Boolean = false,
 ) {
-    MangoCard(modifier = modifier) {
+    ElevatedCard(modifier = modifier) {
         if (isLoading) {
-            Box(Modifier.fillMaxWidth().height(120.dp).background(MangoColors.neutroArena))
-            Spacer(Modifier.height(MangoSpacing.sm))
-            MangoLoadingIndicator(MangoLoadingVariant.Shimmer)
-            Spacer(Modifier.height(MangoSpacing.xs))
-            MangoLoadingIndicator(MangoLoadingVariant.Shimmer, Modifier.fillMaxWidth(0.5f))
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(3f / 4f),
+            ) {
+                MangoLoadingIndicator(
+                    MangoLoadingVariant.Shimmer,
+                    Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                )
+            }
+            Column(modifier = Modifier.padding(MangoSpacing.sm)) {
+                MangoLoadingIndicator(MangoLoadingVariant.Shimmer)
+                Spacer(Modifier.height(MangoSpacing.xs))
+                MangoLoadingIndicator(MangoLoadingVariant.Shimmer, Modifier.fillMaxWidth(0.5f))
+            }
         } else {
-            Box(Modifier.fillMaxWidth().height(120.dp).background(MangoColors.neutroArena))
-            Spacer(Modifier.height(MangoSpacing.sm))
-            MangoText(text = title, style = MaterialTheme.typography.titleMedium)
-            Spacer(Modifier.height(MangoSpacing.xs))
-            MangoText(text = price, style = MaterialTheme.typography.bodyMedium)
+            Box {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imagenUrl.ifBlank { null })
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = title,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(3f / 4f),
+                )
+                if (onFavoritoClick != null) {
+                    MangoIconButton(
+                        imageVector = if (esFavorito) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = if (esFavorito) "Quitar de favoritos" else "Añadir a favoritos",
+                        onClick = onFavoritoClick,
+                        modifier = Modifier.align(Alignment.TopEnd),
+                    )
+                }
+            }
+
+            Column(modifier = Modifier.padding(MangoSpacing.sm)) {
+                if (categoria.isNotBlank()) {
+                    MangoText(
+                        text = categoria.uppercase(),
+                        style = MangoTextStyles.labelSmall,
+                        color = MangoColorTokens.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(MangoSpacing.xs))
+                }
+
+                MangoText(
+                    text = title,
+                    style = MangoTextStyles.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+
+                if (descripcion.isNotBlank()) {
+                    Spacer(Modifier.height(MangoSpacing.xs))
+                    MangoText(
+                        text = descripcion,
+                        style = MangoTextStyles.bodySmall,
+                        color = MangoColorTokens.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+
+                Spacer(Modifier.height(MangoSpacing.xs))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    MangoText(
+                        text = price,
+                        style = MangoTextStyles.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    )
+                    if (puntuacion > 0f) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Filled.Star,
+                                contentDescription = null,
+                                tint = MangoColors.acentoOro,
+                                modifier = Modifier.size(14.dp),
+                            )
+                            Spacer(Modifier.width(2.dp))
+                            MangoText(
+                                text = "%.1f".format(puntuacion),
+                                style = MangoTextStyles.labelSmall,
+                            )
+                            if (numVotaciones > 0) {
+                                MangoText(
+                                    text = " ($numVotaciones)",
+                                    style = MangoTextStyles.labelSmall,
+                                    color = MangoColorTokens.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-@Preview(name = "ProductCard Idle - Claro", showBackground = true)
-@Composable private fun ProductCardPreview() { MangoTheme { MangoProductCard("Camiseta Lino", "49,99 €") } }
+@Preview(name = "ProductCard Content - Claro", showBackground = true)
+@Composable
+private fun ProductCardContentPreview() {
+    MangoTheme {
+        MangoProductCard(
+            title = "Fjallraven Backpack",
+            price = "$109.95",
+            categoria = "Men's clothing",
+            descripcion = "Your perfect pack for everyday use and walks in the forest.",
+            puntuacion = 3.9f,
+            numVotaciones = 120,
+        )
+    }
+}
 
 @Preview(name = "ProductCard Loading - Claro", showBackground = true)
-@Composable private fun ProductCardShimmerPreview() { MangoTheme { MangoProductCard("", "", isLoading = true) } }
+@Composable
+private fun ProductCardShimmerPreview() {
+    MangoTheme { MangoProductCard("", "", isLoading = true) }
+}
+
+@Preview(name = "ProductCard Favorito - Claro", showBackground = true)
+@Composable
+private fun ProductCardFavoritoPreview() {
+    MangoTheme {
+        MangoProductCard(
+            title = "Camiseta Lino",
+            price = "49,99 €",
+            categoria = "Women's",
+            puntuacion = 4.5f,
+            numVotaciones = 300,
+            esFavorito = true,
+            onFavoritoClick = {},
+        )
+    }
+}
 
 @Preview(name = "ProductCard - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable private fun ProductCardDarkPreview() { MangoTheme { MangoProductCard("Camiseta Lino", "49,99 €") } }
+@Composable
+private fun ProductCardDarkPreview() {
+    MangoTheme {
+        MangoProductCard(
+            title = "Camiseta Lino",
+            price = "49,99 €",
+            puntuacion = 4.1f,
+            numVotaciones = 259,
+        )
+    }
+}

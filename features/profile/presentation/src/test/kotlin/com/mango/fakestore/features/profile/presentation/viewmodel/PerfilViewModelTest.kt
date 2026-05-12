@@ -11,11 +11,14 @@ import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.UiError
 import com.mango.fakestore.core.testing.CoroutineTestRule
+import com.mango.fakestore.features.auth.domain.usecase.CerrarSesion
+import com.mango.fakestore.features.auth.domain.usecase.ObtenerSesionActiva
 import com.mango.fakestore.features.favorites.api.ObservarConteoFavoritos
 import com.mango.fakestore.features.profile.domain.model.Usuario
 import com.mango.fakestore.features.profile.domain.usecase.ObtenerPerfil
 import com.mango.fakestore.features.profile.presentation.mapper.PerfilUiErrorMapper
 import com.mango.fakestore.features.profile.presentation.model.PerfilContenidoUi
+import com.mango.fakestore.features.profile.presentation.ui.state.PerfilUiEffect
 import com.mango.fakestore.features.profile.presentation.ui.state.PerfilUiEvent
 import com.mango.fakestore.features.profile.presentation.ui.state.PerfilUiState
 import io.mockk.coEvery
@@ -34,6 +37,8 @@ class PerfilViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val obtenerPerfil: ObtenerPerfil = mockk()
+    private val obtenerSesionActiva: ObtenerSesionActiva = mockk()
+    private val cerrarSesion: CerrarSesion = mockk()
     private val observarConteoFavoritos: ObservarConteoFavoritos = mockk()
     private val telemetry: Telemetry = mockk(relaxed = true)
     private val eventTracker: EventTracker = mockk(relaxed = true)
@@ -66,6 +71,7 @@ class PerfilViewModelTest {
 
     @Before
     fun setUp() {
+        every { obtenerSesionActiva() } returns flowOf(8)
         every { observarConteoFavoritos() } returns flowOf(0)
         every { errorMapper.map(any()) } returns uiErrorNoConnection
     }
@@ -206,10 +212,6 @@ class PerfilViewModelTest {
     }
 
     // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    // -------------------------------------------------------------------------
     // US2 — Evento PerfilVisto
     // -------------------------------------------------------------------------
 
@@ -230,11 +232,33 @@ class PerfilViewModelTest {
     }
 
     // -------------------------------------------------------------------------
+    // 6. CerrarSesion — emite NavLogin tras ejecutar el caso de uso
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun `cuando onEvent CerrarSesion entonces llama cerrarSesion y emite NavLogin`() = runTest {
+        coEvery { obtenerPerfil(any()) } returns Either.Right(usuarioEjemplo)
+        coEvery { cerrarSesion() } returns Either.Right(Unit)
+
+        val viewModel = crearViewModel()
+        coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.uiEffect.test {
+            viewModel.onEvent(PerfilUiEvent.CerrarSesion)
+            coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+            assertThat(awaitItem()).isEqualTo(PerfilUiEffect.NavLogin)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
     private fun crearViewModel() = PerfilViewModel(
         obtenerPerfil = obtenerPerfil,
+        obtenerSesionActiva = obtenerSesionActiva,
+        cerrarSesion = cerrarSesion,
         observarConteoFavoritos = observarConteoFavoritos,
         telemetry = telemetry,
         eventTracker = eventTracker,

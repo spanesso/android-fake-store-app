@@ -71,6 +71,11 @@ fun PerfilInfoCard(
             )
             MangoDivider()
             InfoRow(
+                etiqueta = stringResource(R.string.perfil_campo_numero_calle),
+                valor = "${usuario.numeroCalle}",
+            )
+            MangoDivider()
+            InfoRow(
                 etiqueta = stringResource(R.string.perfil_campo_ciudad),
                 valor = usuario.ciudad,
             )
@@ -145,7 +150,8 @@ private val sampleUsuario = PerfilContenidoUi(
     email = "john@example.com",
     telefono = "1-570-236-7033",
     ciudad = "kilcoole",
-    calle = "new road 7835",
+    calle = "new road",
+    numeroCalle = 7835,
     codigoPostal = "12926-3874",
     contadorFavoritos = 5,
 )

@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,7 +19,7 @@ import androidx.navigation.navDeepLink
 import com.example.fakestoreapp.R
 import com.mango.fakestore.core.designsystem.component.MangoNavItem
 import com.mango.fakestore.core.designsystem.component.MangoNavigationBar
-import com.mango.fakestore.core.security.biometric.BiometricResult
+import com.mango.fakestore.features.auth.presentation.ui.route.LoginRoute
 import com.mango.fakestore.features.favorites.presentation.ui.route.FavoritosRoute
 import com.mango.fakestore.features.products.presentation.ui.route.ProductosRoute
 import com.mango.fakestore.features.profile.presentation.ui.route.PerfilRoute
@@ -29,8 +28,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MangoNavHost(
     navController: NavHostController,
-    sesionAutenticada: Boolean,
-    onAutenticarPerfil: suspend (FragmentActivity) -> BiometricResult,
+    startDestination: AppRoute,
     onMostrarSnackbar: suspend (String) -> Unit,
     contadorFavoritos: Int,
     modifier: Modifier = Modifier,
@@ -39,6 +37,8 @@ fun MangoNavHost(
     val context = LocalContext.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route.orEmpty()
+
+    val showBottomBar = !currentRoute.contains("Login")
 
     val itemsNav = listOf(
         MangoNavItem(
@@ -71,43 +71,32 @@ fun MangoNavHost(
             selected = currentRoute.contains("Perfil"),
             badgeCount = null,
             onClick = {
-                if (sesionAutenticada) {
-                    navController.navigate(AppRoute.Perfil) {
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                } else {
-                    coroutineScope.launch {
-                        val resultado = onAutenticarPerfil(context as FragmentActivity)
-                        when (resultado) {
-                            is BiometricResult.Exito -> navController.navigate(AppRoute.Perfil) {
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                            is BiometricResult.Cancelado ->
-                                onMostrarSnackbar(context.getString(R.string.biometria_cancelado))
-                            is BiometricResult.BloqueadoTemporalmente ->
-                                onMostrarSnackbar(context.getString(R.string.biometria_bloqueado))
-                            is BiometricResult.NoDisponible ->
-                                onMostrarSnackbar(context.getString(R.string.biometria_no_disponible))
-                            is BiometricResult.Error ->
-                                onMostrarSnackbar(resultado.mensaje)
-                        }
-                    }
+                navController.navigate(AppRoute.Perfil) {
+                    launchSingleTop = true
+                    restoreState = true
                 }
             },
         ),
     )
 
     Scaffold(
-        bottomBar = { MangoNavigationBar(items = itemsNav) },
+        bottomBar = { if (showBottomBar) MangoNavigationBar(items = itemsNav) },
         modifier = modifier,
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = AppRoute.Productos,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding),
         ) {
+            composable<AppRoute.Login> {
+                LoginRoute(
+                    onLoginExitoso = {
+                        navController.navigate(AppRoute.Productos) {
+                            popUpTo(AppRoute.Login) { inclusive = true }
+                        }
+                    },
+                )
+            }
             composable<AppRoute.Productos>(
                 deepLinks = listOf(navDeepLink { uriPattern = "mango://fakestore/productos" }),
             ) {
@@ -123,9 +112,16 @@ fun MangoNavHost(
             composable<AppRoute.Perfil>(
                 deepLinks = listOf(navDeepLink { uriPattern = "mango://fakestore/perfil" }),
             ) {
-                PerfilRoute(onMostrarSnackbar = { msg ->
-                    coroutineScope.launch { onMostrarSnackbar(msg) }
-                })
+                PerfilRoute(
+                    onMostrarSnackbar = { msg ->
+                        coroutineScope.launch { onMostrarSnackbar(msg) }
+                    },
+                    onCerrarSesion = {
+                        navController.navigate(AppRoute.Login) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    },
+                )
             }
         }
     }

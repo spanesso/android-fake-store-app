@@ -1,20 +1,12 @@
 package com.mango.fakestore.features.products.presentation.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.mango.fakestore.core.designsystem.component.MangoIconButton
 import com.mango.fakestore.core.designsystem.component.MangoProductCard
 import com.mango.fakestore.core.designsystem.theme.MangoTheme
-import com.mango.fakestore.features.products.presentation.R
 import com.mango.fakestore.features.products.presentation.model.ProductoUi
 import com.mango.fakestore.features.products.presentation.ui.state.ProductosUiEvent
 
@@ -24,25 +16,18 @@ fun ProductoItem(
     onEvent: (ProductosUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
-        MangoProductCard(
-            title = producto.titulo,
-            price = producto.precio,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        MangoIconButton(
-            imageVector = if (producto.esFavorito) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-            contentDescription = stringResource(
-                if (producto.esFavorito) {
-                    R.string.productos_quitar_favorito_descripcion
-                } else {
-                    R.string.productos_aniadir_favorito_descripcion
-                },
-            ),
-            onClick = { onEvent(ProductosUiEvent.ToggleFavorito(producto)) },
-            modifier = Modifier.align(Alignment.TopEnd),
-        )
-    }
+    MangoProductCard(
+        title = producto.titulo,
+        price = producto.precio,
+        imagenUrl = producto.imagenUrl,
+        descripcion = "",
+        categoria = producto.categoria,
+        puntuacion = producto.puntuacion,
+        numVotaciones = producto.numVotaciones,
+        esFavorito = producto.esFavorito,
+        onFavoritoClick = { onEvent(ProductosUiEvent.ToggleFavorito(producto)) },
+        modifier = modifier.fillMaxWidth(),
+    )
 }
 
 @Preview(name = "ProductoItem - Claro", showBackground = true)

@@ -24,6 +24,7 @@ tasks.withType<Test>().configureEach {
 
 dependencies {
     implementation(project(":core:error"))
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     testImplementation(libs.konsist)

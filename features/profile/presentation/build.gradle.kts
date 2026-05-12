@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":core:security"))
     implementation(project(":features:profile:domain"))
     implementation(project(":features:favorites:api"))
+    implementation(project(":features:auth:api"))
 
     implementation(libs.arrow.core)
     implementation(libs.coil.compose)
