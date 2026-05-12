@@ -200,6 +200,19 @@ com.mango.fakestore
 3. **Modificar la matriz de dependencias**: requiere ADR y enmienda en `prompt.txt` +
    constitución + esta sección.
 
+## CI/CD (ETAPA 9)
+
+Los pipelines de automatización viven en `.github/workflows/`:
+
+| Workflow | Trigger | Propósito |
+|---|---|---|
+| `pr.yml` | Pull Request → `develop`/`main` | Detekt + ktlint + tests unitarios + Kover + assembleDevDebug + SonarCloud (opcional) |
+| `main.yml` | Push a `develop` | Todo lo de `pr.yml` + Firebase Test Lab + Firebase App Distribution (grupo `qa-internal`) |
+| `release.yml` | Push de tag `v*` | `bundleProdRelease` firmado + Google Play Internal Testing + mapping Crashlytics + GitHub Release |
+| `azure-pipelines.yml` | Push/PR opcional | Espejo en Azure Pipelines (referencia, no pipeline principal) |
+
+Documentación operacional completa: [`docs/ci-cd.md`](ci-cd.md).
+
 ## Mantenimiento
 
 - Este documento se actualiza al cerrar cada ETAPA del prompt maestro (§14).

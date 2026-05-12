@@ -1,0 +1,133 @@
+# Azure Pipelines — Espejo opcional del pipeline de PR
+# Equivalencia con GitHub Actions: ver docs/ci-cd.md § Correspondencia con otras plataformas
+#
+# NOTA: Este pipeline es OPCIONAL. El pipeline principal es GitHub Actions (.github/workflows/pr.yml).
+# Solo activar si la empresa exige Azure Pipelines como CI primario.
+
+trigger:
+  branches:
+    include:
+      - develop
+      - main
+
+pr:
+  branches:
+    include:
+      - develop
+      - main
+
+# Equivalente a: runs-on: ubuntu-latest
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  JAVA_VERSION: '17'
+
+stages:
+  # ─────────────────────────────────────────────
+  # Análisis estático — equivalente a job "lint" en pr.yml
+  # ─────────────────────────────────────────────
+  - stage: Lint
+    displayName: 'Análisis estático (Detekt + ktlint)'
+    jobs:
+      - job: LintJob
+        steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: $(JAVA_VERSION)
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          # Equivalente a: actions/cache@v4 para ~/.gradle
+          - task: Cache@2
+            inputs:
+              key: 'gradle | "$(Agent.OS)" | **/*.gradle.kts | **/libs.versions.toml'
+              restoreKeys: 'gradle | "$(Agent.OS)"'
+              path: $(HOME)/.gradle
+
+          # Equivalente a: echo "$SECRET" > app/google-services.json
+          - script: echo "$(FIREBASE_GOOGLE_SERVICES_JSON)" > app/google-services.json
+            displayName: 'Escribir google-services.json'
+
+          - script: chmod +x gradlew
+            displayName: 'Permisos al wrapper de Gradle'
+
+          # Equivalente a: ./gradlew detekt ktlintCheck
+          - script: ./gradlew detekt ktlintCheck
+            displayName: 'Ejecutar Detekt + ktlint'
+
+  # ─────────────────────────────────────────────
+  # Tests unitarios — equivalente a job "test" en pr.yml
+  # ─────────────────────────────────────────────
+  - stage: Test
+    displayName: 'Tests unitarios'
+    dependsOn: Lint
+    jobs:
+      - job: TestJob
+        steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: $(JAVA_VERSION)
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          - task: Cache@2
+            inputs:
+              key: 'gradle | "$(Agent.OS)" | **/*.gradle.kts | **/libs.versions.toml'
+              restoreKeys: 'gradle | "$(Agent.OS)"'
+              path: $(HOME)/.gradle
+
+          - script: echo "$(FIREBASE_GOOGLE_SERVICES_JSON)" > app/google-services.json
+            displayName: 'Escribir google-services.json'
+
+          - script: chmod +x gradlew
+            displayName: 'Permisos al wrapper'
+
+          # Equivalente a: ./gradlew testDevDebugUnitTest
+          - script: ./gradlew testDevDebugUnitTest
+            displayName: 'Tests unitarios (flavor dev)'
+
+          # Equivalente a: actions/upload-artifact@v4 para test-results
+          - task: PublishTestResults@2
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/build/test-results/**/*.xml'
+              testRunTitle: 'Unit Tests'
+
+  # ─────────────────────────────────────────────
+  # Compilación — equivalente a job "build" en pr.yml
+  # ─────────────────────────────────────────────
+  - stage: Build
+    displayName: 'Compilar APK debug'
+    dependsOn: Test
+    jobs:
+      - job: BuildJob
+        steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: $(JAVA_VERSION)
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          - task: Cache@2
+            inputs:
+              key: 'gradle | "$(Agent.OS)" | **/*.gradle.kts | **/libs.versions.toml'
+              restoreKeys: 'gradle | "$(Agent.OS)"'
+              path: $(HOME)/.gradle
+
+          - script: echo "$(FIREBASE_GOOGLE_SERVICES_JSON)" > app/google-services.json
+            displayName: 'Escribir google-services.json'
+
+          - script: chmod +x gradlew
+            displayName: 'Permisos al wrapper'
+
+          # Equivalente a: ./gradlew assembleDevDebug
+          - script: ./gradlew assembleDevDebug
+            displayName: 'Compilar APK dev debug'
+
+          # Equivalente a: actions/upload-artifact@v4 para apk-dev-debug
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: 'app/build/outputs/apk/dev/debug'
+              artifactName: 'apk-dev-debug'
