@@ -2,6 +2,8 @@ package com.mango.fakestore.features.profile.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mango.fakestore.core.analytics.AnalyticsEvent
+import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.features.favorites.domain.usecase.ObservarConteoFavoritos
@@ -31,6 +33,7 @@ class PerfilViewModel @Inject constructor(
     private val obtenerPerfil: ObtenerPerfil,
     private val observarConteoFavoritos: ObservarConteoFavoritos,
     private val telemetry: Telemetry,
+    private val eventTracker: EventTracker,
     private val errorMapper: PerfilUiErrorMapper,
 ) : ViewModel() {
 
@@ -82,6 +85,7 @@ class PerfilViewModel @Inject constructor(
                         PerfilUiState.Error(errorMapper.map(error))
                     },
                     ifRight = { usuario ->
+                        eventTracker.registrar(AnalyticsEvent.PerfilVisto)
                         PerfilUiState.Content(
                             usuario = PerfilContenidoUi(
                                 id = usuario.id,

@@ -3,6 +3,8 @@ package com.mango.fakestore.features.products.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.mango.fakestore.core.analytics.AnalyticsEvent
+import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
@@ -35,6 +37,7 @@ class ProductosViewModel @Inject constructor(
     private val observarFavoritos: ObservarFavoritos,
     private val toggleFavorito: ToggleFavorito,
     private val telemetry: Telemetry,
+    private val eventTracker: EventTracker,
     private val errorMapper: DomainErrorToUiErrorMapper,
 ) : ViewModel() {
 
@@ -72,55 +75,74 @@ class ProductosViewModel @Inject constructor(
         cargaJob?.cancel()
         cargaJob = viewModelScope.launch(errorHandler) {
             _uiState.update { ProductosUiState.Loading }
-            combine(obtenerProductos(), observarFavoritos()) { productosResult, favoritosResult ->
-                productosResult to favoritosResult
-            }.collect { (productosResult, favoritosResult) ->
-                when (productosResult) {
-                    is Either.Right -> {
-                        val productos = productosResult.value
-                        val favoritosIds = when (favoritosResult) {
-                            is Either.Right -> favoritosResult.value.map { it.productoId }.toSet()
-                            is Either.Left -> emptySet()
-                        }
-                        _uiState.update {
-                            if (productos.isEmpty()) {
-                                ProductosUiState.Empty
-                            } else {
-                                ProductosUiState.Content(
-                                    productos.map { it.toUi(esFavorito = it.id in favoritosIds) }
-                                )
+            val traza = telemetry.iniciarTraza("cargar_productos")
+            try {
+                combine(obtenerProductos(), observarFavoritos()) { productosResult, favoritosResult ->
+                    productosResult to favoritosResult
+                }.collect { (productosResult, favoritosResult) ->
+                    when (productosResult) {
+                        is Either.Right -> {
+                            val productos = productosResult.value
+                            val favoritosIds = when (favoritosResult) {
+                                is Either.Right -> favoritosResult.value.map { it.productoId }.toSet()
+                                is Either.Left -> emptySet()
+                            }
+                            _uiState.update {
+                                if (productos.isEmpty()) {
+                                    ProductosUiState.Empty
+                                } else {
+                                    // Sin pantalla de detalle: registrar el primer producto visible
+                                    eventTracker.registrar(AnalyticsEvent.ProductoVisto(productos.first().id))
+                                    ProductosUiState.Content(
+                                        productos.map { it.toUi(esFavorito = it.id in favoritosIds) }
+                                    )
+                                }
                             }
                         }
-                    }
-                    is Either.Left -> {
-                        val domainError = productosResult.value
-                        telemetry.reportarNoFatal(
-                            error = domainError,
-                            contexto = mapOf("vm" to "ProductosViewModel", "accion" to "cargarProductos"),
-                        )
-                        val uiError = errorMapper.map(domainError)
-                        _uiState.update { ProductosUiState.Error(uiError) }
-                        _uiEffect.emit(ProductosUiEffect.MostrarSnackbar(uiError))
+                        is Either.Left -> {
+                            val domainError = productosResult.value
+                            telemetry.reportarNoFatal(
+                                error = domainError,
+                                contexto = mapOf("vm" to "ProductosViewModel", "accion" to "cargarProductos"),
+                            )
+                            val uiError = errorMapper.map(domainError)
+                            _uiState.update { ProductosUiState.Error(uiError) }
+                            _uiEffect.emit(ProductosUiEffect.MostrarSnackbar(uiError))
+                        }
                     }
                 }
+            } finally {
+                traza.detener()
             }
         }
     }
 
     private fun toggleFavorito(productoUi: ProductoUi) {
         viewModelScope.launch(errorHandler) {
-            val favorito = Favorito(
-                productoId = productoUi.id,
-                titulo = productoUi.titulo,
-                precio = productoUi.precioDouble,
-                imagenUrl = productoUi.imagenUrl,
-                categoria = productoUi.categoria,
-                fechaMarcado = System.currentTimeMillis(),
-            )
-            val resultado = toggleFavorito(favorito)
-            if (resultado is Either.Left) {
-                val uiError = errorMapper.map(resultado.value)
-                _uiEffect.emit(ProductosUiEffect.MostrarSnackbar(uiError))
+            val traza = telemetry.iniciarTraza("toggle_favorito")
+            try {
+                val favorito = Favorito(
+                    productoId = productoUi.id,
+                    titulo = productoUi.titulo,
+                    precio = productoUi.precioDouble,
+                    imagenUrl = productoUi.imagenUrl,
+                    categoria = productoUi.categoria,
+                    fechaMarcado = System.currentTimeMillis(),
+                )
+                val resultado = toggleFavorito(favorito)
+                if (resultado is Either.Left) {
+                    val uiError = errorMapper.map(resultado.value)
+                    _uiEffect.emit(ProductosUiEffect.MostrarSnackbar(uiError))
+                } else {
+                    val evento = if (productoUi.esFavorito) {
+                        AnalyticsEvent.ProductoDesfavoritado(productoUi.id)
+                    } else {
+                        AnalyticsEvent.ProductoFavoritado(productoUi.id)
+                    }
+                    eventTracker.registrar(evento)
+                }
+            } finally {
+                traza.detener()
             }
         }
     }
