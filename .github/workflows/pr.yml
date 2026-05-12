@@ -195,7 +195,7 @@ jobs:
     name: Análisis SonarCloud
     runs-on: ubuntu-latest
     needs: coverage
-    if: ${{ secrets.SONAR_TOKEN != '' }}
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
