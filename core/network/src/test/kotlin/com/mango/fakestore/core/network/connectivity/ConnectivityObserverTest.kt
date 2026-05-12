@@ -6,7 +6,6 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.mango.fakestore.core.common.dispatchers.AppDispatchers
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -27,7 +26,6 @@ class ConnectivityObserverTest {
     private val callbackSlot = slot<ConnectivityManager.NetworkCallback>()
 
     private val testDispatcher = UnconfinedTestDispatcher()
-    private val dispatchers = mockk<AppDispatchers> { every { io } returns testDispatcher }
 
     @Before
     fun setUp() {
@@ -38,7 +36,7 @@ class ConnectivityObserverTest {
             every { getSystemService(Context.CONNECTIVITY_SERVICE) } returns connectivityManager
             every { applicationContext } returns this
         }
-        observer = ConnectivityObserverImpl(context, dispatchers)
+        observer = ConnectivityObserverImpl(context)
     }
 
     @Test
