@@ -12,7 +12,7 @@ import org.gradle.kotlin.dsl.getByType
  * el BOM + las dependencias mínimas comunes (`ui`, `material3`, `ui-tooling-preview`,
  * `lifecycle-viewmodel-compose`).
  */
-internal fun Project.configureCompose(commonExtension: CommonExtension<*, *, *, *, *, *>) {
+internal fun Project.configureCompose(commonExtension: CommonExtension) {
     val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
     commonExtension.apply {
         buildFeatures.compose = true

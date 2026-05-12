@@ -1,0 +1,181 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>AnnotationOnSeparateLine:MangoBottomSheet.kt$@Preview(name = "BottomSheet - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoButton.kt$@Preview(name = "Button Destructive - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoButton.kt$@Preview(name = "Button Primary - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoButton.kt$@Preview(name = "Button Primary Disabled - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoButton.kt$@Preview(name = "Button Primary Idle - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoButton.kt$@Preview(name = "Button Primary Loading - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoCard.kt$@Preview(name = "Card - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoCard.kt$@Preview(name = "Card Elevated - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoCard.kt$@Preview(name = "Card Outlined - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoChip.kt$@Preview(name = "Chip - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoChip.kt$@Preview(name = "Chip Filter Idle - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoChip.kt$@Preview(name = "Chip Filter Selected - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoDialog.kt$@Preview(name = "Dialog - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoDialog.kt$@Preview(name = "Dialog - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoEmptyState.kt$@Preview(name = "EmptyState - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoEmptyState.kt$@Preview(name = "EmptyState - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoErrorState.kt$@Preview(name = "ErrorState - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoErrorState.kt$@Preview(name = "ErrorState con Retry - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoErrorState.kt$@Preview(name = "ErrorState sin Retry - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoIconButton.kt$@Preview(name = "IconButton - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoIconButton.kt$@Preview(name = "IconButton Disabled - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoIconButton.kt$@Preview(name = "IconButton Idle - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoLoadingIndicator.kt$@Preview(name = "Loading Circular - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoLoadingIndicator.kt$@Preview(name = "Loading Circular - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoLoadingIndicator.kt$@Preview(name = "Loading Linear - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoLoadingIndicator.kt$@Preview(name = "Loading Shimmer - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoNavigationBar.kt$@Preview(name = "NavBar - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoNavigationBar.kt$@Preview(name = "NavBar - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoOfflineBannerContent.kt$@Preview(name = "OfflineBanner - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoOfflineBannerContent.kt$@Preview(name = "OfflineBanner Oculto - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoOfflineBannerContent.kt$@Preview(name = "OfflineBanner Visible - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoProductCard.kt$@Preview(name = "ProductCard - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoProductCard.kt$@Preview(name = "ProductCard Idle - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoProductCard.kt$@Preview(name = "ProductCard Loading - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoSnackbar.kt$@Preview(name = "Snackbar - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoSnackbar.kt$@Preview(name = "Snackbar Error - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoSnackbar.kt$@Preview(name = "Snackbar Info - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoSnackbar.kt$@Preview(name = "Snackbar Success - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoSnackbar.kt$@Preview(name = "Snackbar Warning - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoTextField.kt$@Preview(name = "TextField - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoTextField.kt$@Preview(name = "TextField Disabled - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoTextField.kt$@Preview(name = "TextField Error - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoTextField.kt$@Preview(name = "TextField Idle - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoTopAppBar.kt$@Preview(name = "TopAppBar - Claro", showBackground = true) @Composable private</ID>
+    <ID>AnnotationOnSeparateLine:MangoTopAppBar.kt$@Preview(name = "TopAppBar - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES) @Composable private</ID>
+    <ID>ArgumentListWrapping:MangoButton.kt$( onClick = onClick, enabled = enabled, modifier = modifier.defaultMinSize(minHeight = minHeight), colors = ButtonDefaults.buttonColors(containerColor = MangoColors.semanticoError), contentPadding = contentPadding, content = { content() }, )</ID>
+    <ID>ArgumentListWrapping:MangoButton.kt$( onClick = onClick, enabled = enabled, modifier = modifier.defaultMinSize(minHeight = minHeight), contentPadding = contentPadding, content = { content() }, )</ID>
+    <ID>ArgumentListWrapping:MangoButton.kt$("Confirmar", {}, state = MangoButtonState.Disabled)</ID>
+    <ID>ArgumentListWrapping:MangoButton.kt$("Confirmar", {}, state = MangoButtonState.Loading)</ID>
+    <ID>ArgumentListWrapping:MangoButton.kt$("Eliminar", {}, variant = MangoButtonVariant.Destructive)</ID>
+    <ID>ArgumentListWrapping:MangoCard.kt$("Tarjeta Outlined")</ID>
+    <ID>ArgumentListWrapping:MangoCard.kt$(variant = MangoCardVariant.Outlined)</ID>
+    <ID>ArgumentListWrapping:MangoChip.kt$( onClick = onClick, label = { MangoText(label) }, enabled = enabled, modifier = modifier, )</ID>
+    <ID>ArgumentListWrapping:MangoChip.kt$( selected = selected, onClick = onClick, label = { MangoText(label) }, enabled = enabled, modifier = modifier, )</ID>
+    <ID>ArgumentListWrapping:MangoChip.kt$("Talla S", MangoChipType.Filter, selected = true)</ID>
+    <ID>ArgumentListWrapping:MangoEmptyState.kt$("No hay productos disponibles", title = "Sin resultados")</ID>
+    <ID>ArgumentListWrapping:MangoErrorState.kt$(R.string.error_red_no_autorizado, UiError.Severity.Fatal, listOf(UiError.UiErrorAction.Login), "NET-401")</ID>
+    <ID>ArgumentListWrapping:MangoErrorState.kt$(R.string.error_red_sin_conexion, UiError.Severity.Blocking, listOf(UiError.UiErrorAction.Retry), "NET-000")</ID>
+    <ID>ArgumentListWrapping:MangoErrorState.kt$(UiError.UiErrorAction.Login)</ID>
+    <ID>ArgumentListWrapping:MangoErrorState.kt$(UiError.UiErrorAction.Retry)</ID>
+    <ID>ArgumentListWrapping:MangoIcon.kt$(name = "MangoIcon - Oscuro", showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)</ID>
+    <ID>ArgumentListWrapping:MangoIconButton.kt$(Icons.Default.Favorite, "Favorito", {}, enabled = false)</ID>
+    <ID>ArgumentListWrapping:MangoLoadingIndicator.kt$(MangoLoadingVariant.Circular)</ID>
+    <ID>ArgumentListWrapping:MangoSnackbar.kt$("Atención requerida", MangoSnackbarSeverity.Warning)</ID>
+    <ID>ArgumentListWrapping:MangoSnackbar.kt$("Error en la red", MangoSnackbarSeverity.Error)</ID>
+    <ID>ArgumentListWrapping:MangoSnackbar.kt$("Ha ocurrido un error", MangoSnackbarSeverity.Error)</ID>
+    <ID>ArgumentListWrapping:MangoSnackbar.kt$("Información disponible", MangoSnackbarSeverity.Info)</ID>
+    <ID>ArgumentListWrapping:MangoSnackbar.kt$("Operación exitosa", MangoSnackbarSeverity.Success)</ID>
+    <ID>ArgumentListWrapping:MangoTextField.kt$(value = "invalid", onValueChange = {}, label = "Correo", isError = true, supportingText = "Formato incorrecto")</ID>
+    <ID>ArgumentListWrapping:MangoThemeSnapshotTest.kt$MangoButtonSnapshotTest$("Confirmar", {}, state = com.mango.fakestore.core.designsystem.component.MangoButtonState.Disabled)</ID>
+    <ID>ArgumentListWrapping:MangoThemeSnapshotTest.kt$MangoButtonSnapshotTest$("Confirmar", {}, state = com.mango.fakestore.core.designsystem.component.MangoButtonState.Loading)</ID>
+    <ID>Filename:MangoThemeSnapshotTest.kt$com.mango.fakestore.core.designsystem.snapshot.MangoThemeSnapshotTest.kt</ID>
+    <ID>ImportOrdering:MangoIcon.kt$import androidx.compose.foundation.layout.size import androidx.compose.material3.Icon import androidx.compose.runtime.Composable import androidx.compose.ui.Modifier import androidx.compose.ui.graphics.vector.ImageVector import androidx.compose.ui.tooling.preview.Preview import androidx.compose.ui.unit.dp import androidx.compose.material.icons.Icons import androidx.compose.material.icons.filled.Favorite import com.mango.fakestore.core.designsystem.theme.MangoTheme</ID>
+    <ID>ImportOrdering:MangoNavigationBar.kt$import android.content.res.Configuration import androidx.compose.material3.NavigationBar import androidx.compose.material3.NavigationBarItem import androidx.compose.runtime.Composable import androidx.compose.ui.Modifier import androidx.compose.ui.graphics.vector.ImageVector import androidx.compose.ui.tooling.preview.Preview import androidx.compose.material.icons.Icons import androidx.compose.material.icons.filled.Favorite import androidx.compose.material.icons.filled.Home import com.mango.fakestore.core.designsystem.theme.MangoTheme</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFF0A0A0A</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFF2B2B2B</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFF2E7D32</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFF8B1E1E</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFFB00020</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFFB08D57</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFFB26500</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFFB8AEA2</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFFE6DED3</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFFF5F1EC</ID>
+    <ID>MagicNumber:MangoColors.kt$MangoColors$0xFFFFFFFF</ID>
+    <ID>MagicNumber:MangoMotion.kt$MangoMotion$0.2f</ID>
+    <ID>MagicNumber:MangoProductCard.kt$0.5f</ID>
+    <ID>MagicNumber:MangoShapes.kt$MangoShapes$50</ID>
+    <ID>MatchingDeclarationName:MangoCard.kt$MangoCardVariant</ID>
+    <ID>MatchingDeclarationName:MangoChip.kt$MangoChipType</ID>
+    <ID>MatchingDeclarationName:MangoLoadingIndicator.kt$MangoLoadingVariant</ID>
+    <ID>MatchingDeclarationName:MangoNavigationBar.kt$MangoNavItem</ID>
+    <ID>MatchingDeclarationName:MangoSnackbar.kt$MangoSnackbarSeverity</ID>
+    <ID>MatchingDeclarationName:MangoTextField.kt$MangoTextFieldVariant</ID>
+    <ID>MatchingDeclarationName:MangoThemeSnapshotTest.kt$MangoButtonSnapshotTest</ID>
+    <ID>MatchingDeclarationName:MangoTopAppBar.kt$MangoTopAppBarVariant</ID>
+    <ID>MaxLineLength:MangoButton.kt$@Composable</ID>
+    <ID>MaxLineLength:MangoCard.kt$@Composable</ID>
+    <ID>MaxLineLength:MangoChip.kt$@Composable</ID>
+    <ID>MaxLineLength:MangoEmptyState.kt$@Composable</ID>
+    <ID>MaxLineLength:MangoErrorState.kt$uiError = UiError(R.string.error_red_no_autorizado, UiError.Severity.Fatal, listOf(UiError.UiErrorAction.Login), "NET-401")</ID>
+    <ID>MaxLineLength:MangoErrorState.kt$uiError = UiError(R.string.error_red_sin_conexion, UiError.Severity.Blocking, listOf(UiError.UiErrorAction.Retry), "NET-000")</ID>
+    <ID>MaxLineLength:MangoIcon.kt$@Preview(name = "MangoIcon - Oscuro", showBackground = true, uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES)</ID>
+    <ID>MaxLineLength:MangoIconButton.kt$@Composable</ID>
+    <ID>MaxLineLength:MangoLoadingIndicator.kt$@Composable</ID>
+    <ID>MaxLineLength:MangoSnackbar.kt$@Composable</ID>
+    <ID>MaxLineLength:MangoTextField.kt$MangoTheme { MangoTextField(value = "invalid", onValueChange = {}, label = "Correo", isError = true, supportingText = "Formato incorrecto") }</ID>
+    <ID>MaxLineLength:MangoThemeSnapshotTest.kt$MangoButtonSnapshotTest$MangoButton("Confirmar", {}, state = com.mango.fakestore.core.designsystem.component.MangoButtonState.Disabled)</ID>
+    <ID>MaxLineLength:MangoThemeSnapshotTest.kt$MangoButtonSnapshotTest$MangoButton("Confirmar", {}, state = com.mango.fakestore.core.designsystem.component.MangoButtonState.Loading)</ID>
+    <ID>MaximumLineLength:MangoButton.kt$@</ID>
+    <ID>MaximumLineLength:MangoCard.kt$@</ID>
+    <ID>MaximumLineLength:MangoChip.kt$@</ID>
+    <ID>MaximumLineLength:MangoEmptyState.kt$@</ID>
+    <ID>MaximumLineLength:MangoErrorState.kt$ </ID>
+    <ID>MaximumLineLength:MangoIcon.kt$@</ID>
+    <ID>MaximumLineLength:MangoIconButton.kt$@</ID>
+    <ID>MaximumLineLength:MangoLoadingIndicator.kt$@</ID>
+    <ID>MaximumLineLength:MangoSnackbar.kt$@</ID>
+    <ID>MaximumLineLength:MangoTextField.kt$ </ID>
+    <ID>MaximumLineLength:MangoThemeSnapshotTest.kt$MangoButtonSnapshotTest$ </ID>
+    <ID>NoMultipleSpaces:MangoColors.kt$MangoColors$ </ID>
+    <ID>NoMultipleSpaces:MangoElevations.kt$MangoElevations$ </ID>
+    <ID>NoMultipleSpaces:MangoMotion.kt$MangoMotion$ </ID>
+    <ID>NoMultipleSpaces:MangoShapes.kt$ </ID>
+    <ID>NoMultipleSpaces:MangoShapes.kt$MangoShapes$ </ID>
+    <ID>NoMultipleSpaces:MangoSnackbar.kt$ </ID>
+    <ID>NoMultipleSpaces:MangoSpacing.kt$MangoSpacing$ </ID>
+    <ID>NoMultipleSpaces:MangoTheme.kt$ </ID>
+    <ID>NoMultipleSpaces:MangoTypography.kt$ </ID>
+    <ID>NoUnusedImports:MangoBottomSheet.kt$com.mango.fakestore.core.designsystem.component.MangoBottomSheet.kt</ID>
+    <ID>NoUnusedImports:MangoButton.kt$com.mango.fakestore.core.designsystem.component.MangoButton.kt</ID>
+    <ID>NoUnusedImports:MangoIcon.kt$com.mango.fakestore.core.designsystem.component.MangoIcon.kt</ID>
+    <ID>NoUnusedImports:MangoLoadingIndicator.kt$com.mango.fakestore.core.designsystem.component.MangoLoadingIndicator.kt</ID>
+    <ID>NoUnusedImports:MangoProductCard.kt$com.mango.fakestore.core.designsystem.component.MangoProductCard.kt</ID>
+    <ID>NoUnusedImports:MangoSnackbar.kt$com.mango.fakestore.core.designsystem.component.MangoSnackbar.kt</ID>
+    <ID>NoUnusedImports:MangoTextField.kt$com.mango.fakestore.core.designsystem.component.MangoTextField.kt</ID>
+    <ID>NoUnusedImports:Material3IsolationKonsistTest.kt$com.mango.fakestore.core.designsystem.konsist.Material3IsolationKonsistTest.kt</ID>
+    <ID>SpacingAroundOperators:MangoColors.kt$MangoColors$=</ID>
+    <ID>SpacingAroundOperators:MangoSpacing.kt$MangoSpacing$=</ID>
+    <ID>UnusedParameter:MangoTextField.kt$variant: MangoTextFieldVariant = MangoTextFieldVariant.Outlined</ID>
+    <ID>UnusedPrivateProperty:Material3IsolationKonsistTest.kt$Material3IsolationKonsistTest$private val allowedClassesInCoreUi = setOf("Surface", "Scaffold", "Snackbar")</ID>
+    <ID>Wrapping:MangoButton.kt$</ID>
+    <ID>Wrapping:MangoButton.kt$;</ID>
+    <ID>Wrapping:MangoButton.kt$MangoButton("Confirmar", {}, state = MangoButtonState.Disabled)</ID>
+    <ID>Wrapping:MangoButton.kt$MangoButton("Confirmar", {}, state = MangoButtonState.Loading)</ID>
+    <ID>Wrapping:MangoButton.kt$MangoButton("Eliminar", {}, variant = MangoButtonVariant.Destructive)</ID>
+    <ID>Wrapping:MangoButton.kt${ MangoTheme { MangoButton("Confirmar", {}, state = MangoButtonState.Disabled) } }</ID>
+    <ID>Wrapping:MangoButton.kt${ MangoTheme { MangoButton("Confirmar", {}, state = MangoButtonState.Loading) } }</ID>
+    <ID>Wrapping:MangoButton.kt${ MangoTheme { MangoButton("Eliminar", {}, variant = MangoButtonVariant.Destructive) } }</ID>
+    <ID>Wrapping:MangoCard.kt$MangoCard(variant = MangoCardVariant.Outlined) { MangoText("Tarjeta Outlined") }</ID>
+    <ID>Wrapping:MangoCard.kt$MangoText("Tarjeta Outlined")</ID>
+    <ID>Wrapping:MangoCard.kt${ MangoTheme { MangoCard(variant = MangoCardVariant.Outlined) { MangoText("Tarjeta Outlined") } } }</ID>
+    <ID>Wrapping:MangoChip.kt$MangoChip("Talla S", MangoChipType.Filter, selected = true)</ID>
+    <ID>Wrapping:MangoChip.kt${ MangoTheme { MangoChip("Talla S", MangoChipType.Filter, selected = true) } }</ID>
+    <ID>Wrapping:MangoDialog.kt${ TextButton(onClick = onDismiss) { MangoText(it) } }</ID>
+    <ID>Wrapping:MangoEmptyState.kt$MangoEmptyState("No hay productos disponibles", title = "Sin resultados")</ID>
+    <ID>Wrapping:MangoEmptyState.kt${ MangoTheme { MangoEmptyState("No hay productos disponibles", title = "Sin resultados") } }</ID>
+    <ID>Wrapping:MangoIconButton.kt$</ID>
+    <ID>Wrapping:MangoIconButton.kt$MangoIconButton(Icons.Default.Favorite, "Favorito", {}, enabled = false)</ID>
+    <ID>Wrapping:MangoIconButton.kt${ MangoTheme { MangoIconButton(Icons.Default.Favorite, "Favorito", {}, enabled = false) } }</ID>
+    <ID>Wrapping:MangoLoadingIndicator.kt$MangoLoadingIndicator(MangoLoadingVariant.Circular)</ID>
+    <ID>Wrapping:MangoLoadingIndicator.kt${ MangoTheme { MangoLoadingIndicator(MangoLoadingVariant.Circular) } }</ID>
+    <ID>Wrapping:MangoNavigationBar.kt$(</ID>
+    <ID>Wrapping:MangoSnackbar.kt$MangoSnackbar("Atención requerida", MangoSnackbarSeverity.Warning)</ID>
+    <ID>Wrapping:MangoSnackbar.kt$MangoSnackbar("Error en la red", MangoSnackbarSeverity.Error)</ID>
+    <ID>Wrapping:MangoSnackbar.kt$MangoSnackbar("Ha ocurrido un error", MangoSnackbarSeverity.Error)</ID>
+    <ID>Wrapping:MangoSnackbar.kt$MangoSnackbar("Información disponible", MangoSnackbarSeverity.Info)</ID>
+    <ID>Wrapping:MangoSnackbar.kt$MangoSnackbar("Operación exitosa", MangoSnackbarSeverity.Success)</ID>
+    <ID>Wrapping:MangoSnackbar.kt${ MangoTheme { MangoSnackbar("Atención requerida", MangoSnackbarSeverity.Warning) } }</ID>
+    <ID>Wrapping:MangoSnackbar.kt${ MangoTheme { MangoSnackbar("Error en la red", MangoSnackbarSeverity.Error) } }</ID>
+    <ID>Wrapping:MangoSnackbar.kt${ MangoTheme { MangoSnackbar("Ha ocurrido un error", MangoSnackbarSeverity.Error) } }</ID>
+    <ID>Wrapping:MangoSnackbar.kt${ MangoTheme { MangoSnackbar("Información disponible", MangoSnackbarSeverity.Info) } }</ID>
+    <ID>Wrapping:MangoSnackbar.kt${ MangoTheme { MangoSnackbar("Operación exitosa", MangoSnackbarSeverity.Success) } }</ID>
+    <ID>Wrapping:MangoTextField.kt$</ID>
+    <ID>Wrapping:MangoTextField.kt$MangoTextField(value = "invalid", onValueChange = {}, label = "Correo", isError = true, supportingText = "Formato incorrecto")</ID>
+  </CurrentIssues>
+</SmellBaseline>

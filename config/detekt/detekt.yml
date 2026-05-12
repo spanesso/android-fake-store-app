@@ -39,7 +39,7 @@ exceptions:
   # documentadas. Las barreras se anotan con @Suppress("TooGenericExceptionCaught", "...").
   TooGenericExceptionCaught:
     active: true
-    exceptions:
+    exceptionNames:
       - 'ArrayIndexOutOfBoundsException'
       - 'Error'
       - 'Exception'

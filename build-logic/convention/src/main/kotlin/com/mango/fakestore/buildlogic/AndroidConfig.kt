@@ -11,17 +11,13 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
  * targetSdk, compileSdk, JDK source/target y la JVM toolchain de Kotlin.
  */
 internal fun Project.configureAndroidCommon(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
     commonExtension.apply {
         compileSdk = 36
-        defaultConfig {
-            minSdk = 24
-        }
-        compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
-        }
+        defaultConfig.minSdk = 24
+        compileOptions.sourceCompatibility = JavaVersion.VERSION_11
+        compileOptions.targetCompatibility = JavaVersion.VERSION_11
     }
     extensions.findByType(KotlinAndroidProjectExtension::class.java)?.apply {
         compilerOptions {

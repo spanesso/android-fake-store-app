@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Red -->
+    <string name="error_red_sin_conexion">Sin conexión a internet. Verifica tu red e inténtalo de nuevo.</string>
+    <string name="error_red_tiempo_agotado">La solicitud tardó demasiado. Inténtalo de nuevo.</string>
+    <string name="error_red_servidor">Error en el servidor. Inténtalo en unos minutos.</string>
+    <string name="error_red_no_autorizado">Tu sesión ha expirado. Inicia sesión nuevamente.</string>
+    <string name="error_red_sin_permiso">No tienes permiso para realizar esta acción.</string>
+    <string name="error_red_no_encontrado">El contenido solicitado no está disponible.</string>
+    <string name="error_red_formato">Hubo un problema al procesar la respuesta.</string>
+
+    <!-- Base de datos -->
+    <string name="error_bd_lectura">No se pudo leer la información. Inténtalo de nuevo.</string>
+    <string name="error_bd_escritura">No se pudo guardar la información. Inténtalo de nuevo.</string>
+    <string name="error_bd_no_encontrado">No se encontró la información solicitada.</string>
+    <string name="error_bd_integridad">Error de integridad de datos.</string>
+
+    <!-- Seguridad -->
+    <string name="error_seg_biometria_no_disponible">La autenticación biométrica no está disponible en este dispositivo.</string>
+    <string name="error_seg_biometria_bloqueada">Demasiados intentos fallidos. La biometría está bloqueada temporalmente.</string>
+    <string name="error_seg_root_detectado">No se puede usar la aplicación en este dispositivo.</string>
+    <string name="error_seg_integridad">La integridad de la aplicación no pudo verificarse.</string>
+    <string name="error_seg_sesion_expirada">Tu sesión ha expirado. Inicia sesión nuevamente.</string>
+
+    <!-- Validación y genérico -->
+    <string name="error_validacion_formulario">Revisa los campos del formulario e inténtalo de nuevo.</string>
+    <string name="error_desconocido">Ocurrió un error inesperado. Inténtalo de nuevo.</string>
+</resources>
