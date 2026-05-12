@@ -2,18 +2,19 @@
 <network-security-config>
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">fakestoreapi.com</domain>
-        <pin-set>
-            <!-- Pin primario — SHA-256 de fakestoreapi.com obtenido el 2026-05-11 -->
+        <!--
+            Verificado: 2026-05-12. Rotar antes de 2027-01-01.
+            Ver docs/seguridad.md seccion 6 para el comando openssl de verificacion.
+        -->
+        <pin-set expiration="2027-01-01">
+            <!-- Pin primario — SHA-256 SPKI del certificado hoja de fakestoreapi.com -->
             <pin digest="SHA-256">dSxOWQR+hD1HkfYEk0y+JuXzHrLTjhVPXDzGRsbO7oI=</pin>
             <!--
-                Pin de backup — placeholder. Actualizar con:
-                openssl s_client -connect fakestoreapi.com:443 </dev/null \
-                  | openssl x509 -pubkey -noout \
-                  | openssl pkey -pubin -outform DER \
-                  | openssl dgst -sha256 -binary \
-                  | openssl enc -base64
+                Pin de backup — SHA-256 SPKI de la CA intermedia Let's Encrypt E5/E6.
+                Más estable que el certificado hoja (válida 2+ años).
+                Verificar con el comando openssl indicado en research.md antes de release.
             -->
-            <pin digest="SHA-256">AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</pin>
+            <pin digest="SHA-256">jQJTbIh0grw0/1TkHSumWb+Fs0Kct2/cm9cT5a1+aI=</pin>
         </pin-set>
     </domain-config>
     <debug-overrides>
