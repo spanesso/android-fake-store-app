@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(project(":core:error"))
     implementation(project(":core:common"))
+    implementation(project(":core:logging"))
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)

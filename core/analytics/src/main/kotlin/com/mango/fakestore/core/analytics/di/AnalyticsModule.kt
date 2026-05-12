@@ -8,6 +8,7 @@ import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.analytics.impl.FirebaseEventTrackerImpl
 import com.mango.fakestore.core.analytics.impl.FirebaseTelemetryImpl
+import com.mango.fakestore.core.logging.Logger
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,7 +39,8 @@ object AnalyticsModule {
         crashlytics: FirebaseCrashlytics,
         analytics: FirebaseAnalytics,
         performance: FirebasePerformance,
-    ): Telemetry = FirebaseTelemetryImpl(crashlytics, analytics, performance)
+        logger: Logger,
+    ): Telemetry = FirebaseTelemetryImpl(crashlytics, analytics, performance, logger)
 
     @Provides
     @Singleton
