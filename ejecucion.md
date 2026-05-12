@@ -96,6 +96,8 @@ Por cada módulo:
 
 Compila tras cada módulo. Al cerrar, abre PR en español.
 
+instrucciones de como debo implementar del dashboard en la pagina de Firebase 
+
 Pregúntame si tienes dudas antes de asumir.
 ```
 
@@ -463,8 +465,10 @@ Pregúntame si tienes dudas antes de asumir.
 
 ## Estado actual
 
-> Anota aquí en qué sesión vas, qué quedó pendiente y cualquier decisión clave que tomaste fuera del prompt.
-
-- **Sesión actual**: _(rellenar)_
-- **Última etapa completada**: _(rellenar)_
-- **Pendientes / decisiones**: _(rellenar)_
+- **Sesión actual**: 4 — ETAPA 1 (parte 3/3) · sub-etapas 1.8–1.10 (analytics, security, testing)
+- **Última etapa completada**: SESIÓN 3 — ETAPA 1.5–1.7 (network, database, datastore) · PR abierto
+- **Pendientes / decisiones**:
+  - `MangoDatabase` sin `@Database` (Room requiere ≥1 entidad) — ensamblaje concreto en `:app`
+  - Certificate pin de backup en `network_security_config.xml` es placeholder; reemplazar en producción
+  - `AndroidKeystoreDatabaseKeyManager` y `TinkEncryption` requieren tests instrumentados (ETAPA 7)
+  - Próxima sesión: ETAPA 1.8–1.10 usando SESIÓN 4 prompt de `ejecucion.md`
