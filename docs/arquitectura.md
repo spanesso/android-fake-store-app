@@ -123,7 +123,7 @@ Ensambla la aplicación, declara `Application` con Hilt, aloja el `NavHost` raí
 | `:core:network` | Android | OkHttp/Retrofit base, interceptors, certificate pinning, `NetworkErrorMapper`, `ConnectivityObserver`, retry con backoff. |
 | `:core:database` | Android | Room base, encriptación SQLCipher, migrations, `DatabaseErrorMapper`. |
 | `:core:datastore` | Android | DataStore Preferences cifrado para tokens/preferencias. |
-| `:core:analytics` | Android | Interfaz `Telemetry`, `EventTracker`, impls Firebase y Console (Datadog/Sentry opcionales). |
+| `:core:analytics` | Android | Interfaz `Telemetry`, `EventTracker`, impls Firebase y Console. |
 | `:core:security` | Android | Biometría, anti-screenshot, root detection, secret obfuscation. |
 | `:core:testing` | Kotlin puro | Utilidades de test (fakes, rules, dispatchers test, builders, tests Konsist). |
 
