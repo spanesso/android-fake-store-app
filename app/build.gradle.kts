@@ -4,6 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
+    // firebase-perf plugin (1.4.2) uses the removed AGP Transform API and is incompatible with AGP 9+.
+    // Custom traces via FirebasePerformance SDK are still fully functional.
 }
 
 android {

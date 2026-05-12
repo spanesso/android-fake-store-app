@@ -10,4 +10,6 @@ class NoOpTelemetryImpl : Telemetry {
     override fun iniciarTraza(nombre: String): TraceHandle = object : TraceHandle {
         override fun detener() = Unit
     }
+    override fun setUserId(hashUsuario: String) = Unit
+    override fun setContexto(claves: Map<String, String>) = Unit
 }

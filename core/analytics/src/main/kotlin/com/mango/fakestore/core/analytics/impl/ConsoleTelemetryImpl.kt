@@ -26,6 +26,14 @@ class ConsoleTelemetryImpl(private val logger: Logger) : Telemetry {
         }
     }
 
+    override fun setUserId(hashUsuario: String) {
+        logger.info(TAG, "setUserId: $hashUsuario")
+    }
+
+    override fun setContexto(claves: Map<String, String>) {
+        logger.info(TAG, "setContexto: $claves")
+    }
+
     private companion object {
         const val TAG = "ConsoleTelemetry"
     }

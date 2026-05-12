@@ -3,6 +3,8 @@ package com.mango.fakestore.features.profile.presentation.viewmodel
 import app.cash.turbine.test
 import arrow.core.Either
 import com.google.common.truth.Truth.assertThat
+import com.mango.fakestore.core.analytics.AnalyticsEvent
+import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.UiError
@@ -17,6 +19,7 @@ import com.mango.fakestore.features.profile.presentation.ui.state.PerfilUiState
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -31,6 +34,7 @@ class PerfilViewModelTest {
     private val obtenerPerfil: ObtenerPerfil = mockk()
     private val observarConteoFavoritos: ObservarConteoFavoritos = mockk()
     private val telemetry: Telemetry = mockk(relaxed = true)
+    private val eventTracker: EventTracker = mockk(relaxed = true)
     private val errorMapper: PerfilUiErrorMapper = mockk()
 
     private val usuarioEjemplo = Usuario(
@@ -203,10 +207,35 @@ class PerfilViewModelTest {
     // Helpers
     // -------------------------------------------------------------------------
 
+    // -------------------------------------------------------------------------
+    // US2 — Evento PerfilVisto
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun `cuando perfil carga con exito entonces registra PerfilVisto`() = runTest {
+        coEvery { obtenerPerfil(8) } returns Either.Right(usuarioEjemplo)
+        val viewModel = crearViewModel()
+        coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+        verify { eventTracker.registrar(AnalyticsEvent.PerfilVisto) }
+    }
+
+    @Test
+    fun `cuando perfil falla entonces NO registra PerfilVisto`() = runTest {
+        coEvery { obtenerPerfil(8) } returns Either.Left(DomainError.Network.NoConnection())
+        val viewModel = crearViewModel()
+        coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+        verify(exactly = 0) { eventTracker.registrar(AnalyticsEvent.PerfilVisto) }
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
     private fun crearViewModel() = PerfilViewModel(
         obtenerPerfil = obtenerPerfil,
         observarConteoFavoritos = observarConteoFavoritos,
         telemetry = telemetry,
+        eventTracker = eventTracker,
         errorMapper = errorMapper,
     )
 }
