@@ -12,13 +12,13 @@ import com.mango.fakestore.features.favorites.presentation.model.FavoritoUi
 import com.mango.fakestore.features.favorites.presentation.ui.screens.FavoritosScreen
 import com.mango.fakestore.features.favorites.presentation.ui.state.FavoritosUiEvent
 import com.mango.fakestore.features.favorites.presentation.ui.state.FavoritosUiState
-import com.mango.fakestore.core.error.R as ErrorR
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import com.mango.fakestore.core.error.R as ErrorR
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])

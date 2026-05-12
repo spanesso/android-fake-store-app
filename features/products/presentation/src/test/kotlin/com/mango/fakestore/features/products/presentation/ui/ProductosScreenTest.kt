@@ -12,13 +12,13 @@ import com.mango.fakestore.features.products.presentation.model.ProductoUi
 import com.mango.fakestore.features.products.presentation.ui.screens.ProductosScreen
 import com.mango.fakestore.features.products.presentation.ui.state.ProductosUiEvent
 import com.mango.fakestore.features.products.presentation.ui.state.ProductosUiState
-import com.mango.fakestore.core.error.R as ErrorR
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import com.mango.fakestore.core.error.R as ErrorR
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
