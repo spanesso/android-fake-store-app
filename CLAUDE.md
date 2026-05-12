@@ -10,6 +10,8 @@ Todos los documentos generados deben estar escritos en **español**: especificac
 
 Esta es una prueba técnica que usa **Spec Kit** — un flujo de trabajo integrado con Claude Code para desarrollo guiado por especificaciones. La funcionalidad a construir vive en `repository/android-fake-store-app/`, una aplicación Android (Kotlin + Jetpack Compose) que consume la [Fake Store API](https://fakestoreapi.com/).
 
+**Repositorio Android (público)**: [github.com/spanesso/android-fake-store-app](https://github.com/spanesso/android-fake-store-app)
+
 ## Comandos de la app Android
 
 Todos los comandos Gradle deben ejecutarse desde `repository/android-fake-store-app/`.
