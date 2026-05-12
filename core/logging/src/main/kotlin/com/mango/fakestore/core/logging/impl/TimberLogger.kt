@@ -16,12 +16,10 @@ class TimberLogger : Logger {
     }
 
     override fun warn(tag: String, mensaje: String, causa: Throwable?) {
-        if (causa != null) Timber.tag(tag).w(causa, mensaje)
-        else Timber.tag(tag).w(mensaje)
+        if (causa != null) { Timber.tag(tag).w(causa, mensaje) } else { Timber.tag(tag).w(mensaje) }
     }
 
     override fun error(tag: String, mensaje: String, causa: Throwable?) {
-        if (causa != null) Timber.tag(tag).e(causa, mensaje)
-        else Timber.tag(tag).e(mensaje)
+        if (causa != null) { Timber.tag(tag).e(causa, mensaje) } else { Timber.tag(tag).e(mensaje) }
     }
 }

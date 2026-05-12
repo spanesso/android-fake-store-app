@@ -1,3 +1,5 @@
+@file:Suppress("MaximumLineLength", "MaxLineLength")
+
 package com.mango.fakestore.features.profile.data.mapper
 
 import com.google.common.truth.Truth.assertThat

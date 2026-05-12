@@ -1,3 +1,5 @@
+@file:Suppress("MaximumLineLength", "MaxLineLength")
+
 package com.mango.fakestore.features.products.presentation.viewmodel
 
 import app.cash.turbine.test
@@ -10,10 +12,10 @@ import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.UiError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
 import com.mango.fakestore.core.testing.CoroutineTestRule
-import com.mango.fakestore.features.products.domain.model.Producto
-import com.mango.fakestore.features.products.domain.model.Valoracion
 import com.mango.fakestore.features.favorites.domain.usecase.ObservarFavoritos
 import com.mango.fakestore.features.favorites.domain.usecase.ToggleFavorito
+import com.mango.fakestore.features.products.domain.model.Producto
+import com.mango.fakestore.features.products.domain.model.Valoracion
 import com.mango.fakestore.features.products.domain.usecase.ObtenerProductos
 import com.mango.fakestore.features.products.presentation.mapper.toUi
 import com.mango.fakestore.features.products.presentation.ui.state.ProductosUiEffect
@@ -79,7 +81,12 @@ class ProductosViewModelTest {
     }
 
     private fun crearViewModel() = ProductosViewModel(
-        obtenerProductos, observarFavoritos, toggleFavorito, telemetry, eventTracker, errorMapper,
+        obtenerProductos,
+        observarFavoritos,
+        toggleFavorito,
+        telemetry,
+        eventTracker,
+        errorMapper,
     )
 
     // -------------------------------------------------------------------------
@@ -199,8 +206,11 @@ class ProductosViewModelTest {
         var invocaciones = 0
         every { obtenerProductos() } answers {
             invocaciones++
-            if (invocaciones == 1) flow { emit(Either.Left(domainError)) }
-            else flow { emit(Either.Right(productosDominio)) }
+            if (invocaciones == 1) {
+                flow { emit(Either.Left(domainError)) }
+            } else {
+                flow { emit(Either.Right(productosDominio)) }
+            }
         }
         val viewModel = crearViewModel()
         val productosEsperados = productosDominio.map { it.toUi() }

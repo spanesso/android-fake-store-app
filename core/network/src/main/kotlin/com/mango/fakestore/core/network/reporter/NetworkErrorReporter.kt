@@ -5,7 +5,7 @@ import com.mango.fakestore.core.error.DomainError
 interface NetworkErrorReporter {
     fun reportNetworkError(
         error: DomainError.Network,
-        context: Map<String, String> = emptyMap()
+        context: Map<String, String> = emptyMap(),
     )
 }
 

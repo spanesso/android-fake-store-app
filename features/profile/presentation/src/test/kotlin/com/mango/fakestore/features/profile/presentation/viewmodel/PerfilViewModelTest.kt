@@ -1,3 +1,5 @@
+@file:Suppress("MaximumLineLength", "MaxLineLength")
+
 package com.mango.fakestore.features.profile.presentation.viewmodel
 
 import app.cash.turbine.test

@@ -1,21 +1,17 @@
 package com.mango.fakestore.core.datastore
 
-import androidx.datastore.core.DataStoreFactory
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.mango.fakestore.core.datastore.model.AppTheme
 import com.mango.fakestore.core.datastore.model.SessionData
 import com.mango.fakestore.core.datastore.model.UserPreferences
-import io.mockk.every
-import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,7 +33,7 @@ class MangoDataStoreTest {
         tinkEncryption = FakeTinkEncryption()
         val prefsDataStore = PreferenceDataStoreFactory.create(
             scope = testScope,
-            produceFile = { tmpFolder.newFile("test_prefs.preferences_pb") }
+            produceFile = { tmpFolder.newFile("test_prefs.preferences_pb") },
         )
         dataStore = MangoDataStoreImpl(prefsDataStore, tinkEncryption, testDispatcher)
     }
@@ -47,7 +43,7 @@ class MangoDataStoreTest {
         val session = SessionData(
             accessToken = "access123",
             refreshToken = "refresh456",
-            userId = "user789"
+            userId = "user789",
         )
 
         dataStore.saveSession(session)
@@ -122,8 +118,8 @@ class MangoDataStoreTest {
 
         val corruptStore = PreferenceDataStoreFactory.create(
             scope = testScope,
-            corruptionHandler = androidx.datastore.core.handlers.ReplaceFileCorruptionHandler { androidx.datastore.preferences.core.emptyPreferences() },
-            produceFile = { corruptFile }
+            corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+            produceFile = { corruptFile },
         )
         val storeWithCorruption = MangoDataStoreImpl(corruptStore, tinkEncryption, testDispatcher)
 
@@ -137,11 +133,11 @@ class MangoDataStoreTest {
     fun decrypt_failure_returns_null_token_so_session_appears_empty() = runTest(testDispatcher) {
         val brokenTink = object : com.mango.fakestore.core.datastore.crypto.TinkEncryption(null) {
             override fun encrypt(plaintext: String): String = "enc_$plaintext"
-            override fun decrypt(ciphertext: String): String = throw IllegalStateException("Tink key missing")
+            override fun decrypt(ciphertext: String): String = error("Tink key missing")
         }
         val prefsDataStore = PreferenceDataStoreFactory.create(
             scope = testScope,
-            produceFile = { tmpFolder.newFile("broken_tink.preferences_pb") }
+            produceFile = { tmpFolder.newFile("broken_tink.preferences_pb") },
         )
         val storeWithBrokenTink = MangoDataStoreImpl(prefsDataStore, brokenTink, testDispatcher)
 
@@ -156,8 +152,6 @@ class MangoDataStoreTest {
     }
 
     private class FakeTinkEncryption : com.mango.fakestore.core.datastore.crypto.TinkEncryption(null) {
-        private val store = mutableMapOf<String, String>()
-
         override fun encrypt(plaintext: String): String = "enc_$plaintext"
         override fun decrypt(ciphertext: String): String = ciphertext.removePrefix("enc_")
     }
