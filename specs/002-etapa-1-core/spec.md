@@ -115,7 +115,10 @@ error en cada pantalla.
   `getOrElse`, `flatMap`, `fold`, y equivalentes para `Flow<Either<L, R>>`.
 - **RF-003**: El módulo DEBE exportar extensiones Kotlin utilitarias (nullables, colecciones,
   strings) usadas en más de dos módulos.
-- **RF-004**: El módulo NO DEBE tener dependencias Android; debe ser un módulo Kotlin puro.
+- **RF-004**: El módulo DEBE ser un Android library (`com.android.library`) sin dependencias de
+  UI Android (sin Compose, sin Views, sin Context). Hilt está permitido para el binding de
+  `AppDispatchers`. La restricción "sin dependencias Android" se refiere exclusivamente a capas
+  de UI y presentación.
 
 **Módulo :core:error**
 
@@ -137,14 +140,17 @@ error en cada pantalla.
 - **RF-011**: El módulo DEBE declarar todos los tokens de color `MangoColors` con sus
   variantes claro y oscuro, según §5 del prompt maestro.
 - **RF-012**: El módulo DEBE declarar `MangoTypography` con los estilos listados en §5
-  usando Playfair Display (o similar serif) para titulares e Inter/Manrope para cuerpo.
+  usando fuentes del sistema por defecto, centralizadas en un único archivo de configuración
+  `TypographyConfig.kt` que facilite reemplazarlas por fuentes personalizadas en el futuro
+  sin modificar los componentes.
 - **RF-013**: El módulo DEBE declarar `MangoSpacing`, `MangoShapes`, `MangoElevations` y
   `MangoMotion` con los valores exactos de §5.
 - **RF-014**: El módulo DEBE implementar todos los componentes listados en §5: MangoButton,
   MangoTextField, MangoLabel/MangoText, MangoCard, MangoProductCard, MangoIconButton,
   MangoIcon, MangoChip, MangoDivider, MangoTopAppBar, MangoBottomBar/MangoNavigationBar,
   MangoDialog, MangoBottomSheet, MangoLoadingIndicator, MangoEmptyState, MangoErrorState,
-  MangoBadge, MangoSnackbar, MangoOfflineBanner.
+  MangoBadge, MangoSnackbar, `MangoOfflineBannerContent(isOffline: Boolean)` (stateless,
+  sin dependencias de Android system services para permitir snapshot tests en aislamiento).
 - **RF-015**: Cada componente DEBE tener `@Preview` en modo claro y oscuro, y `@Preview` por
   cada estado relevante (idle, loading, pressed, disabled, error, etc.).
 - **RF-016**: Cada componente DEBE tener al menos un test de snapshot con Paparazzi o
@@ -152,8 +158,14 @@ error en cada pantalla.
 - **RF-017**: El módulo DEBE proveer `MangoTheme { }` como wrapper de tema que aplica colores,
   tipografía y formas a toda la jerarquía Compose.
 - **RF-018**: Ningún import directo de `androidx.compose.material3.*` está permitido fuera de
-  este módulo (salvo excepciones documentadas: Surface, Scaffold, Snackbar como contenedores
-  en `:core:ui`).
+  `:core:design-system`. Las únicas excepciones son `Surface`, `Scaffold` y `Snackbar` en
+  `:core:ui`, declaradas explícitamente en una regla Konsist. La regla Konsist DEBE ejecutarse
+  en CI y fallar el build ante cualquier violación no incluida en la allowlist.
+- **RF-018b**: Todos los componentes táctiles del design system DEBEN tener un touch target
+  mínimo de 48dp. Todos los íconos interactivos (`MangoIconButton`, `MangoIcon` usado en
+  acciones) DEBEN aceptar un parámetro `contentDescription: String?` y aplicarlo al
+  `Modifier.semantics`. Los tokens de color de `MangoColors` DEBEN cumplir ratio de contraste
+  WCAG 2.1 AA: ≥ 4.5:1 para texto normal, ≥ 3:1 para texto grande y componentes de UI.
 
 **Módulo :core:ui**
 
@@ -164,8 +176,10 @@ error en cada pantalla.
   features (p. ej. `Modifier.shimmer()`, `Modifier.conditional()`).
 - **RF-021**: El módulo DEBE exportar extensiones de `Context`, `Dp`, `Px` y utilidades de
   preview comunes (`@PreviewLightDark`, `@PreviewFontScale`).
-- **RF-022**: El módulo DEBE exportar `MangoOfflineBanner` como composable observable del
-  estado de red.
+- **RF-022**: El módulo DEBE exportar `MangoOfflineBanner()` como composable stateful que
+  observa `ConnectivityManager` y delega la presentación en `MangoOfflineBannerContent`
+  de `:core:design-system`. El nombre `MangoOfflineBanner` (sin parámetro) es exclusivo de
+  `:core:ui`; `:core:design-system` expone únicamente `MangoOfflineBannerContent(isOffline: Boolean)`.
 
 ### Key Entities
 
@@ -199,12 +213,25 @@ error en cada pantalla.
 
 - Los módulos ya tienen su `build.gradle.kts` vacío creado en ETAPA 0; este trabajo implementa
   su contenido.
-- La fuente Playfair Display se incorpora como archivo TTF en `core/design-system/src/main/res/font/`
-  o se descarga desde Google Fonts vía el plugin de Android Studio (si no hay restricción de red).
+- La tipografía usa fuentes del sistema por defecto. Todos los valores de `FontFamily` se
+  definen en `TypographyConfig.kt` como constantes reemplazables, de modo que cambiar de
+  fuentes del sistema a fuentes personalizadas no requiera modificar los componentes.
 - Los golden files de snapshot se generan en la primera ejecución y se commitean; posteriores
   ejecuciones los verifican.
 - La cobertura del 100% aplica solo a las clases de mapeo (ErrorMapper); los componentes UI
   se validan con snapshots, no con unit tests de lógica.
-- Paparazzi se prefiere sobre Roborazzi por no requerir dispositivo físico ni emulador.
+- Paparazzi se prefiere sobre Roborazzi por no requerir dispositivo físico ni emulador. Los
+  módulos que usen Paparazzi configurarán `testOptions { targetSdk = 35 }` para garantizar
+  compatibilidad estable; el `compileSdk` de producción permanece en 36.
 - Los cuatro módulos se implementan secuencialmente (common → error → design-system → ui)
   dado que hay dependencias entre ellos.
+
+## Clarifications
+
+### Sesión 2026-05-11
+
+- Q: ¿MangoOfflineBanner reside en design-system, en core:ui, o en ambos con distintos roles? → A: Ambos con distintos roles — design-system expone `MangoOfflineBannerContent(isOffline: Boolean)` (stateless, sin Android system services); core:ui expone `MangoOfflineBanner()` (stateful, observa ConnectivityManager y delega en el anterior).
+- Q: ¿`:core:common` debe ser módulo Kotlin puro (kotlin.jvm) o Android library con Hilt? → A: Android library sin dependencias de UI Android — Hilt está permitido; la restricción "Kotlin puro" significa sin Compose/Views/Context.
+- Q: ¿Qué nivel de accesibilidad (a11y) aplica a los componentes del design system en ETAPA 1? → A: Mínimos WCAG 2.1 AA: contentDescription en íconos interactivos, touch target ≥ 48dp, ratio de contraste ≥ 4.5:1 (texto normal) / ≥ 3:1 (texto grande y componentes UI).
+- Q: ¿Paparazzi o Roborazzi para snapshot tests dado que compileSdk = 36? → A: Paparazzi con `testOptions { targetSdk = 35 }` en módulos de snapshot; compileSdk de producción permanece en 36.
+- Q: ¿Cómo se enforcea la regla "sin imports directos de Material3" fuera de :core:design-system? → A: Regla Konsist en :core:design-system y :core:ui con allowlist explícita (Surface, Scaffold, Snackbar); falla el build en CI ante cualquier violación no incluida.

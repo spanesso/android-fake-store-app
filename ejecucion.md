@@ -67,7 +67,7 @@ snapshot tests con Paparazzi o Roborazzi.
 Compila el proyecto Android tras cada módulo
 (cd repository/android-fake-store-app && ./gradlew build).
 
-Al cerrar, abre PR en español.
+Al cerrar, abre PR en español. modifica el CLAUDE.md y README.md con estos nuevos modulos
 
 Pregúntame si tienes dudas antes de asumir.
 ```

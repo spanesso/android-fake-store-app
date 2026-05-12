@@ -31,6 +31,8 @@
 
 ## Notes
 
-- Todos los ítems pasan en la primera iteración.
+- Todos los ítems pasan. Validación actualizada tras aclaraciones del usuario (2026-05-11).
 - La especificación cubre los cuatro módulos core de ETAPA 1 (common, error, design-system, ui).
-- Listo para proceder a `/speckit-plan`.
+- RF-012 y Assumptions actualizados: tipografía usa fuentes del sistema con `TypographyConfig.kt`
+  (no Playfair Display TTF), per preferencia explícita del usuario.
+- Listo para proceder a `/speckit-clarify`.
