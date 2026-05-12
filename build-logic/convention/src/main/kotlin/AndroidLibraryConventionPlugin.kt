@@ -19,7 +19,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             }
             extensions.configure<LibraryExtension> {
                 configureAndroidCommon(this)
-                defaultConfig.targetSdk = 36
             }
         }
     }
