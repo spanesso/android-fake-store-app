@@ -79,45 +79,6 @@ Los siguientes errores son flujos esperados y **nunca** se reportan a Crashlytic
 
 ---
 
-## Opcionales (no activos — detrás de flag)
-
-Las siguientes integraciones están preparadas en la interfaz `Telemetry` y `EventTracker` pero **no activadas** en el build actual:
-
-| Herramienta | Estado | Cómo activar |
-|---|---|---|
-| **Datadog** | Desactivado — requiere licencia de pago | Ver sección *Activar Datadog* abajo |
-| **Sentry** | Desactivado — requiere plan de pago o self-hosted | Ver sección *Activar Sentry* abajo |
-
-### Activar Datadog
-
-1. Solicitar al equipo de plataforma las credenciales de Datadog (client token + application ID).
-2. Añadir el SDK en `gradle/libs.versions.toml`:
-   ```toml
-   datadog-sdk = { group = "com.datadoghq", name = "dd-sdk-android", version = "2.x.x" }
-   datadog-logs = { group = "com.datadoghq", name = "dd-sdk-android-logs", version = "2.x.x" }
-   ```
-3. Crear `DatadogTelemetryImpl : Telemetry` en `core/analytics/src/main/kotlin/.../impl/`.
-4. En `AnalyticsModule.kt`, cambiar el binding de `@Singleton` de `FirebaseTelemetryImpl` a `DatadogTelemetryImpl`, o usar un flag de build:
-   ```kotlin
-   @Provides @Singleton
-   fun provideTelemetry(...): Telemetry =
-       if (BuildConfig.USE_DATADOG) DatadogTelemetryImpl(...) else FirebaseTelemetryImpl(...)
-   ```
-5. Nunca incluir el client token en el repositorio — usar `local.properties` o CI secrets.
-
-### Activar Sentry
-
-1. Solicitar al equipo el DSN de Sentry (self-hosted o sentry.io).
-2. Añadir el SDK en `gradle/libs.versions.toml`:
-   ```toml
-   sentry = { group = "io.sentry", name = "sentry-android", version = "7.x.x" }
-   ```
-3. Crear `SentryTelemetryImpl : Telemetry` en `core/analytics/src/main/kotlin/.../impl/`.
-4. Cambiar el binding en `AnalyticsModule.kt` igual que con Datadog.
-5. El DSN nunca se incluye en el repositorio — usar `local.properties` o CI secrets.
-
----
-
 ## Cómo abrir el dashboard de Firebase
 
 ### Paso 1 — Crear el proyecto Firebase
