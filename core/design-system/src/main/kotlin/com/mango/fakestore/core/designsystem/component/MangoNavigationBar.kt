@@ -1,6 +1,8 @@
 package com.mango.fakestore.core.designsystem.component
 
 import android.content.res.Configuration
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
@@ -30,7 +32,17 @@ fun MangoNavigationBar(
             NavigationBarItem(
                 selected = item.selected,
                 onClick = item.onClick,
-                icon = { MangoIcon(item.icon, item.label) },
+                icon = {
+                    if (item.badgeCount != null && item.badgeCount > 0) {
+                        BadgedBox(badge = {
+                            Badge { MangoText(item.badgeCount.toString()) }
+                        }) {
+                            MangoIcon(item.icon, item.label)
+                        }
+                    } else {
+                        MangoIcon(item.icon, item.label)
+                    }
+                },
                 label = { MangoText(item.label) },
             )
         }
