@@ -9,6 +9,8 @@ import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
 import com.mango.fakestore.core.testing.CoroutineTestRule
 import com.mango.fakestore.features.products.domain.model.Producto
 import com.mango.fakestore.features.products.domain.model.Valoracion
+import com.mango.fakestore.features.favorites.domain.usecase.ObservarFavoritos
+import com.mango.fakestore.features.favorites.domain.usecase.ToggleFavorito
 import com.mango.fakestore.features.products.domain.usecase.ObtenerProductos
 import com.mango.fakestore.features.products.presentation.mapper.toUi
 import com.mango.fakestore.features.products.presentation.ui.state.ProductosUiEffect
@@ -29,6 +31,8 @@ class ProductosViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val obtenerProductos: ObtenerProductos = mockk()
+    private val observarFavoritos: ObservarFavoritos = mockk()
+    private val toggleFavorito: ToggleFavorito = mockk()
     private val telemetry: Telemetry = mockk(relaxed = true)
     private val errorMapper: DomainErrorToUiErrorMapper = mockk()
 
@@ -64,8 +68,9 @@ class ProductosViewModelTest {
 
     @Before
     fun setUp() {
-        // Configuración por defecto: el mapper siempre devuelve el UiError de prueba
         every { errorMapper.map(any()) } returns uiErrorPrueba
+        // Por defecto favoritos vacíos para no interferir con los tests de productos
+        every { observarFavoritos() } returns flow { emit(Either.Right(emptyList())) }
     }
 
     // -------------------------------------------------------------------------
@@ -77,7 +82,7 @@ class ProductosViewModelTest {
         // Configuramos el usecase para que no emita nada de inmediato (flow vacío)
         every { obtenerProductos() } returns flow { /* no emite */ }
 
-        val viewModel = ProductosViewModel(obtenerProductos, telemetry, errorMapper)
+        val viewModel = ProductosViewModel(obtenerProductos, observarFavoritos, toggleFavorito, telemetry, errorMapper)
 
         viewModel.uiState.test {
             assertEquals(ProductosUiState.Loading, awaitItem())
@@ -96,7 +101,7 @@ class ProductosViewModelTest {
                 emit(Either.Right(productosDominio))
             }
 
-            val viewModel = ProductosViewModel(obtenerProductos, telemetry, errorMapper)
+            val viewModel = ProductosViewModel(obtenerProductos, observarFavoritos, toggleFavorito, telemetry, errorMapper)
             val productosEsperados = productosDominio.map { it.toUi() }
 
             viewModel.uiState.test {
@@ -118,7 +123,7 @@ class ProductosViewModelTest {
                 emit(Either.Right(emptyList()))
             }
 
-            val viewModel = ProductosViewModel(obtenerProductos, telemetry, errorMapper)
+            val viewModel = ProductosViewModel(obtenerProductos, observarFavoritos, toggleFavorito, telemetry, errorMapper)
 
             viewModel.uiState.test {
                 assertEquals(ProductosUiState.Loading, awaitItem())
@@ -140,7 +145,7 @@ class ProductosViewModelTest {
                 emit(Either.Left(domainError))
             }
 
-            val viewModel = ProductosViewModel(obtenerProductos, telemetry, errorMapper)
+            val viewModel = ProductosViewModel(obtenerProductos, observarFavoritos, toggleFavorito, telemetry, errorMapper)
 
             viewModel.uiState.test {
                 assertEquals(ProductosUiState.Loading, awaitItem())
@@ -170,7 +175,7 @@ class ProductosViewModelTest {
                 emit(Either.Left(domainError))
             }
 
-            val viewModel = ProductosViewModel(obtenerProductos, telemetry, errorMapper)
+            val viewModel = ProductosViewModel(obtenerProductos, observarFavoritos, toggleFavorito, telemetry, errorMapper)
 
             viewModel.uiState.test {
                 assertEquals(ProductosUiState.Loading, awaitItem())
@@ -194,7 +199,7 @@ class ProductosViewModelTest {
                 emit(Either.Left(domainError))
             }
 
-            val viewModel = ProductosViewModel(obtenerProductos, telemetry, errorMapper)
+            val viewModel = ProductosViewModel(obtenerProductos, observarFavoritos, toggleFavorito, telemetry, errorMapper)
 
             viewModel.uiState.test {
                 assertEquals(ProductosUiState.Loading, awaitItem())
@@ -226,7 +231,7 @@ class ProductosViewModelTest {
                 }
             }
 
-            val viewModel = ProductosViewModel(obtenerProductos, telemetry, errorMapper)
+            val viewModel = ProductosViewModel(obtenerProductos, observarFavoritos, toggleFavorito, telemetry, errorMapper)
             val productosEsperados = productosDominio.map { it.toUi() }
 
             viewModel.uiState.test {
@@ -263,7 +268,7 @@ class ProductosViewModelTest {
                 emit(Either.Left(domainError))
             }
 
-            val viewModel = ProductosViewModel(obtenerProductos, telemetry, errorMapper)
+            val viewModel = ProductosViewModel(obtenerProductos, observarFavoritos, toggleFavorito, telemetry, errorMapper)
 
             // Usamos Turbine en el SharedFlow para garantizar que el collector esté
             // suscrito antes de que la corrutina interna emita el efecto.
