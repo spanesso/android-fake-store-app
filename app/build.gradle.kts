@@ -133,7 +133,7 @@ dependencies {
     implementation(project(":features:products:domain"))
     implementation(project(":features:products:data"))
     implementation(project(":features:products:presentation"))
-    implementation(project(":features:favorites:domain"))
+    implementation(project(":features:favorites:api"))
     implementation(project(":features:favorites:data"))
     implementation(project(":features:favorites:presentation"))
     implementation(project(":features:profile:domain"))

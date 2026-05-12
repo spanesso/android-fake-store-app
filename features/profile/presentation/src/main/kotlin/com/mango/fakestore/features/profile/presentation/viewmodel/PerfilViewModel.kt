@@ -6,7 +6,7 @@ import com.mango.fakestore.core.analytics.AnalyticsEvent
 import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
-import com.mango.fakestore.features.favorites.domain.usecase.ObservarConteoFavoritos
+import com.mango.fakestore.features.favorites.api.ObservarConteoFavoritos
 import com.mango.fakestore.features.profile.domain.usecase.ObtenerPerfil
 import com.mango.fakestore.features.profile.presentation.mapper.PerfilUiErrorMapper
 import com.mango.fakestore.features.profile.presentation.model.PerfilContenidoUi

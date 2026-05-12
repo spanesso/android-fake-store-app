@@ -18,8 +18,9 @@ import com.mango.fakestore.core.security.biometric.BiometricAuthenticator
 import com.mango.fakestore.core.security.biometric.BiometricResult
 import com.mango.fakestore.core.security.integrity.IntegrityChecker
 import com.mango.fakestore.core.security.integrity.IntegrityResult
-import com.mango.fakestore.features.favorites.domain.usecase.ObservarConteoFavoritos
+import com.mango.fakestore.features.favorites.api.ObservarConteoFavoritos
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharedFlow
@@ -40,6 +41,10 @@ class AppViewModel @Inject constructor(
     private val integrityChecker: IntegrityChecker,
     observarConteoFavoritos: ObservarConteoFavoritos,
 ) : ViewModel() {
+
+    private val emisionErrorHandler = CoroutineExceptionHandler { _, t ->
+        telemetry.reportarNoFatal(DomainError.Unknown(t))
+    }
 
     val integridadResultado: IntegrityResult by lazy { integrityChecker.verificarIntegridad() }
 
@@ -97,7 +102,7 @@ class AppViewModel @Inject constructor(
         val domainError = DomainError.Unknown(throwable)
         telemetry.reportarNoFatal(domainError)
         val uiError = errorMapper.map(domainError)
-        viewModelScope.launch {
+        viewModelScope.launch(emisionErrorHandler) {
             _uiEffect.emit(AppUiEffect.MostrarErrorGlobal(uiError))
         }
     }
