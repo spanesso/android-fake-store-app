@@ -6,6 +6,13 @@ import com.mango.fakestore.core.error.mapper.NetworkErrorMapper
 import kotlinx.coroutines.CancellationException
 import retrofit2.HttpException
 
+private const val HTTP_UNAUTHORIZED = 401
+private const val HTTP_FORBIDDEN = 403
+private const val HTTP_NOT_FOUND = 404
+private const val HTTP_SERVER_ERROR_FIRST = 500
+private const val HTTP_SERVER_ERROR_LAST = 599
+
+@Suppress("TooGenericExceptionCaught")
 suspend fun <T> safeRetrofitCall(block: suspend () -> T): Either<DomainError, T> =
     try {
         Either.Right(block())
@@ -14,12 +21,12 @@ suspend fun <T> safeRetrofitCall(block: suspend () -> T): Either<DomainError, T>
     } catch (e: HttpException) {
         Either.Left(
             when (e.code()) {
-                401 -> DomainError.Network.Unauthorized(e)
-                403 -> DomainError.Network.Forbidden(e)
-                404 -> DomainError.Network.NotFound(e)
-                in 500..599 -> DomainError.Network.Server(e.code(), e)
+                HTTP_UNAUTHORIZED -> DomainError.Network.Unauthorized(e)
+                HTTP_FORBIDDEN -> DomainError.Network.Forbidden(e)
+                HTTP_NOT_FOUND -> DomainError.Network.NotFound(e)
+                in HTTP_SERVER_ERROR_FIRST..HTTP_SERVER_ERROR_LAST -> DomainError.Network.Server(e.code(), e)
                 else -> DomainError.Network.NoConnection(e)
-            }
+            },
         )
     } catch (e: Throwable) {
         Either.Left(NetworkErrorMapper().map(e))

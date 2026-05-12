@@ -18,6 +18,7 @@ import com.mango.fakestore.core.designsystem.theme.MangoTheme
 import com.mango.fakestore.features.favorites.presentation.R
 import com.mango.fakestore.features.favorites.presentation.model.FavoritoUi
 import com.mango.fakestore.features.favorites.presentation.ui.state.FavoritosUiEvent
+import java.util.Locale
 
 @Composable
 fun FavoritoItem(
@@ -28,7 +29,7 @@ fun FavoritoItem(
     Box(modifier = modifier) {
         MangoProductCard(
             title = favorito.titulo,
-            price = "€${String.format("%.2f", favorito.precio)}",
+            price = "€${String.format(Locale.getDefault(), "%.2f", favorito.precio)}",
             modifier = Modifier.fillMaxWidth(),
         )
         MangoIconButton(

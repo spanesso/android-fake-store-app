@@ -13,7 +13,7 @@ private const val KEY_PASSPHRASE = "db_passphrase"
 private const val PASSPHRASE_BYTE_LENGTH = 32
 
 class AndroidKeystoreDatabaseKeyManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : DatabaseKeyManager {
 
     private val masterKey = MasterKey.Builder(context)
@@ -26,7 +26,7 @@ class AndroidKeystoreDatabaseKeyManager @Inject constructor(
             PREFS_FILE,
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
         )
     }
 

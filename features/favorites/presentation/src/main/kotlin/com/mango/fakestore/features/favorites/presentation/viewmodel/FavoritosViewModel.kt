@@ -77,8 +77,11 @@ class FavoritosViewModel @Inject constructor(
                     is Either.Right -> {
                         val favoritos = resultado.value
                         _uiState.update {
-                            if (favoritos.isEmpty()) FavoritosUiState.Empty
-                            else FavoritosUiState.Content(favoritos.map { it.toUi() })
+                            if (favoritos.isEmpty()) {
+                                FavoritosUiState.Empty
+                            } else {
+                                FavoritosUiState.Content(favoritos.map { it.toUi() })
+                            }
                         }
                     }
                     is Either.Left -> {

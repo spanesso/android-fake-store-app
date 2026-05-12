@@ -1,3 +1,5 @@
+@file:Suppress("ForbiddenComment")
+
 package com.mango.fakestore.features.products.presentation.ui.route
 
 import androidx.compose.runtime.Composable
