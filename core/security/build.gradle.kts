@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(project(":core:error"))
     implementation(project(":core:common"))
+    implementation(project(":core:logging"))
 
     implementation(libs.androidx.biometric)
     implementation(libs.rootbeer)

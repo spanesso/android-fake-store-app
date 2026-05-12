@@ -44,6 +44,7 @@ Aplicación Android para la prueba técnica de Mango Fashion Group. Consume la [
 | `:core:network` | Retrofit + OkHttp, certificate pinning, `RetryInterceptor`, `ConnectivityObserver`, `safeRetrofitCall`, flavors dev/staging/prod | 22 |
 | `:core:database` | Room base abstracta cifrada con SQLCipher, `DatabaseKeyManager` con Android Keystore | 6 |
 | `:core:datastore` | DataStore cifrado con Tink AES-256-GCM para tokens (`SessionData`) y preferencias (`UserPreferences`) | 8 |
+| `:core:logging` | `Logger` interface; `TimberLogger` (debug) + `NoOpLogger` (producción — silencioso); DI via `BuildConfig.DEBUG` | 14 |
 | `:core:analytics` | `Telemetry` + `EventTracker` interfaces; Firebase impl (Crashlytics/Analytics/Performance); Console + NoOp | 13 |
 | `:core:security` | `BiometricAuthenticator` (BIOMETRIC_STRONG), `IntegrityChecker` (RootBeer), `SecureScreen` (FLAG_SECURE) | 8 |
 | `:core:testing` | `CoroutineTestRule`, `TestAppDispatchers`, builders de `DomainError` y `UiError` | 0 |

@@ -4,11 +4,14 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.mango.fakestore.core.logging.Logger
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class BiometricAuthenticatorImpl @Inject constructor() : BiometricAuthenticator {
+class BiometricAuthenticatorImpl @Inject constructor(
+    private val logger: Logger,
+) : BiometricAuthenticator {
 
     override suspend fun autenticar(
         actividad: FragmentActivity,
@@ -28,13 +31,22 @@ class BiometricAuthenticatorImpl @Inject constructor() : BiometricAuthenticator 
                     BiometricPrompt.ERROR_USER_CANCELED -> BiometricResult.Cancelado
 
                     BiometricPrompt.ERROR_LOCKOUT,
-                    BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> BiometricResult.BloqueadoTemporalmente
+                    BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> {
+                        logger.warn(TAG, "Biometría bloqueada temporalmente (errorCode=$errorCode)")
+                        BiometricResult.BloqueadoTemporalmente
+                    }
 
                     BiometricPrompt.ERROR_HW_UNAVAILABLE,
                     BiometricPrompt.ERROR_HW_NOT_PRESENT,
-                    BiometricPrompt.ERROR_NO_BIOMETRICS -> BiometricResult.NoDisponible
+                    BiometricPrompt.ERROR_NO_BIOMETRICS -> {
+                        logger.warn(TAG, "Hardware biométrico no disponible (errorCode=$errorCode)")
+                        BiometricResult.NoDisponible
+                    }
 
-                    else -> BiometricResult.Error(errString.toString())
+                    else -> {
+                        logger.error(TAG, "Error biométrico inesperado: $errString (errorCode=$errorCode)")
+                        BiometricResult.Error(errString.toString())
+                    }
                 }
                 cont.resume(resultado)
             }
@@ -42,11 +54,12 @@ class BiometricAuthenticatorImpl @Inject constructor() : BiometricAuthenticator 
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                 if (reanudado) return
                 reanudado = true
+                logger.info(TAG, "Autenticación biométrica exitosa")
                 cont.resume(BiometricResult.Exito)
             }
 
             override fun onAuthenticationFailed() {
-                // El usuario puede reintentar; no resumimos la corrutina aquí
+                logger.warn(TAG, "Intento biométrico fallido — el usuario puede reintentar")
             }
         }
 
@@ -58,5 +71,9 @@ class BiometricAuthenticatorImpl @Inject constructor() : BiometricAuthenticator 
             .build()
 
         BiometricPrompt(actividad, executor, callback).authenticate(promptInfo)
+    }
+
+    private companion object {
+        const val TAG = "BiometricAuth"
     }
 }

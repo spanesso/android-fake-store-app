@@ -3,26 +3,30 @@ package com.mango.fakestore.core.analytics.impl
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.analytics.TraceHandle
 import com.mango.fakestore.core.error.DomainError
-import timber.log.Timber
+import com.mango.fakestore.core.logging.Logger
 
-class ConsoleTelemetryImpl : Telemetry {
+class ConsoleTelemetryImpl(private val logger: Logger) : Telemetry {
 
     override fun reportarNoFatal(error: DomainError, contexto: Map<String, String>) {
-        Timber.w("[Telemetry] No-fatal: %s | contexto=%s", error::class.simpleName, contexto)
+        logger.warn(TAG, "No-fatal: ${error::class.simpleName} | contexto=$contexto", error.cause)
     }
 
     override fun registrarEvento(nombre: String, params: Map<String, Any?>) {
-        Timber.d("[Telemetry] Evento: %s | params=%s", nombre, params)
+        logger.info(TAG, "Evento: $nombre | params=$params")
     }
 
     override fun iniciarTraza(nombre: String): TraceHandle {
         val inicio = System.currentTimeMillis()
-        Timber.d("[Telemetry] Traza iniciada: %s", nombre)
+        logger.info(TAG, "Traza iniciada: $nombre")
         return object : TraceHandle {
             override fun detener() {
                 val ms = System.currentTimeMillis() - inicio
-                Timber.d("[Telemetry] Traza detenida: %s (%dms)", nombre, ms)
+                logger.info(TAG, "Traza detenida: $nombre (${ms}ms)")
             }
         }
+    }
+
+    private companion object {
+        const val TAG = "ConsoleTelemetry"
     }
 }
