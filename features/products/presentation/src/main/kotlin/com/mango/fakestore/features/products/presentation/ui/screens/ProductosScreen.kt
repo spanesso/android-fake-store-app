@@ -58,6 +58,7 @@ fun ProductosScreen(
                     ) { producto ->
                         ProductoItem(
                             producto = producto,
+                            onEvent = onEvent,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -97,37 +98,45 @@ private val sampleProductos = listOf(
         id = 1,
         titulo = "Camiseta de lino",
         precio = "$49.99",
+        precioDouble = 49.99,
         categoria = "ropa",
         imagenUrl = "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg",
         puntuacion = 4.1f,
         numVotaciones = 259,
+        esFavorito = false,
     ),
     ProductoUi(
         id = 2,
         titulo = "Pantalon slim fit",
         precio = "$79.99",
+        precioDouble = 79.99,
         categoria = "ropa",
         imagenUrl = "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg",
         puntuacion = 3.9f,
         numVotaciones = 120,
+        esFavorito = true,
     ),
     ProductoUi(
         id = 3,
         titulo = "Bolso de cuero",
         precio = "$129.99",
+        precioDouble = 129.99,
         categoria = "accesorios",
         imagenUrl = "https://fakestoreapi.com/img/81fAZal24fL._AC_UY879_.jpg",
         puntuacion = 4.5f,
         numVotaciones = 400,
+        esFavorito = false,
     ),
     ProductoUi(
         id = 4,
         titulo = "Vestido floral",
         precio = "$89.99",
+        precioDouble = 89.99,
         categoria = "ropa",
         imagenUrl = "https://fakestoreapi.com/img/51UDEzMJVpL._AC_UL640_FMwebp_QL65_.jpg",
         puntuacion = 4.3f,
         numVotaciones = 187,
+        esFavorito = false,
     ),
 )
 
