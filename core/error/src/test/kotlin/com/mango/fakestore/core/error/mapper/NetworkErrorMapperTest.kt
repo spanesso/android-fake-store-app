@@ -55,4 +55,22 @@ class NetworkErrorMapperTest {
         val server = result as DomainError.Network.Server
         assertTrue(server.httpCode == 500)
     }
+
+    @Test
+    fun `RuntimeException con HTTP 403 se mapea a Forbidden`() {
+        val result = mapper.map(RuntimeException("HTTP 403 Forbidden"))
+        assertTrue(result is DomainError.Network.Forbidden)
+    }
+
+    @Test
+    fun `RuntimeException con HTTP 404 se mapea a NotFound`() {
+        val result = mapper.map(RuntimeException("HTTP 404 Not Found"))
+        assertTrue(result is DomainError.Network.NotFound)
+    }
+
+    @Test
+    fun `RuntimeException sin codigo HTTP se mapea a NoConnection`() {
+        val result = mapper.map(RuntimeException("error desconocido"))
+        assertTrue(result is DomainError.Network.NoConnection)
+    }
 }

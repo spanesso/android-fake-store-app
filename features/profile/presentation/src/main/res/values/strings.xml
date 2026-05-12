@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_perfil_no_encontrado">Perfil no encontrado. Comprueba tu conexión e inténtalo de nuevo.</string>
+    <string name="perfil_favoritos_contador">%1$d favoritos</string>
+    <string name="perfil_favoritos_contador_uno">1 favorito</string>
+    <string name="perfil_titulo">Mi Perfil</string>
+    <string name="perfil_seccion_datos">Datos personales</string>
+    <string name="perfil_seccion_direccion">Dirección</string>
+    <string name="perfil_seccion_actividad">Actividad</string>
+    <string name="perfil_campo_email">Correo electrónico</string>
+    <string name="perfil_campo_telefono">Teléfono</string>
+    <string name="perfil_campo_ciudad">Ciudad</string>
+    <string name="perfil_campo_calle">Dirección</string>
+    <string name="perfil_campo_codigo_postal">Código postal</string>
+</resources>

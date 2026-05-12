@@ -1,12 +1,14 @@
+@file:Suppress("MaximumLineLength", "MaxLineLength")
+
 package com.mango.fakestore.features.products.domain.usecase
 
 import app.cash.turbine.test
 import arrow.core.Either
+import com.google.common.truth.Truth.assertThat
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.features.products.domain.model.Producto
 import com.mango.fakestore.features.products.domain.model.Valoracion
 import com.mango.fakestore.features.products.domain.repository.ProductosRepository
-import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

@@ -123,7 +123,7 @@ Ensambla la aplicación, declara `Application` con Hilt, aloja el `NavHost` raí
 | `:core:network` | Android | OkHttp/Retrofit base, interceptors, certificate pinning, `NetworkErrorMapper`, `ConnectivityObserver`, retry con backoff. |
 | `:core:database` | Android | Room base, encriptación SQLCipher, migrations, `DatabaseErrorMapper`. |
 | `:core:datastore` | Android | DataStore Preferences cifrado para tokens/preferencias. |
-| `:core:analytics` | Android | Interfaz `Telemetry`, `EventTracker`, impls Firebase y Console (Datadog/Sentry opcionales). |
+| `:core:analytics` | Android | Interfaz `Telemetry`, `EventTracker`, impls Firebase y Console. |
 | `:core:security` | Android | Biometría, anti-screenshot, root detection, secret obfuscation. |
 | `:core:testing` | Kotlin puro | Utilidades de test (fakes, rules, dispatchers test, builders, tests Konsist). |
 
@@ -199,6 +199,19 @@ com.mango.fakestore
    un ADR la necesidad (qué problema transversal resuelve).
 3. **Modificar la matriz de dependencias**: requiere ADR y enmienda en `prompt.txt` +
    constitución + esta sección.
+
+## CI/CD (ETAPA 9)
+
+Los pipelines de automatización viven en `.github/workflows/`:
+
+| Workflow | Trigger | Propósito |
+|---|---|---|
+| `pr.yml` | Pull Request → `develop`/`main` | Detekt + ktlint + tests unitarios + Kover + assembleDevDebug + SonarCloud (opcional) |
+| `main.yml` | Push a `develop` | Todo lo de `pr.yml` + Firebase Test Lab + Firebase App Distribution (grupo `qa-internal`) |
+| `release.yml` | Push de tag `v*` | `bundleProdRelease` firmado + Google Play Internal Testing + mapping Crashlytics + GitHub Release |
+| `azure-pipelines.yml` | Push/PR opcional | Espejo en Azure Pipelines (referencia, no pipeline principal) |
+
+Documentación operacional completa: [`docs/ci-cd.md`](ci-cd.md).
 
 ## Mantenimiento
 

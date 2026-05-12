@@ -1,4 +1,11 @@
-// Módulo `:features:favorites:api` — Kotlin puro. Convention plugin: mango.kotlin.library.
 plugins {
-    id("mango.kotlin.library")
+    id("mango.android.library")
+}
+
+android {
+    namespace = "com.mango.fakestore.features.favorites.api"
+}
+
+dependencies {
+    api(project(":features:favorites:domain"))
 }

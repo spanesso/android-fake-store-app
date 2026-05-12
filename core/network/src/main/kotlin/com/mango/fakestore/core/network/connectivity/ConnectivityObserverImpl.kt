@@ -5,7 +5,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import com.mango.fakestore.core.common.dispatchers.AppDispatchers
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -14,7 +13,6 @@ import javax.inject.Inject
 
 class ConnectivityObserverImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    dispatchers: AppDispatchers
 ) : ConnectivityObserver {
 
     private val connectivityManager =

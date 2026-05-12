@@ -9,9 +9,8 @@
 
 El proyecto es una prueba técnica con calidad de producción para Mango Fashion Group. La
 regla R0.12 del prompt maestro exige que **no se incorpore ninguna herramienta, SDK o
-servicio externo sin tier gratuito viable** para esta prueba. Cualquier servicio "trial"
-(Datadog, Bitrise pago, Sentry sobre cuota gratuita, etc.) queda marcado como opcional
-y se activa solo si la empresa lo provee.
+servicio externo sin tier gratuito viable** para esta prueba. Cualquier servicio de pago
+(Bitrise, etc.) queda fuera del alcance.
 
 El repositorio Android es **público** en [github.com/spanesso/android-fake-store-app](https://github.com/spanesso/android-fake-store-app), lo que desbloquea el tier gratuito de SonarCloud y los minutos ilimitados de GitHub Actions.
 
@@ -51,32 +50,21 @@ para el alcance del proyecto:
 | Espejo opcional | Azure Pipelines | 1 800 min/mes, OPCIONAL. |
 | Distribución QA | Firebase App Distribution | Ilimitado, gratis. |
 
-### Stack opcional (solo si la empresa lo provee)
+### Herramientas descartadas (fuera del alcance de la prueba técnica)
 
-Estos servicios quedan registrados pero **no se activan** mientras el proyecto vive en
-modo prueba técnica. Su integración se documenta y queda detrás de un gradle property o
-flag opt-in.
-
-| Componente | Herramienta opcional | Por qué se descarta como default |
+| Componente | Herramienta | Por qué se descarta |
 |---|---|---|
-| APM/RUM mobile | Datadog Mobile RUM + Logs + APM | Sin tier gratuito viable; solo trial. |
-| Crash reporting alternativo | Sentry | Free tier limitado a 5 000 eventos/mes; bastará para fase post-piloto si crece. |
 | Análisis estático self-hosted | SonarQube Community Edition | Requiere infraestructura propia (servidor + Postgres); descartado en favor de SonarCloud. |
 | CI/CD mobile especializado | Bitrise | Plan gratis muy limitado para Android (≤200 builds, capping). |
 
 ## Alternativas consideradas y descartadas
 
-1. **Adoptar Datadog Mobile RUM como observabilidad principal**: descartada por R0.12 (no
-   tiene tier gratuito viable). Queda como _opcional_ documentado.
-2. **SonarCloud como gate de calidad opcional**: inicialmente descartada asumiendo repo
+1. **SonarCloud como gate de calidad opcional**: inicialmente descartada asumiendo repo
    privado. Al confirmar que el repo es público ([github.com/spanesso/android-fake-store-app](https://github.com/spanesso/android-fake-store-app)),
    SonarCloud es gratuito y se incorpora al plan de CI/CD de ETAPA 9. Detekt + Kover +
    Konsist siguen activos como análisis local; SonarCloud añade el quality gate central.
-3. **Bitrise como CI principal**: descartada por R0.12; GitHub Actions es funcionalmente
+2. **Bitrise como CI principal**: descartada por R0.12; GitHub Actions es funcionalmente
    suficiente y gratuito.
-4. **Sentry como crash reporter principal**: descartada porque Firebase Crashlytics es
-   ilimitado y ya está integrado en el ecosistema Google que usa el proyecto (Analytics +
-   Performance + App Distribution + Test Lab).
 
 ## Consecuencias
 
@@ -89,9 +77,8 @@ flag opt-in.
 
 ### Negativas y mitigaciones
 
-- **No hay APM mobile profundo**: Firebase Performance da traces básicos pero menos
-  granular que Datadog. Mitigación: aceptable para el alcance de la prueba; documentamos
-  el upgrade path a Datadog si la empresa lo aprueba.
+- **No hay APM mobile profundo**: Firebase Performance da traces y métricas básicos.
+  Mitigación: aceptable para el alcance de la prueba técnica.
 - **Quality gate centralizado disponible**: SonarCloud se activa en ETAPA 9 aprovechando
   que el repo es público. Hasta entonces, GitHub Actions + Detekt + Kover + Konsist cubren
   el mismo territorio.
@@ -99,13 +86,12 @@ flag opt-in.
   secreto en GitHub Actions Secrets (`FIREBASE_SERVICE_ACCOUNT_JSON`) y se descarga durante
   CI; nunca se commitea (R0.7).
 
-## Activación de servicios opcionales
+## Incorporación de nuevas herramientas
 
-Cuando la empresa decida activar un servicio opcional:
+Si en el futuro se decide añadir una nueva herramienta externa:
 
 1. Crear un ADR posterior (`0003-...md`, etc.) documentando la decisión.
-2. Añadir la dependencia al catálogo (`gradle/libs.versions.toml`) tras una gradle property
-   opt-in (p. ej. `mango.observabilidad.datadog=true`).
+2. Añadir la dependencia al catálogo (`gradle/libs.versions.toml`).
 3. Implementar la integración detrás de la interfaz existente (`Telemetry`,
    `EventTracker`, etc.) en `:core:analytics`.
 4. Actualizar este ADR con un cambio de estado a "Superseded" si aplica.
@@ -117,8 +103,8 @@ Esta decisión se verifica mediante:
 - Revisión de `gradle/libs.versions.toml`: ninguna dependencia de pago/trial debe estar en
   el grafo por defecto.
 - Revisión de `.github/workflows/*.yml`: ningún workflow obligatorio depende de tokens de
-  servicios opcionales (Datadog, Sentry). SonarCloud se integra en ETAPA 9 como step
-  opcional controlado por el secreto `SONAR_TOKEN`.
+  servicios de pago. SonarCloud se integra en ETAPA 9 como step opcional controlado por
+  el secreto `SONAR_TOKEN`.
 - Bug tracker: cualquier issue que requiera un servicio opcional debe marcarlo como
   bloqueante de validación humana antes de incorporarse.
 
