@@ -399,7 +399,7 @@ Azure Pipelines. Bitrise queda opcional.
 Tareas:
   · 9.1 Crear .github/workflows/pr.yml: detekt, ktlint, unit tests,
     Kover, snapshot tests, build debug. Subir cobertura como
-    artifact. SonarCloud SOLO si el repo es público.
+    artifact. SonarCloud activo (repo público ✅).
   · 9.1 Crear .github/workflows/main.yml: todo lo de pr +
     instrumentation tests en Firebase Test Lab + build staging +
     deploy a Firebase App Distribution.
@@ -408,7 +408,7 @@ Tareas:
     a Crashlytics, crear tag y release notes.
   · 9.2 Espejo opcional azure-pipelines.yml.
   · 9.3 Firebase App Distribution para QA interno.
-  · 9.4 SonarCloud opcional (solo público).
+  · 9.4 SonarCloud — integrar como quality gate (repo público, gratis).
   · 9.5 docs/ci-cd.md con: cómo regenerar y rotar cada secreto,
     cómo correr workflows localmente con `act`, mapeo Bitrise →
     GitHub Actions por si la empresa exige Bitrise.
