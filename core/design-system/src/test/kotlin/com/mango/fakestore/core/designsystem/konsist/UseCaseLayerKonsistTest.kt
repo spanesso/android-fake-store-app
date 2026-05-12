@@ -17,7 +17,8 @@ class UseCaseLayerKonsistTest {
                     importDeclaration.name.contains(".data.")
                 }
                 assert(importaciosDeData.isEmpty()) {
-                    "UseCase '${file.name}' importa de la capa data — viola el principio de inversión de dependencias: " +
+                    "UseCase '${file.name}' importa de la capa data — " +
+                        "viola inversión de dependencias: " +
                         importaciosDeData.map { it.name }
                 }
             }
