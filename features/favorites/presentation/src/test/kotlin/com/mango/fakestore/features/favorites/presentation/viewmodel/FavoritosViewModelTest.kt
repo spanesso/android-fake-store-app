@@ -2,7 +2,10 @@ package com.mango.fakestore.features.favorites.presentation.viewmodel
 
 import app.cash.turbine.test
 import arrow.core.Either
+import com.mango.fakestore.core.analytics.AnalyticsEvent
+import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
+import com.mango.fakestore.core.analytics.TraceHandle
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.UiError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
@@ -33,6 +36,8 @@ class FavoritosViewModelTest {
     private val observarFavoritos: ObservarFavoritos = mockk()
     private val toggleFavorito: ToggleFavorito = mockk()
     private val telemetry: Telemetry = mockk(relaxed = true)
+    private val eventTracker: EventTracker = mockk(relaxed = true)
+    private val traceHandle: TraceHandle = mockk(relaxed = true)
     private val errorMapper: DomainErrorToUiErrorMapper = mockk()
 
     private val uiErrorPrueba = UiError(
@@ -72,6 +77,7 @@ class FavoritosViewModelTest {
     @Before
     fun setUp() {
         every { errorMapper.map(any()) } returns uiErrorPrueba
+        every { telemetry.iniciarTraza(any()) } returns traceHandle
     }
 
     // -------------------------------------------------------------------------
@@ -231,6 +237,45 @@ class FavoritosViewModelTest {
         }
 
     // -------------------------------------------------------------------------
+    // US3 — Trazas de rendimiento
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun `cuando toggle favorito entonces inicia y detiene traza toggle_favorito`() =
+        kotlinx.coroutines.test.runTest {
+            every { observarFavoritos() } returns flow {
+                emit(Either.Right(favoritosDominio))
+            }
+            coEvery { toggleFavorito(any()) } returns Either.Right(Unit)
+
+            val viewModel = crearViewModel()
+            coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.onEvent(FavoritosUiEvent.ToggleFavorito(favoritoUiPrueba))
+            coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+
+            verify { telemetry.iniciarTraza("toggle_favorito") }
+            verify { traceHandle.detener() }
+        }
+
+    @Test
+    fun `cuando toggle favorito tiene exito entonces registra ProductoDesfavoritado`() =
+        kotlinx.coroutines.test.runTest {
+            every { observarFavoritos() } returns flow {
+                emit(Either.Right(favoritosDominio))
+            }
+            coEvery { toggleFavorito(any()) } returns Either.Right(Unit)
+
+            val viewModel = crearViewModel()
+            coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+
+            viewModel.onEvent(FavoritosUiEvent.ToggleFavorito(favoritoUiPrueba))
+            coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+
+            verify { eventTracker.registrar(AnalyticsEvent.ProductoDesfavoritado(favoritoUiPrueba.productoId)) }
+        }
+
+    // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
 
@@ -238,6 +283,7 @@ class FavoritosViewModelTest {
         observarFavoritos = observarFavoritos,
         toggleFavorito = toggleFavorito,
         telemetry = telemetry,
+        eventTracker = eventTracker,
         errorMapper = errorMapper,
     )
 }
