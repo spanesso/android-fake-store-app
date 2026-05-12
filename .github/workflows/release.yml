@@ -127,13 +127,32 @@ jobs:
           rm -f play-credentials.json
 
   # ─────────────────────────────────────────────
+  # Verificar disponibilidad de secrets de Google
+  # ─────────────────────────────────────────────
+  check-google-secrets:
+    name: Verificar secrets de Google Cloud
+    runs-on: ubuntu-latest
+    outputs:
+      available: ${{ steps.check.outputs.available }}
+    steps:
+      - id: check
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -n "$SA_JSON" ]; then
+            echo "available=true" >> $GITHUB_OUTPUT
+          else
+            echo "available=false" >> $GITHUB_OUTPUT
+          fi
+
+  # ─────────────────────────────────────────────
   # Subir mapping.txt a Firebase Crashlytics
   # ─────────────────────────────────────────────
   upload-mapping:
     name: Subir mapping a Crashlytics
     runs-on: ubuntu-latest
-    needs: build-release
-    if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON != '' }}
+    needs: [build-release, check-google-secrets]
+    if: needs.check-google-secrets.outputs.available == 'true'
     steps:
       - uses: actions/checkout@v4
 
