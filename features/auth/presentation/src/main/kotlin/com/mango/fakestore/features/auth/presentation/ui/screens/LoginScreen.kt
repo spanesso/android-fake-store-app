@@ -1,13 +1,14 @@
 package com.mango.fakestore.features.auth.presentation.ui.screens
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -15,12 +16,17 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mango.fakestore.core.designsystem.component.MangoCard
+import com.mango.fakestore.core.designsystem.component.MangoChip
+import com.mango.fakestore.core.designsystem.component.MangoChipType
 import com.mango.fakestore.core.designsystem.component.MangoErrorState
 import com.mango.fakestore.core.designsystem.component.MangoLoadingIndicator
 import com.mango.fakestore.core.designsystem.component.MangoText
-import com.mango.fakestore.core.designsystem.component.MangoTopAppBar
+import com.mango.fakestore.core.designsystem.theme.MangoColorTokens
 import com.mango.fakestore.core.designsystem.theme.MangoSpacing
 import com.mango.fakestore.core.designsystem.theme.MangoTextStyles
 import com.mango.fakestore.core.designsystem.theme.MangoTheme
@@ -36,76 +42,115 @@ fun LoginScreen(
     onEvent: (LoginUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        MangoTopAppBar(title = "Selecciona tu usuario")
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MangoColorTokens.background),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        MangoBrandHeader(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(240.dp),
+        )
+
+        val cardModifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+            .padding(horizontal = MangoSpacing.md)
+            .padding(bottom = MangoSpacing.xl)
 
         when (uiState) {
-            is LoginUiState.Idle -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(MangoSpacing.md),
-                    horizontalArrangement = Arrangement.spacedBy(MangoSpacing.sm),
-                    verticalArrangement = Arrangement.spacedBy(MangoSpacing.sm),
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    items(uiState.usuarios) { usuario ->
-                        UsuarioCard(
-                            usuario = usuario,
-                            onClick = { onEvent(LoginUiEvent.SeleccionarUsuario(usuario.id)) },
-                        )
-                    }
-                }
-            }
+            is LoginUiState.Idle -> LoginFormContent(
+                usuarios = uiState.usuarios,
+                onSelect = { onEvent(LoginUiEvent.SeleccionarUsuario(it)) },
+                modifier = cardModifier,
+            )
 
-            is LoginUiState.Loading -> {
+            is LoginUiState.Loading -> MangoCard(modifier = cardModifier) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     MangoLoadingIndicator()
                 }
             }
 
-            is LoginUiState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    MangoErrorState(
-                        uiError = uiState.uiError,
-                        onRetry = { onEvent(LoginUiEvent.Retry) },
-                    )
-                }
+            is LoginUiState.Error -> MangoCard(modifier = cardModifier) {
+                MangoErrorState(
+                    uiError = uiState.uiError,
+                    onRetry = { onEvent(LoginUiEvent.Retry) },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun UsuarioCard(
-    usuario: UsuarioSeleccionUi,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    MangoCard(
-        modifier = modifier.clickable(onClick = onClick),
+private fun MangoBrandHeader(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(MangoSpacing.md),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(MangoSpacing.xs),
         ) {
             MangoText(
-                text = "${usuario.id}",
-                style = MangoTextStyles.headlineLarge,
+                text = "MANGO",
+                style = MangoTextStyles.headlineLarge.copy(letterSpacing = 8.sp),
+                color = MangoColorTokens.onBackground,
             )
             MangoText(
-                text = usuario.etiqueta,
-                style = MangoTextStyles.bodyMedium,
+                text = "Fake Store",
+                style = MangoTextStyles.titleMedium,
+                color = MangoColorTokens.onSurfaceVariant,
             )
         }
+    }
+}
+
+@Composable
+private fun LoginFormContent(
+    usuarios: List<UsuarioSeleccionUi>,
+    onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    MangoCard(modifier = modifier) {
+        MangoText(
+            text = "Iniciar sesión",
+            style = MangoTextStyles.headlineSmall,
+            color = MangoColorTokens.onSurface,
+        )
+        Spacer(modifier = Modifier.height(MangoSpacing.xxs))
+        MangoText(
+            text = "Selecciona tu perfil de acceso",
+            style = MangoTextStyles.bodyMedium,
+            color = MangoColorTokens.onSurfaceVariant,
+        )
+        Spacer(modifier = Modifier.height(MangoSpacing.xl))
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(5),
+            horizontalArrangement = Arrangement.spacedBy(MangoSpacing.xs),
+            verticalArrangement = Arrangement.spacedBy(MangoSpacing.xs),
+        ) {
+            items(usuarios) { usuario ->
+                MangoChip(
+                    label = "${usuario.id}",
+                    type = MangoChipType.Assist,
+                    onClick = { onSelect(usuario.id) },
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(MangoSpacing.md))
+        MangoText(
+            text = "Toca un número para acceder",
+            style = MangoTextStyles.bodySmall,
+            color = MangoColorTokens.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
