@@ -30,20 +30,28 @@ android {
             dimension = "env"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
+            buildConfigField("String", "INTEGRITY_POLICY", "\"LOG\"")
+            buildConfigField("String", "EXPECTED_CERT_HASH", "\"\"")
         }
         create("staging") {
             dimension = "env"
             applicationIdSuffix = ".staging"
             versionNameSuffix = "-staging"
+            buildConfigField("String", "INTEGRITY_POLICY", "\"WARN\"")
+            buildConfigField("String", "EXPECTED_CERT_HASH", "\"\"")
         }
         create("prod") {
             dimension = "env"
+            buildConfigField("String", "INTEGRITY_POLICY", "\"BLOCK\"")
+            val certHash = project.findProperty("RELEASE_CERT_HASH")?.toString() ?: ""
+            buildConfigField("String", "EXPECTED_CERT_HASH", "\"$certHash\"")
         }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -59,6 +67,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

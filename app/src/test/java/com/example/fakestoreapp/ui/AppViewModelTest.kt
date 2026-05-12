@@ -9,6 +9,8 @@ import com.mango.fakestore.core.network.connectivity.ConnectivityObserver
 import com.mango.fakestore.core.network.connectivity.ConnectivityStatus
 import com.mango.fakestore.core.security.biometric.BiometricAuthenticator
 import com.mango.fakestore.core.security.biometric.BiometricResult
+import com.mango.fakestore.core.security.integrity.IntegrityChecker
+import com.mango.fakestore.core.security.integrity.IntegrityResult
 import com.mango.fakestore.core.testing.CoroutineTestRule
 import com.mango.fakestore.features.favorites.domain.usecase.ObservarConteoFavoritos
 import io.mockk.coEvery
@@ -48,6 +50,10 @@ class AppViewModelTest {
 
     private val observarConteoFavoritos: ObservarConteoFavoritos = mockk()
 
+    private val integrityChecker: IntegrityChecker = mockk {
+        every { verificarIntegridad() } returns IntegrityResult.INTEGRA
+    }
+
     @Before
     fun setUp() {
         every { observarConteoFavoritos() } returns flowOf(0)
@@ -58,6 +64,7 @@ class AppViewModelTest {
         biometricAuthenticator = biometricAuthenticator,
         telemetry = telemetry,
         errorMapper = errorMapper,
+        integrityChecker = integrityChecker,
         observarConteoFavoritos = observarConteoFavoritos,
     )
 
