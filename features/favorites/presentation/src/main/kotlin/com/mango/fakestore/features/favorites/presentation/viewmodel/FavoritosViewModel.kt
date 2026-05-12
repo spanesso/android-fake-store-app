@@ -3,6 +3,8 @@ package com.mango.fakestore.features.favorites.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
+import com.mango.fakestore.core.analytics.AnalyticsEvent
+import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
@@ -32,6 +34,7 @@ class FavoritosViewModel @Inject constructor(
     private val observarFavoritos: ObservarFavoritos,
     private val toggleFavorito: ToggleFavorito,
     private val telemetry: Telemetry,
+    private val eventTracker: EventTracker,
     private val errorMapper: DomainErrorToUiErrorMapper,
 ) : ViewModel() {
 
@@ -93,18 +96,26 @@ class FavoritosViewModel @Inject constructor(
 
     private fun toggleFavorito(favoritoUi: FavoritoUi) {
         viewModelScope.launch(errorHandler) {
-            val favorito = Favorito(
-                productoId = favoritoUi.productoId,
-                titulo = favoritoUi.titulo,
-                precio = favoritoUi.precio,
-                imagenUrl = favoritoUi.imagenUrl,
-                categoria = favoritoUi.categoria,
-                fechaMarcado = System.currentTimeMillis(),
-            )
-            val resultado = toggleFavorito(favorito)
-            if (resultado is Either.Left) {
-                val uiError = errorMapper.map(resultado.value)
-                _uiEffect.emit(FavoritosUiEffect.MostrarSnackbar(uiError))
+            val traza = telemetry.iniciarTraza("toggle_favorito")
+            try {
+                val favorito = Favorito(
+                    productoId = favoritoUi.productoId,
+                    titulo = favoritoUi.titulo,
+                    precio = favoritoUi.precio,
+                    imagenUrl = favoritoUi.imagenUrl,
+                    categoria = favoritoUi.categoria,
+                    fechaMarcado = System.currentTimeMillis(),
+                )
+                val resultado = toggleFavorito(favorito)
+                if (resultado is Either.Left) {
+                    val uiError = errorMapper.map(resultado.value)
+                    _uiEffect.emit(FavoritosUiEffect.MostrarSnackbar(uiError))
+                } else {
+                    // Favorito quita al hacer toggle desde la pantalla de favoritos
+                    eventTracker.registrar(AnalyticsEvent.ProductoDesfavoritado(favoritoUi.productoId))
+                }
+            } finally {
+                traza.detener()
             }
         }
     }

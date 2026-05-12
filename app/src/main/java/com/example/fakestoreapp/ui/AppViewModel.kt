@@ -7,6 +7,8 @@ import androidx.fragment.app.FragmentActivity
 import com.example.fakestoreapp.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mango.fakestore.core.analytics.AnalyticsEvent
+import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
@@ -33,12 +35,12 @@ class AppViewModel @Inject constructor(
     private val connectivityObserver: ConnectivityObserver,
     private val biometricAuthenticator: BiometricAuthenticator,
     private val telemetry: Telemetry,
+    private val eventTracker: EventTracker,
     private val errorMapper: DomainErrorToUiErrorMapper,
     private val integrityChecker: IntegrityChecker,
     observarConteoFavoritos: ObservarConteoFavoritos,
 ) : ViewModel() {
 
-    /** Resultado de integridad evaluado una sola vez al primer acceso desde la UI. */
     val integridadResultado: IntegrityResult by lazy { integrityChecker.verificarIntegridad() }
 
     val isOffline: StateFlow<Boolean> = connectivityObserver.statusFlow
@@ -63,16 +65,32 @@ class AppViewModel @Inject constructor(
         private set
 
     suspend fun autenticarParaPerfil(actividad: FragmentActivity): BiometricResult {
-        val resultado = biometricAuthenticator.autenticar(
-            actividad = actividad,
-            titulo = actividad.getString(R.string.biometria_titulo),
-            subtitulo = actividad.getString(R.string.biometria_subtitulo),
-            cancelarTexto = actividad.getString(R.string.biometria_cancelar),
-        )
-        if (resultado is BiometricResult.Exito) {
-            sesionAutenticada = true
+        val traza = telemetry.iniciarTraza("login_biometrico")
+        return try {
+            val resultado = biometricAuthenticator.autenticar(
+                actividad = actividad,
+                titulo = actividad.getString(R.string.biometria_titulo),
+                subtitulo = actividad.getString(R.string.biometria_subtitulo),
+                cancelarTexto = actividad.getString(R.string.biometria_cancelar),
+            )
+            when (resultado) {
+                is BiometricResult.Exito -> {
+                    sesionAutenticada = true
+                    eventTracker.registrar(AnalyticsEvent.LoginExitoso)
+                }
+                is BiometricResult.Cancelado ->
+                    eventTracker.registrar(AnalyticsEvent.LoginFallido("cancelado"))
+                is BiometricResult.BloqueadoTemporalmente ->
+                    eventTracker.registrar(AnalyticsEvent.LoginFallido("bloqueado"))
+                is BiometricResult.NoDisponible ->
+                    eventTracker.registrar(AnalyticsEvent.LoginFallido("no_disponible"))
+                is BiometricResult.Error ->
+                    eventTracker.registrar(AnalyticsEvent.LoginFallido("error_hw"))
+            }
+            resultado
+        } finally {
+            traza.detener()
         }
-        return resultado
     }
 
     fun reportarErrorGlobal(throwable: Throwable) {

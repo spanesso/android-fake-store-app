@@ -4,6 +4,8 @@ import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.perf.FirebasePerformance
+import com.mango.fakestore.core.analytics.ErrorRateLimiter
+import com.mango.fakestore.core.analytics.SessionIdProvider
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.analytics.TraceHandle
 import com.mango.fakestore.core.error.DomainError
@@ -14,13 +16,31 @@ class FirebaseTelemetryImpl(
     private val analytics: FirebaseAnalytics,
     private val performance: FirebasePerformance,
     private val logger: Logger,
+    private val sessionIdProvider: SessionIdProvider,
+    private val rateLimiter: ErrorRateLimiter,
 ) : Telemetry {
 
     override fun reportarNoFatal(error: DomainError, contexto: Map<String, String>) {
-        contexto.forEach { (clave, valor) -> crashlytics.setCustomKey(clave, valor) }
-        val causa = error.cause ?: Throwable(error::class.simpleName)
+        // Errores del flujo normal — no son bugs, no se reportan
+        if (error is DomainError.Validation || error is DomainError.Security.BiometricLockout) return
+
+        val errorCode = error::class.simpleName ?: "Unknown"
+        if (!rateLimiter.permitir(errorCode)) {
+            logger.info(TAG, "[Rate-limited] $errorCode")
+            return
+        }
+
+        val tagsCompletos = contexto + buildMap {
+            put("errorType", errorCode)
+            put("errorCode", errorCode)
+            put("sessionId", sessionIdProvider.obtener())
+            if (error is DomainError.Network.Server) put("httpCode", error.httpCode.toString())
+        }
+        tagsCompletos.forEach { (k, v) -> crashlytics.setCustomKey(k, v) }
+
+        val causa = error.cause ?: Throwable(errorCode)
         crashlytics.recordException(causa)
-        logger.warn(TAG, "No-fatal registrado: ${error::class.simpleName}", causa)
+        logger.warn(TAG, "No-fatal: $errorCode | contexto=$tagsCompletos", causa)
     }
 
     override fun registrarEvento(nombre: String, params: Map<String, Any?>) {
@@ -49,6 +69,16 @@ class FirebaseTelemetryImpl(
                 logger.info(TAG, "Traza detenida: $nombre")
             }
         }
+    }
+
+    override fun setUserId(hashUsuario: String) {
+        crashlytics.setUserId(hashUsuario)
+        logger.info(TAG, "setUserId: [hash]")
+    }
+
+    override fun setContexto(claves: Map<String, String>) {
+        claves.forEach { (k, v) -> crashlytics.setCustomKey(k, v) }
+        logger.info(TAG, "setContexto: keys=${claves.keys}")
     }
 
     private companion object {
