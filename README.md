@@ -44,8 +44,11 @@ Aplicación Android para la prueba técnica de Mango Fashion Group. Consume la [
 | `:core:network` | Retrofit + OkHttp, certificate pinning, `RetryInterceptor`, `ConnectivityObserver`, `safeRetrofitCall`, flavors dev/staging/prod | 22 |
 | `:core:database` | Room base abstracta cifrada con SQLCipher, `DatabaseKeyManager` con Android Keystore | 6 |
 | `:core:datastore` | DataStore cifrado con Tink AES-256-GCM para tokens (`SessionData`) y preferencias (`UserPreferences`) | 8 |
+| `:core:analytics` | `Telemetry` + `EventTracker` interfaces; Firebase impl (Crashlytics/Analytics/Performance); Console + NoOp | 13 |
+| `:core:security` | `BiometricAuthenticator` (BIOMETRIC_STRONG), `IntegrityChecker` (RootBeer), `SecureScreen` (FLAG_SECURE) | 8 |
+| `:core:testing` | `CoroutineTestRule`, `TestAppDispatchers`, builders de `DomainError` y `UiError` | 0 |
 
-**Total tests**: 118 ✅
+**Total tests**: 139 ✅
 
 ## Cómo ejecutar
 
@@ -74,6 +77,8 @@ cd android-fake-store-app
 ./gradlew :core:network:testDevDebugUnitTest      # core:network  (22 tests)
 ./gradlew :core:database:testDebugUnitTest        # core:database  (6 tests)
 ./gradlew :core:datastore:testDebugUnitTest       # core:datastore (8 tests)
+./gradlew :core:analytics:testDebugUnitTest       # core:analytics (13 tests)
+./gradlew :core:security:testDebugUnitTest        # core:security  (8 tests)
 
 # Snapshots Paparazzi (core:design-system)
 ./gradlew :core:design-system:recordPaparazziDebug   # Grabar golden images
@@ -135,3 +140,6 @@ Ver el catálogo completo en [`core/error/docs/errores.md`](core/error/docs/erro
 | `:core:network` | [`core/network/docs/`](core/network/docs/) |
 | `:core:database` | [`core/database/docs/`](core/database/docs/) |
 | `:core:datastore` | [`core/datastore/docs/`](core/datastore/docs/) |
+| `:core:analytics` | [`core/analytics/docs/`](core/analytics/docs/) |
+| `:core:security` | [`core/security/docs/`](core/security/docs/) |
+| `:core:testing` | [`core/testing/docs/`](core/testing/docs/) |
