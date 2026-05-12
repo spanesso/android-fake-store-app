@@ -1,7 +1,6 @@
 package com.mango.fakestore.core.network.interceptor
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.test.runTest
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -108,7 +107,7 @@ class RetryInterceptorTest {
             Request.Builder()
                 .url(server.url("/test"))
                 .post("body".toRequestBody(null))
-                .build()
+                .build(),
         ).execute()
 
         assertThat(response.code).isEqualTo(500)
@@ -125,7 +124,7 @@ class RetryInterceptorTest {
                 .url(server.url("/test"))
                 .addHeader("Idempotency-Key", "key-abc-123")
                 .post("body".toRequestBody(null))
-                .build()
+                .build(),
         ).execute()
 
         assertThat(response.code).isEqualTo(200)

@@ -24,6 +24,7 @@ import com.mango.fakestore.core.designsystem.theme.MangoTheme
 import com.mango.fakestore.features.profile.presentation.R
 import com.mango.fakestore.features.profile.presentation.model.PerfilContenidoUi
 
+@Suppress("LongMethod")
 @Composable
 fun PerfilInfoCard(
     usuario: PerfilContenidoUi,
