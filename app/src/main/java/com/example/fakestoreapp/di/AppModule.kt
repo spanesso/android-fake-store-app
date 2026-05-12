@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.fakestoreapp.database.AppDatabase
 import com.mango.fakestore.core.database.MangoDatabase
+import com.mango.fakestore.features.favorites.data.local.FavoritosDao
 import com.mango.fakestore.features.products.data.local.ProductosDao
 import dagger.Module
 import dagger.Provides
@@ -23,10 +24,17 @@ object AppModule {
             context,
             AppDatabase::class.java,
             MangoDatabase.DATABASE_NAME,
-        ).build()
+        )
+            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .build()
 
     @Provides
     @Singleton
     fun provideProductosDao(database: AppDatabase): ProductosDao =
         database.productosDao()
+
+    @Provides
+    @Singleton
+    fun provideFavoritosDao(database: AppDatabase): FavoritosDao =
+        database.favoritosDao()
 }
