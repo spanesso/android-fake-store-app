@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "296137589797",
+    "project_id": "mango-fake-store",
+    "storage_bucket": "mango-fake-store.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:296137589797:android:f253584825b8bfad62ebcc",
+        "android_client_info": {
+          "package_name": "com.example.fakestoreapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiDoxbD2sotzGrfQ3l-LUyAoSux8wV1cw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:296137589797:android:f253584825b8bfad62ebcc",
+        "android_client_info": {
+          "package_name": "com.example.fakestoreapp.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiDoxbD2sotzGrfQ3l-LUyAoSux8wV1cw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:296137589797:android:f253584825b8bfad62ebcc",
+        "android_client_info": {
+          "package_name": "com.example.fakestoreapp.staging"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiDoxbD2sotzGrfQ3l-LUyAoSux8wV1cw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
