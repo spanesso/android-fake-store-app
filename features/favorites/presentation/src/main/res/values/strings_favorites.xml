@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="favoritos_titulo_pantalla">Favoritos</string>
+    <string name="favoritos_lista_vacia">Aún no tienes productos favoritos.</string>
+    <string name="favoritos_quitar_descripcion">Quitar de favoritos</string>
+</resources>

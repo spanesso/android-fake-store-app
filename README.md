@@ -69,6 +69,17 @@ Aplicación Android para la prueba técnica de Mango Fashion Group. Consume la [
 **Nuevos tests ETAPA 3**: 15 ✅  
 **Total tests acumulado**: 168 ✅
 
+### ETAPA 4 — Favoritos
+
+| Módulo | Descripción | Tests |
+|--------|-------------|-------|
+| `:features:favorites:domain` | Entidad `Favorito`, `FavoritosRepository` interface, 3 use cases (ObservarFavoritos, ToggleFavorito, ObservarConteoFavoritos) | 9 |
+| `:features:favorites:data` | `FavoritosRepositoryImpl` SSOT (Room local), `FavoritosDao`, `FavoritoEntity`, mapper Entity↔Domain | 7 |
+| `:features:favorites:presentation` | `FavoritosViewModel` (MVVM + Turbine), `UiState` sealed (Loading/Content/Empty/Error), `FavoritosRoute` + `FavoritosScreen` puro | 6 |
+
+**Nuevos tests ETAPA 4**: 22 ✅  
+**Total tests acumulado**: 190 ✅
+
 ## Cómo ejecutar
 
 ```bash
@@ -104,6 +115,11 @@ cd android-fake-store-app
 ./gradlew :features:products:domain:testDebugUnitTest        # products:domain       (7 tests)
 ./gradlew :features:products:presentation:testDebugUnitTest  # products:presentation (8 tests)
 
+# Tests features:favorites
+./gradlew :features:favorites:domain:testDebugUnitTest        # favorites:domain       (9 tests)
+./gradlew :features:favorites:data:testDebugUnitTest          # favorites:data         (7 tests)
+./gradlew :features:favorites:presentation:testDebugUnitTest  # favorites:presentation (6 tests)
+
 # Snapshots Paparazzi (core:design-system)
 ./gradlew :core:design-system:recordPaparazziDebug   # Grabar golden images
 ./gradlew :core:design-system:verifyPaparazziDebug   # Verificar snapshots
@@ -131,9 +147,9 @@ core/
   logging/     ✅              — Logger interface; TimberLogger (debug) + NoOpLogger (prod)
 features/
   products/    ✅              — catálogo SSOT (Room + Retrofit), MVVM, Either tipado, 15 tests
-  auth/                        — pendiente ETAPA 4
-  favorites/                   — pendiente ETAPA 5
-  profile/                     — pendiente ETAPA 6
+  favorites/   ✅              — favoritos persistidos en Room, SSOT reactivo, toggle desde catálogo, 22 tests
+  auth/                        — pendiente
+  profile/                     — pendiente
 ```
 
 Cada feature se organiza en submódulos `:api`, `:domain`, `:data`, `:presentation`.
@@ -173,3 +189,4 @@ Ver el catálogo completo en [`core/error/docs/errores.md`](core/error/docs/erro
 | `:core:testing` | [`core/testing/docs/`](core/testing/docs/) |
 | `:core:logging` | [`core/logging/docs/`](core/logging/docs/) |
 | `:features:products` | [`features/products/docs/`](features/products/docs/) |
+| `:features:favorites` | [`features/favorites/docs/`](features/favorites/docs/) |
