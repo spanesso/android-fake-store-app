@@ -62,6 +62,11 @@ android {
     }
 }
 
+ksp {
+    arg("dagger.hilt.android.internal.disableAndroidSuperclassValidation", "true")
+    arg("dagger.hilt.android.internal.projectType", "APP")
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -76,8 +81,24 @@ dependencies {
     implementation(project(":core:datastore"))
     implementation(project(":core:common"))
     implementation(project(":core:error"))
+    implementation(project(":core:analytics"))
+    implementation(project(":core:logging"))
+    implementation(libs.androidx.datastore.preferences)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.performance)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.okhttp.core)
+    implementation(libs.retrofit.core)
+    implementation(project(":features:products:domain"))
+    implementation(project(":features:products:data"))
+    implementation(project(":features:products:presentation"))
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
