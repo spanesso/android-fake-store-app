@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Network -->
+    <string name="error_red_sin_conexion">No internet connection. Check your network and try again.</string>
+    <string name="error_red_tiempo_agotado">The request timed out. Please try again.</string>
+    <string name="error_red_servidor">Server error. Please try again in a few minutes.</string>
+    <string name="error_red_no_autorizado">Your session has expired. Please sign in again.</string>
+    <string name="error_red_sin_permiso">You don\'t have permission to perform this action.</string>
+    <string name="error_red_no_encontrado">The requested content is not available.</string>
+    <string name="error_red_formato">There was a problem processing the response.</string>
+
+    <!-- Database -->
+    <string name="error_bd_lectura">Could not read the information. Please try again.</string>
+    <string name="error_bd_escritura">Could not save the information. Please try again.</string>
+    <string name="error_bd_no_encontrado">The requested information was not found.</string>
+    <string name="error_bd_integridad">Data integrity error.</string>
+
+    <!-- Security -->
+    <string name="error_seg_biometria_no_disponible">Biometric authentication is not available on this device.</string>
+    <string name="error_seg_biometria_bloqueada">Too many failed attempts. Biometrics are temporarily locked.</string>
+    <string name="error_seg_root_detectado">This application cannot be used on this device.</string>
+    <string name="error_seg_integridad">The application integrity could not be verified.</string>
+    <string name="error_seg_sesion_expirada">Your session has expired. Please sign in again.</string>
+
+    <!-- Validation and generic -->
+    <string name="error_validacion_formulario">Please review the form fields and try again.</string>
+    <string name="error_desconocido">An unexpected error occurred. Please try again.</string>
+</resources>

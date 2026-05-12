@@ -1,0 +1,225 @@
+# Configuración Detekt para el proyecto Mango Fake Store.
+#
+# Esta configuración sobrescribe los defaults de Detekt 1.23 con las reglas custom de §7.13
+# (manejo de errores tipados) y §10 (calidad de código) del prompt maestro. Cada regla se
+# documenta en español dentro de `docs/manejo-errores.md` y `docs/calidad.md`.
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+  weights:
+    complexity: 2
+    formatting: 1
+    LongParameterList: 1
+    comments: 1
+
+config:
+  validation: true
+  warningsAsErrors: false
+  checkExhaustiveness: false
+
+processors:
+  active: true
+
+console-reports:
+  active: true
+
+output-reports:
+  active: true
+
+# §7.13 — Errores tipados ----------------------------------------------------------
+
+# Detekt no permite definir reglas custom inline en YAML; las reglas específicas viven en
+# `:build-logic:convention:detekt-rules` (en una versión posterior). Aquí ajustamos los
+# parámetros de las reglas estándar y delegamos en las custom cuando estén compiladas.
+
+exceptions:
+  active: true
+  # Prohibir catch (e: Exception) y catch (e: Throwable) genéricos salvo en barreras
+  # documentadas. Las barreras se anotan con @Suppress("TooGenericExceptionCaught", "...").
+  TooGenericExceptionCaught:
+    active: true
+    exceptionNames:
+      - 'ArrayIndexOutOfBoundsException'
+      - 'Error'
+      - 'Exception'
+      - 'IllegalMonitorStateException'
+      - 'NullPointerException'
+      - 'IndexOutOfBoundsException'
+      - 'RuntimeException'
+      - 'Throwable'
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+  TooGenericExceptionThrown:
+    active: true
+    exceptionNames:
+      - 'Error'
+      - 'Exception'
+      - 'RuntimeException'
+      - 'Throwable'
+  # Prohibir capturar Throwable en cualquier contexto que no esté anotado.
+  ThrowingExceptionsWithoutMessageOrCause:
+    active: true
+  ThrowingExceptionFromFinally:
+    active: true
+  ThrowingExceptionInMain:
+    active: true
+  # Permite swallowed exceptions solo si la captura está documentada con un mensaje.
+  SwallowedException:
+    active: true
+    ignoredExceptionTypes:
+      - 'InterruptedException'
+      - 'MalformedURLException'
+      - 'NumberFormatException'
+      - 'ParseException'
+    allowedExceptionNameRegex: '_|(ignore|expected).*'
+
+# Reglas que Detekt aplica por defecto y que se afinan para Compose ----------------
+
+complexity:
+  active: true
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 8
+    ignoreDefaultParameters: true
+    ignoreDataClasses: true
+    ignoreAnnotated:
+      - 'Composable'
+  TooManyFunctions:
+    active: true
+    ignoreAnnotated:
+      - 'Composable'
+
+naming:
+  active: true
+  FunctionNaming:
+    active: true
+    ignoreAnnotated:
+      - 'Composable'  # Composables se nombran en PascalCase y eso es válido.
+
+style:
+  active: true
+  MagicNumber:
+    active: true
+    ignoreAnnotated:
+      - 'Preview'
+    ignoreNumbers:
+      - '-1'
+      - '0'
+      - '1'
+      - '2'
+  ReturnCount:
+    active: true
+    max: 4
+  ForbiddenComment:
+    active: true
+    comments:
+      - reason: 'Marcador FIXME no resuelto antes de fusionar.'
+        value: 'FIXME:'
+      - reason: 'Marcador TODO sin issue asignado.'
+        value: 'TODO:'
+    allowedPatterns: 'TODO\\(#\\d+\\)'  # TODOs con número de issue son aceptables.
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated:
+      - 'Preview'  # Los Composables de preview suelen ser private + no llamados.
+
+formatting:
+  active: true
+  android: true
+  autoCorrect: true
+  ArgumentListWrapping:
+    active: true
+  ChainWrapping:
+    active: true
+  CommentSpacing:
+    active: true
+  EnumEntryNameCase:
+    active: true
+  Filename:
+    active: true
+  FinalNewline:
+    active: true
+  ImportOrdering:
+    active: true
+  Indentation:
+    active: true
+    indentSize: 4
+  MaximumLineLength:
+    active: true
+    maxLineLength: 120
+  MultiLineIfElse:
+    active: true
+  NoBlankLineBeforeRbrace:
+    active: true
+  NoConsecutiveBlankLines:
+    active: true
+  NoEmptyClassBody:
+    active: true
+  NoLineBreakAfterElse:
+    active: true
+  NoLineBreakBeforeAssignment:
+    active: true
+  NoMultipleSpaces:
+    active: true
+  NoSemicolons:
+    active: true
+  NoTrailingSpaces:
+    active: true
+  NoUnitReturn:
+    active: true
+  NoUnusedImports:
+    active: true
+  NoWildcardImports:
+    active: true
+  ParameterListWrapping:
+    active: true
+  PackageName:
+    active: true
+  SpacingAroundAngleBrackets:
+    active: true
+  SpacingAroundColon:
+    active: true
+  SpacingAroundComma:
+    active: true
+  SpacingAroundCurly:
+    active: true
+  SpacingAroundDot:
+    active: true
+  SpacingAroundDoubleColon:
+    active: true
+  SpacingAroundKeyword:
+    active: true
+  SpacingAroundOperators:
+    active: true
+  SpacingAroundParens:
+    active: true
+  SpacingAroundRangeOperator:
+    active: true
+  SpacingAroundUnaryOperator:
+    active: true
+  SpacingBetweenDeclarationsWithAnnotations:
+    active: true
+  SpacingBetweenDeclarationsWithComments:
+    active: true
+  StringTemplate:
+    active: true
+  TrailingCommaOnCallSite:
+    active: true
+    useTrailingCommaOnCallSite: true
+  TrailingCommaOnDeclarationSite:
+    active: true
+    useTrailingCommaOnDeclarationSite: true
+
+# Notas sobre reglas que requieren plugin custom (versión futura):
+#  - "ProhibirHiltViewModelEnComposablesDeFeature": detectar imports de hiltViewModel fuera
+#    de paquetes `ui.route` → cubierto por el skill `validar-arquitectura` (ARQ-001).
+#  - "ProhibirMaterial3FueraDeDesignSystem": cubierto por el skill `validar-arquitectura`
+#    (ARQ-002).
+#  - "ProhibirImportDeDtoEntityFueraDeData": cubierto por el skill `validar-arquitectura`
+#    (ARQ-003) y por Konsist.
+#  - "ProhibirThrowableMessageEnComposables": cubierto por `validar-manejo-errores` (ERR-003).
+#  - "ExigirEitherEnUseCases": cubierto por `validar-manejo-errores` (ERR-002).
+#  - "ProhibirRunCatchingSinFold": cubierto por `validar-manejo-errores` (ERR-006).
+# La compilación de un set custom de reglas para Detekt llegará en una iteración posterior
+# (probablemente en ETAPA 10 — pulido y entrega).
