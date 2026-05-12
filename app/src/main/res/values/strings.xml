@@ -10,4 +10,9 @@
     <string name="biometria_bloqueado">Biometría bloqueada temporalmente. Inténtalo de nuevo.</string>
     <string name="biometria_no_disponible">Biometría no disponible en este dispositivo.</string>
     <string name="error_global_inesperado">Ocurrió un error inesperado. La app continuará funcionando.</string>
+    <string name="integridad_titulo">Dispositivo comprometido</string>
+    <string name="integridad_mensaje_bloqueo">Se ha detectado que este dispositivo puede estar comprometido (root, depurador o manipulación de la app). Por seguridad, la aplicación no puede continuar.</string>
+    <string name="integridad_mensaje_advertencia">Se ha detectado que este dispositivo puede estar comprometido. Continuar podría exponerte a riesgos de seguridad.</string>
+    <string name="integridad_boton_salir">Cerrar app</string>
+    <string name="integridad_boton_continuar">Continuar de todas formas</string>
 </resources>
