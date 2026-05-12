@@ -30,7 +30,7 @@ Permite verificar que la clase base `MangoDatabase` es extensible con la anotaci
 ## Comandos Gradle
 
 ```bash
-cd repository/android-fake-store-app
+# Desde la raíz del repositorio (https://github.com/spanesso/android-fake-store-app)
 
 ./gradlew :core:database:testDebugUnitTest
 ```

@@ -13,7 +13,7 @@
 ## Ejecución
 
 ```bash
-cd repository/android-fake-store-app
+# Desde la raíz del repositorio (https://github.com/spanesso/android-fake-store-app)
 
 # Tests Konsist (incluidos en el ciclo estándar)
 ./gradlew :core:design-system:testDebugUnitTest
