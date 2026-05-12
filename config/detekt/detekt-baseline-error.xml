@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:DomainErrorToUiErrorMapper.kt$DomainErrorToUiErrorMapper$fun map(error: DomainError): UiError</ID>
+    <ID>LongMethod:DomainErrorToUiErrorMapper.kt$DomainErrorToUiErrorMapper$fun map(error: DomainError): UiError</ID>
+  </CurrentIssues>
+</SmellBaseline>
