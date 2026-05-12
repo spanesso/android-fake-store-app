@@ -10,8 +10,10 @@
 El proyecto es una prueba técnica con calidad de producción para Mango Fashion Group. La
 regla R0.12 del prompt maestro exige que **no se incorpore ninguna herramienta, SDK o
 servicio externo sin tier gratuito viable** para esta prueba. Cualquier servicio "trial"
-(Datadog, Bitrise pago, SonarCloud privado, Sentry sobre cuota gratuita, etc.) queda
-marcado como opcional y se activa solo si la empresa lo provee.
+(Datadog, Bitrise pago, Sentry sobre cuota gratuita, etc.) queda marcado como opcional
+y se activa solo si la empresa lo provee.
+
+El repositorio Android es **público** en [github.com/spanesso/android-fake-store-app](https://github.com/spanesso/android-fake-store-app), lo que desbloquea el tier gratuito de SonarCloud y los minutos ilimitados de GitHub Actions.
 
 Esta decisión condiciona observabilidad, CI/CD, análisis estático y distribución interna.
 
@@ -39,12 +41,13 @@ para el alcance del proyecto:
 | Formato/lint | **ktlint** vía plugin Gradle | Gratis, local. |
 | Cobertura | **Kover** (de JetBrains) | Gratis, sustituye JaCoCo para Kotlin moderno. |
 | Arquitectura | **Konsist** | Gratis, ejecuta tests JUnit. |
+| Análisis estático cloud | **SonarCloud** | **Gratis para repos públicos** ✅ — activar en ETAPA 9 (CI/CD). |
 
 ### CI/CD
 
 | Componente | Herramienta | Tier gratuito |
 |---|---|---|
-| Pipeline principal | **GitHub Actions** | 2 000 min/mes en repos privados, ilimitado en públicos. |
+| Pipeline principal | **GitHub Actions** | Ilimitado en repos públicos ✅ (el nuestro es público). |
 | Espejo opcional | Azure Pipelines | 1 800 min/mes, OPCIONAL. |
 | Distribución QA | Firebase App Distribution | Ilimitado, gratis. |
 
@@ -58,17 +61,17 @@ flag opt-in.
 |---|---|---|
 | APM/RUM mobile | Datadog Mobile RUM + Logs + APM | Sin tier gratuito viable; solo trial. |
 | Crash reporting alternativo | Sentry | Free tier limitado a 5 000 eventos/mes; bastará para fase post-piloto si crece. |
-| Análisis estático cloud | SonarCloud | Gratis solo si el repo es público; el nuestro es privado. |
-| Análisis estático self-hosted | SonarQube Community Edition | Requiere infraestructura propia (servidor + Postgres). |
+| Análisis estático self-hosted | SonarQube Community Edition | Requiere infraestructura propia (servidor + Postgres); descartado en favor de SonarCloud. |
 | CI/CD mobile especializado | Bitrise | Plan gratis muy limitado para Android (≤200 builds, capping). |
 
 ## Alternativas consideradas y descartadas
 
 1. **Adoptar Datadog Mobile RUM como observabilidad principal**: descartada por R0.12 (no
    tiene tier gratuito viable). Queda como _opcional_ documentado.
-2. **SonarCloud como gate de calidad obligatorio**: descartada porque el repo es privado;
-   SonarCloud no es gratis en repos privados. Detekt + Kover + Konsist cubren el mismo
-   territorio sin coste.
+2. **SonarCloud como gate de calidad opcional**: inicialmente descartada asumiendo repo
+   privado. Al confirmar que el repo es público ([github.com/spanesso/android-fake-store-app](https://github.com/spanesso/android-fake-store-app)),
+   SonarCloud es gratuito y se incorpora al plan de CI/CD de ETAPA 9. Detekt + Kover +
+   Konsist siguen activos como análisis local; SonarCloud añade el quality gate central.
 3. **Bitrise como CI principal**: descartada por R0.12; GitHub Actions es funcionalmente
    suficiente y gratuito.
 4. **Sentry como crash reporter principal**: descartada porque Firebase Crashlytics es
@@ -89,9 +92,9 @@ flag opt-in.
 - **No hay APM mobile profundo**: Firebase Performance da traces básicos pero menos
   granular que Datadog. Mitigación: aceptable para el alcance de la prueba; documentamos
   el upgrade path a Datadog si la empresa lo aprueba.
-- **Detekt y Kover requieren disciplina manual**: no hay quality gate central como Sonar.
-  Mitigación: GitHub Actions valida en cada PR; el skill `validar-arquitectura` actúa como
-  red de seguridad humana legible.
+- **Quality gate centralizado disponible**: SonarCloud se activa en ETAPA 9 aprovechando
+  que el repo es público. Hasta entonces, GitHub Actions + Detekt + Kover + Konsist cubren
+  el mismo territorio.
 - **Firebase Crashlytics requiere `google-services.json`**: el archivo se gestiona como
   secreto en GitHub Actions Secrets (`FIREBASE_SERVICE_ACCOUNT_JSON`) y se descarga durante
   CI; nunca se commitea (R0.7).
@@ -114,7 +117,8 @@ Esta decisión se verifica mediante:
 - Revisión de `gradle/libs.versions.toml`: ninguna dependencia de pago/trial debe estar en
   el grafo por defecto.
 - Revisión de `.github/workflows/*.yml`: ningún workflow obligatorio depende de tokens de
-  servicios opcionales (Datadog, Sentry, SonarCloud).
+  servicios opcionales (Datadog, Sentry). SonarCloud se integra en ETAPA 9 como step
+  opcional controlado por el secreto `SONAR_TOKEN`.
 - Bug tracker: cualquier issue que requiera un servicio opcional debe marcarlo como
   bloqueante de validación humana antes de incorporarse.
 
