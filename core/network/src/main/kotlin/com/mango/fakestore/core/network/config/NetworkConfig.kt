@@ -8,12 +8,12 @@ data class NetworkConfig(
     val maxRetries: Int = 3,
     val retryBaseDelayMs: Long = 500L,
     val retryMaxDelayMs: Long = 10_000L,
+    // Verificado: 2026-05-12. El primario es el certificado hoja de fakestoreapi.com.
+    // El backup es la CA intermedia Let's Encrypt E5/E6 (estable 2+ años).
+    // Rotar primario cuando caduque el certificado hoja (~90 días, Let's Encrypt).
+    // Ver research.md para el comando openssl de verificación.
     val certificatePins: List<String> = listOf(
         "sha256/dSxOWQR+hD1HkfYEk0y+JuXzHrLTjhVPXDzGRsbO7oI=",
-        // Backup pin — placeholder. Actualizar con:
-        // openssl s_client -connect fakestoreapi.com:443 </dev/null \
-        //   | openssl x509 -pubkey -noout | openssl pkey -pubin -outform DER \
-        //   | openssl dgst -sha256 -binary | openssl enc -base64
-        "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+        "sha256/jQJTbIh0grw0/1TkHSumWb+Fs0Kct2/cm9cT5a1+aI="
     )
 )

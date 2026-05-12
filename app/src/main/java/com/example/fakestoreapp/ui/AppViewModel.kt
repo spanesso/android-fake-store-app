@@ -14,6 +14,8 @@ import com.mango.fakestore.core.network.connectivity.ConnectivityObserver
 import com.mango.fakestore.core.network.connectivity.ConnectivityStatus
 import com.mango.fakestore.core.security.biometric.BiometricAuthenticator
 import com.mango.fakestore.core.security.biometric.BiometricResult
+import com.mango.fakestore.core.security.integrity.IntegrityChecker
+import com.mango.fakestore.core.security.integrity.IntegrityResult
 import com.mango.fakestore.features.favorites.domain.usecase.ObservarConteoFavoritos
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,8 +34,12 @@ class AppViewModel @Inject constructor(
     private val biometricAuthenticator: BiometricAuthenticator,
     private val telemetry: Telemetry,
     private val errorMapper: DomainErrorToUiErrorMapper,
+    private val integrityChecker: IntegrityChecker,
     observarConteoFavoritos: ObservarConteoFavoritos,
 ) : ViewModel() {
+
+    /** Resultado de integridad evaluado una sola vez al primer acceso desde la UI. */
+    val integridadResultado: IntegrityResult by lazy { integrityChecker.verificarIntegridad() }
 
     val isOffline: StateFlow<Boolean> = connectivityObserver.statusFlow
         .map { it != ConnectivityStatus.Connected }

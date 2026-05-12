@@ -4,6 +4,7 @@ import com.mango.fakestore.core.security.biometric.BiometricAuthenticator
 import com.mango.fakestore.core.security.biometric.BiometricResult
 import com.mango.fakestore.core.security.di.SecurityModule
 import com.mango.fakestore.core.security.integrity.IntegrityChecker
+import com.mango.fakestore.core.security.integrity.IntegrityResult
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
@@ -21,8 +22,10 @@ class FakeBiometricAuthenticator(
     ): BiometricResult = defaultResult
 }
 
-class FakeIntegrityChecker : IntegrityChecker {
-    override fun estaComprometido(): Boolean = false
+class FakeIntegrityChecker(
+    var defaultResult: IntegrityResult = IntegrityResult.INTEGRA,
+) : IntegrityChecker {
+    override fun verificarIntegridad(): IntegrityResult = defaultResult
 }
 
 @Module
