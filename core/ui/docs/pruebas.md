@@ -14,7 +14,7 @@
 ## Ejecución
 
 ```bash
-cd repository/android-fake-store-app
+# Desde la raíz del repositorio (https://github.com/spanesso/android-fake-store-app)
 ./gradlew :core:ui:testDebugUnitTest
 ```
 
