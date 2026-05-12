@@ -12,7 +12,7 @@ private const val KEY_URI = "android-keystore://$KEYSET_ALIAS"
 private const val TEMPLATE = "AES256_GCM"
 
 open class TinkEncryption(
-    private val context: Context?
+    private val context: Context?,
 ) {
 
     private val aead: Aead by lazy {

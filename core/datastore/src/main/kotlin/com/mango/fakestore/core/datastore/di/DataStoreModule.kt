@@ -11,7 +11,6 @@ import com.mango.fakestore.core.common.dispatchers.AppDispatchers
 import com.mango.fakestore.core.datastore.MangoDataStore
 import com.mango.fakestore.core.datastore.MangoDataStoreImpl
 import com.mango.fakestore.core.datastore.crypto.TinkEncryption
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,11 +30,11 @@ object DataStoreModule {
     @Singleton
     fun providePreferencesDataStore(
         @ApplicationContext context: Context,
-        dispatchers: AppDispatchers
+        dispatchers: AppDispatchers,
     ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
         corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
         scope = CoroutineScope(dispatchers.io + SupervisorJob()),
-        produceFile = { context.preferencesDataStoreFile(DATASTORE_FILE) }
+        produceFile = { context.preferencesDataStoreFile(DATASTORE_FILE) },
     )
 
     @Provides
@@ -48,6 +47,6 @@ object DataStoreModule {
     fun provideMangoDataStore(
         dataStore: DataStore<Preferences>,
         tink: TinkEncryption,
-        dispatchers: AppDispatchers
+        dispatchers: AppDispatchers,
     ): MangoDataStore = MangoDataStoreImpl(dataStore, tink, dispatchers.io)
 }

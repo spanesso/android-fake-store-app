@@ -2,4 +2,6 @@
 <resources>
     <string name="productos_lista_vacia">No hay productos disponibles en este momento.</string>
     <string name="productos_titulo_pantalla">Productos</string>
+    <string name="productos_aniadir_favorito_descripcion">Añadir a favoritos</string>
+    <string name="productos_quitar_favorito_descripcion">Quitar de favoritos</string>
 </resources>

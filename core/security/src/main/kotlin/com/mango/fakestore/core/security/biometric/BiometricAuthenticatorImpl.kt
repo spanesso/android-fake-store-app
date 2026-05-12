@@ -28,17 +28,20 @@ class BiometricAuthenticatorImpl @Inject constructor(
                 reanudado = true
                 val resultado = when (errorCode) {
                     BiometricPrompt.ERROR_NEGATIVE_BUTTON,
-                    BiometricPrompt.ERROR_USER_CANCELED -> BiometricResult.Cancelado
+                    BiometricPrompt.ERROR_USER_CANCELED,
+                    -> BiometricResult.Cancelado
 
                     BiometricPrompt.ERROR_LOCKOUT,
-                    BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> {
+                    BiometricPrompt.ERROR_LOCKOUT_PERMANENT,
+                    -> {
                         logger.warn(TAG, "Biometría bloqueada temporalmente (errorCode=$errorCode)")
                         BiometricResult.BloqueadoTemporalmente
                     }
 
                     BiometricPrompt.ERROR_HW_UNAVAILABLE,
                     BiometricPrompt.ERROR_HW_NOT_PRESENT,
-                    BiometricPrompt.ERROR_NO_BIOMETRICS -> {
+                    BiometricPrompt.ERROR_NO_BIOMETRICS,
+                    -> {
                         logger.warn(TAG, "Hardware biométrico no disponible (errorCode=$errorCode)")
                         BiometricResult.NoDisponible
                     }

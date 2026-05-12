@@ -32,3 +32,7 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# CI/CD — secretos locales para act (nunca commitear)
+.secrets.local
+release.keystore

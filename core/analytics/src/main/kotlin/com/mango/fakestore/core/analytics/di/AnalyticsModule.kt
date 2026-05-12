@@ -4,7 +4,10 @@ import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.perf.FirebasePerformance
+import com.mango.fakestore.core.analytics.ErrorRateLimiter
 import com.mango.fakestore.core.analytics.EventTracker
+import com.mango.fakestore.core.analytics.RandomSessionIdProvider
+import com.mango.fakestore.core.analytics.SessionIdProvider
 import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.analytics.impl.FirebaseEventTrackerImpl
 import com.mango.fakestore.core.analytics.impl.FirebaseTelemetryImpl
@@ -35,12 +38,22 @@ object AnalyticsModule {
 
     @Provides
     @Singleton
+    fun provideSessionIdProvider(): SessionIdProvider = RandomSessionIdProvider()
+
+    @Provides
+    @Singleton
+    fun provideErrorRateLimiter(): ErrorRateLimiter = ErrorRateLimiter()
+
+    @Provides
+    @Singleton
     fun provideTelemetry(
         crashlytics: FirebaseCrashlytics,
         analytics: FirebaseAnalytics,
         performance: FirebasePerformance,
         logger: Logger,
-    ): Telemetry = FirebaseTelemetryImpl(crashlytics, analytics, performance, logger)
+        sessionIdProvider: SessionIdProvider,
+        rateLimiter: ErrorRateLimiter,
+    ): Telemetry = FirebaseTelemetryImpl(crashlytics, analytics, performance, logger, sessionIdProvider, rateLimiter)
 
     @Provides
     @Singleton
