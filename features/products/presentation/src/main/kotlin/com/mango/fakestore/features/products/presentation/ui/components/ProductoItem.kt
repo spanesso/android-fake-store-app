@@ -33,8 +33,11 @@ fun ProductoItem(
         MangoIconButton(
             imageVector = if (producto.esFavorito) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
             contentDescription = stringResource(
-                if (producto.esFavorito) R.string.productos_quitar_favorito_descripcion
-                else R.string.productos_aniadir_favorito_descripcion,
+                if (producto.esFavorito) {
+                    R.string.productos_quitar_favorito_descripcion
+                } else {
+                    R.string.productos_aniadir_favorito_descripcion
+                },
             ),
             onClick = { onEvent(ProductosUiEvent.ToggleFavorito(producto)) },
             modifier = Modifier.align(Alignment.TopEnd),

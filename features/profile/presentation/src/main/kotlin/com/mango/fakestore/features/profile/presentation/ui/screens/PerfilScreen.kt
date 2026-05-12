@@ -134,7 +134,11 @@ private fun ErrorNoEncontradoClaroPreview() {
     MangoTheme { PerfilScreen(uiState = PerfilUiState.Error(errorNoEncontrado), onEvent = {}) }
 }
 
-@Preview(name = "Perfil - Error No Encontrado - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    name = "Perfil - Error No Encontrado - Oscuro",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun ErrorNoEncontradoOscuroPreview() {
     MangoTheme { PerfilScreen(uiState = PerfilUiState.Error(errorNoEncontrado), onEvent = {}) }
@@ -155,7 +159,12 @@ private fun ContentOscuroPreview() {
 @Preview(name = "Perfil - Content sin favoritos - Claro", showBackground = true)
 @Composable
 private fun ContentSinFavoritosClaroPreview() {
-    MangoTheme { PerfilScreen(uiState = PerfilUiState.Content(sampleUsuario.copy(contadorFavoritos = 0)), onEvent = {}) }
+    MangoTheme {
+        PerfilScreen(
+            uiState = PerfilUiState.Content(sampleUsuario.copy(contadorFavoritos = 0)),
+            onEvent = {},
+        )
+    }
 }
 
 // endregion

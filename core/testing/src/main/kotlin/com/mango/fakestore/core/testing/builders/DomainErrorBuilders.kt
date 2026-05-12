@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package com.mango.fakestore.core.testing.builders
 
 import com.mango.fakestore.core.error.DomainError

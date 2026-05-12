@@ -6,10 +6,17 @@ import timber.log.Timber
 import kotlin.math.min
 import kotlin.random.Random
 
+private const val HTTP_TOO_MANY_REQUESTS = 429
+private const val HTTP_REQUEST_TIMEOUT = 408
+private const val HTTP_SERVER_ERROR_FIRST = 500
+private const val HTTP_SERVER_ERROR_LAST = 599
+private const val MS_PER_SECOND = 1_000L
+private const val JITTER_RANGE_MS = 300L
+
 class RetryInterceptor(
     private val maxRetries: Int = 3,
     private val baseDelayMs: Long = 500L,
-    private val maxDelayMs: Long = 10_000L
+    private val maxDelayMs: Long = 10_000L,
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -44,19 +51,19 @@ class RetryInterceptor(
 
     private fun shouldRetry(response: Response): Boolean {
         val code = response.code
-        if (code == 429) {
+        if (code == HTTP_TOO_MANY_REQUESTS) {
             val retryAfterSecs = response.header("Retry-After")?.toLongOrNull()
             if (retryAfterSecs != null && retryAfterSecs > 0) {
-                Thread.sleep(retryAfterSecs * 1_000)
+                Thread.sleep(retryAfterSecs * MS_PER_SECOND)
             }
             return true
         }
-        return code == 408 || code in 500..599
+        return code == HTTP_REQUEST_TIMEOUT || code in HTTP_SERVER_ERROR_FIRST..HTTP_SERVER_ERROR_LAST
     }
 
     private fun computeDelay(attempt: Int): Long {
         val exponential = min(baseDelayMs * (1L shl (attempt - 1)), maxDelayMs)
-        val jitter = Random.nextLong(-300L, 300L)
+        val jitter = Random.nextLong(-JITTER_RANGE_MS, JITTER_RANGE_MS)
         return maxOf(0L, exponential + jitter)
     }
 }

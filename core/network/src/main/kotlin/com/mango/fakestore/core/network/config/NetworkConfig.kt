@@ -14,6 +14,6 @@ data class NetworkConfig(
     // Ver research.md para el comando openssl de verificación.
     val certificatePins: List<String> = listOf(
         "sha256/dSxOWQR+hD1HkfYEk0y+JuXzHrLTjhVPXDzGRsbO7oI=",
-        "sha256/jQJTbIh0grw0/1TkHSumWb+Fs0Kct2/cm9cT5a1+aI="
-    )
+        "sha256/jQJTbIh0grw0/1TkHSumWb+Fs0Kct2/cm9cT5a1+aI=",
+    ),
 )

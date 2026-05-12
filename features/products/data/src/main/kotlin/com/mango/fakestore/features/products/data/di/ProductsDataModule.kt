@@ -1,7 +1,7 @@
 package com.mango.fakestore.features.products.data.di
 
-import com.mango.fakestore.features.products.data.repository.ProductosRepositoryImpl
 import com.mango.fakestore.features.products.data.remote.ProductosApi
+import com.mango.fakestore.features.products.data.repository.ProductosRepositoryImpl
 import com.mango.fakestore.features.products.domain.repository.ProductosRepository
 import dagger.Binds
 import dagger.Module

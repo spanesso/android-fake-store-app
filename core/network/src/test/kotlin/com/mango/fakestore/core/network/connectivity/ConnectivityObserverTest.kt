@@ -46,7 +46,7 @@ class ConnectivityObserverTest {
         observer.statusFlow.test {
             callbackSlot.captured.onCapabilitiesChanged(
                 mockk(),
-                mockk { every { hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) } returns true }
+                mockk { every { hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) } returns true },
             )
             assertThat(awaitItem()).isEqualTo(ConnectivityStatus.Connected)
             cancelAndIgnoreRemainingEvents()

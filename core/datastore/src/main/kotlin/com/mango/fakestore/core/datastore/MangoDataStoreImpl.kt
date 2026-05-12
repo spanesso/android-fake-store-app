@@ -19,7 +19,7 @@ import timber.log.Timber
 class MangoDataStoreImpl(
     private val dataStore: DataStore<Preferences>,
     private val tink: TinkEncryption,
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
 ) : MangoDataStore {
 
     override val sessionFlow: Flow<SessionData> = dataStore.data
@@ -28,7 +28,7 @@ class MangoDataStoreImpl(
             SessionData(
                 accessToken = prefs[PreferencesKeys.ACCESS_TOKEN]?.let { decryptOrNull(it, "accessToken") },
                 refreshToken = prefs[PreferencesKeys.REFRESH_TOKEN]?.let { decryptOrNull(it, "refreshToken") },
-                userId = prefs[PreferencesKeys.USER_ID]?.let { decryptOrNull(it, "userId") }
+                userId = prefs[PreferencesKeys.USER_ID]?.let { decryptOrNull(it, "userId") },
             )
         }
 
@@ -43,7 +43,7 @@ class MangoDataStoreImpl(
                             null
                         })
                 } ?: AppTheme.SYSTEM,
-                notificationsEnabled = prefs[PreferencesKeys.NOTIFICATIONS] ?: true
+                notificationsEnabled = prefs[PreferencesKeys.NOTIFICATIONS] ?: true,
             )
         }
 

@@ -94,7 +94,7 @@ class ProductosViewModel @Inject constructor(
                                     // Sin pantalla de detalle: registrar el primer producto visible
                                     eventTracker.registrar(AnalyticsEvent.ProductoVisto(productos.first().id))
                                     ProductosUiState.Content(
-                                        productos.map { it.toUi(esFavorito = it.id in favoritosIds) }
+                                        productos.map { it.toUi(esFavorito = it.id in favoritosIds) },
                                     )
                                 }
                             }

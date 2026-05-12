@@ -37,10 +37,9 @@ class DatabaseKeyManagerTest {
 
     @Test
     fun clear_removes_stored_key() {
-        val original = keyManager.getOrCreatePassphrase()
+        keyManager.getOrCreatePassphrase()
         keyManager.clearPassphrase()
         val newPassphrase = keyManager.getOrCreatePassphrase()
-        // After clearing, a new passphrase is generated (may differ from original)
         assertThat(newPassphrase).isNotEmpty()
         assertThat(newPassphrase).hasLength(32)
     }
