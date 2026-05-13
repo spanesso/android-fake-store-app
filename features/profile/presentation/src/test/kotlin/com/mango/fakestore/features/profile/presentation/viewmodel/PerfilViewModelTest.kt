@@ -33,6 +33,15 @@ import org.junit.Test
 
 class PerfilViewModelTest {
 
+    companion object {
+        private const val NOMBRE_COMPLETO = "John Doe"
+        private const val EMAIL = "john@example.com"
+        private const val TELEFONO = "1-570-236-7033"
+        private const val CALLE = "new road 7835"
+        private const val CODIGO_POSTAL = "12926-3874"
+    }
+
+
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
@@ -46,13 +55,13 @@ class PerfilViewModelTest {
 
     private val usuarioEjemplo = Usuario(
         id = 8,
-        nombreCompleto = "John Doe",
+        nombreCompleto = NOMBRE_COMPLETO,
         nombreUsuario = "johnd",
-        email = "john@example.com",
-        telefono = "1-570-236-7033",
+        email = EMAIL,
+        telefono = TELEFONO,
         ciudad = "kilcoole",
-        calle = "new road 7835",
-        codigoPostal = "12926-3874",
+        calle = CALLE,
+        codigoPostal = CODIGO_POSTAL,
     )
 
     private val uiErrorNotFound = UiError(
@@ -105,13 +114,13 @@ class PerfilViewModelTest {
 
         val contenidoEsperado = PerfilContenidoUi(
             id = 8,
-            nombreCompleto = "John Doe",
+            nombreCompleto = NOMBRE_COMPLETO,
             nombreUsuario = "johnd",
-            email = "john@example.com",
-            telefono = "1-570-236-7033",
+            email = EMAIL,
+            telefono = TELEFONO,
             ciudad = "kilcoole",
-            calle = "new road 7835",
-            codigoPostal = "12926-3874",
+            calle = CALLE,
+            codigoPostal = CODIGO_POSTAL,
             contadorFavoritos = 5,
         )
 
@@ -185,13 +194,13 @@ class PerfilViewModelTest {
 
         val contenidoEsperado = PerfilContenidoUi(
             id = 8,
-            nombreCompleto = "John Doe",
+            nombreCompleto = NOMBRE_COMPLETO,
             nombreUsuario = "johnd",
-            email = "john@example.com",
-            telefono = "1-570-236-7033",
+            email = EMAIL,
+            telefono = TELEFONO,
             ciudad = "kilcoole",
-            calle = "new road 7835",
-            codigoPostal = "12926-3874",
+            calle = CALLE,
+            codigoPostal = CODIGO_POSTAL,
             contadorFavoritos = 0,
         )
 
@@ -218,7 +227,7 @@ class PerfilViewModelTest {
     @Test
     fun `cuando perfil carga con exito entonces registra PerfilVisto`() = runTest {
         coEvery { obtenerPerfil(8) } returns Either.Right(usuarioEjemplo)
-        val viewModel = crearViewModel()
+        crearViewModel()
         coroutineRule.dispatcher.scheduler.advanceUntilIdle()
         verify { eventTracker.registrar(AnalyticsEvent.PerfilVisto) }
     }
@@ -226,7 +235,7 @@ class PerfilViewModelTest {
     @Test
     fun `cuando perfil falla entonces NO registra PerfilVisto`() = runTest {
         coEvery { obtenerPerfil(8) } returns Either.Left(DomainError.Network.NoConnection())
-        val viewModel = crearViewModel()
+        crearViewModel()
         coroutineRule.dispatcher.scheduler.advanceUntilIdle()
         verify(exactly = 0) { eventTracker.registrar(AnalyticsEvent.PerfilVisto) }
     }

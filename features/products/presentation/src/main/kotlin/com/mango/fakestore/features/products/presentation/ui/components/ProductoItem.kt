@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mango.fakestore.core.designsystem.component.MangoProductCard
+import com.mango.fakestore.core.designsystem.component.MangoProductCardData
 import com.mango.fakestore.core.designsystem.theme.MangoTheme
 import com.mango.fakestore.features.products.presentation.model.ProductoUi
 import com.mango.fakestore.features.products.presentation.ui.state.ProductosUiEvent
@@ -17,13 +18,14 @@ fun ProductoItem(
     modifier: Modifier = Modifier,
 ) {
     MangoProductCard(
-        title = producto.titulo,
-        price = producto.precio,
-        imagenUrl = producto.imagenUrl,
-        descripcion = "",
-        categoria = producto.categoria,
-        puntuacion = producto.puntuacion,
-        numVotaciones = producto.numVotaciones,
+        data = MangoProductCardData(
+            title = producto.titulo,
+            price = producto.precio,
+            imagenUrl = producto.imagenUrl,
+            categoria = producto.categoria,
+            puntuacion = producto.puntuacion,
+            numVotaciones = producto.numVotaciones,
+        ),
         esFavorito = producto.esFavorito,
         onFavoritoClick = { onEvent(ProductosUiEvent.ToggleFavorito(producto)) },
         modifier = modifier.fillMaxWidth(),

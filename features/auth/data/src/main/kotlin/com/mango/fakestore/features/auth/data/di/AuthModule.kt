@@ -23,9 +23,9 @@ object AuthProvidesModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AuthBindsModule {
+interface AuthBindsModule {
 
     @Binds
     @Singleton
-    abstract fun bindSesionRepository(impl: SesionRepositoryImpl): SesionRepository
+    fun bindSesionRepository(impl: SesionRepositoryImpl): SesionRepository
 }

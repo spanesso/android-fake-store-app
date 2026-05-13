@@ -63,13 +63,13 @@ object NetworkModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class NetworkBindsModule {
+interface NetworkBindsModule {
 
     @Binds
     @Singleton
-    abstract fun bindConnectivityObserver(impl: ConnectivityObserverImpl): ConnectivityObserver
+    fun bindConnectivityObserver(impl: ConnectivityObserverImpl): ConnectivityObserver
 
     @Binds
     @Singleton
-    abstract fun bindNetworkErrorReporter(impl: NoOpNetworkErrorReporter): NetworkErrorReporter
+    fun bindNetworkErrorReporter(impl: NoOpNetworkErrorReporter): NetworkErrorReporter
 }

@@ -28,18 +28,18 @@ class NavigacionE2ETest {
     }
 
     @Test
-    fun app_arranca_y_muestra_pantalla_productos() {
+    fun appArrancaYMuestraPantallaProductos() {
         composeRule.onNodeWithText("Productos").assertIsDisplayed()
     }
 
     @Test
-    fun navegar_a_favoritos_muestra_pantalla_favoritos() {
+    fun navegarAFavoritosMuestraPantallaFavoritos() {
         composeRule.onNodeWithText("Favoritos").performClick()
         composeRule.onNodeWithText("Favoritos").assertIsDisplayed()
     }
 
     @Test
-    fun navegar_a_perfil_muestra_pantalla_perfil() {
+    fun navegarAPerfilMuestraPantallaPerfil() {
         composeRule.onNodeWithText("Perfil").performClick()
         composeRule.waitForIdle()
         composeRule.onNodeWithText("Perfil").assertIsDisplayed()

@@ -23,9 +23,9 @@ object PerfilDataProvidesModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class PerfilDataBindsModule {
+interface PerfilDataBindsModule {
 
     @Binds
     @Singleton
-    abstract fun bindPerfilRepository(impl: PerfilRepositoryImpl): PerfilRepository
+    fun bindPerfilRepository(impl: PerfilRepositoryImpl): PerfilRepository
 }

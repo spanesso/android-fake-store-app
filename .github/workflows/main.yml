@@ -263,7 +263,7 @@ jobs:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
 
       - name: Instalar Firebase CLI
-        run: npm install -g firebase-tools
+        run: npm install -g firebase-tools@14.3.1 --ignore-scripts
 
       - name: Distribuir a grupo qa-internal
         run: |

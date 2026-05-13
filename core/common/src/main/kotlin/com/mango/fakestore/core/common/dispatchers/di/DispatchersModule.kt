@@ -10,8 +10,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DispatchersModule {
+interface DispatchersModule {
     @Binds
     @Singleton
-    abstract fun bindDispatchers(impl: DefaultAppDispatchers): AppDispatchers
+    fun bindDispatchers(impl: DefaultAppDispatchers): AppDispatchers
 }

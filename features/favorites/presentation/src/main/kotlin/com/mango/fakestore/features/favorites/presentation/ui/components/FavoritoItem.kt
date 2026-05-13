@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.mango.fakestore.core.designsystem.component.MangoProductCard
+import com.mango.fakestore.core.designsystem.component.MangoProductCardData
 import com.mango.fakestore.core.designsystem.theme.MangoTheme
 import com.mango.fakestore.features.favorites.presentation.model.FavoritoUi
 import com.mango.fakestore.features.favorites.presentation.ui.state.FavoritosUiEvent
@@ -18,10 +19,12 @@ fun FavoritoItem(
     modifier: Modifier = Modifier,
 ) {
     MangoProductCard(
-        title = favorito.titulo,
-        price = "€${String.format(Locale.getDefault(), "%.2f", favorito.precio)}",
-        imagenUrl = favorito.imagenUrl,
-        categoria = favorito.categoria,
+        data = MangoProductCardData(
+            title = favorito.titulo,
+            price = "€${String.format(Locale.getDefault(), "%.2f", favorito.precio)}",
+            imagenUrl = favorito.imagenUrl,
+            categoria = favorito.categoria,
+        ),
         esFavorito = true,
         onFavoritoClick = { onEvent(FavoritosUiEvent.ToggleFavorito(favorito)) },
         modifier = modifier.fillMaxWidth(),
