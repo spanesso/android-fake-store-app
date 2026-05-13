@@ -7,8 +7,8 @@
 
 <table>
   <tr>
-    <td width="60%"><img src="docs/diagrama.png" width="100%" alt="Diagrama de arquitectura"/></td>
-    <td width="40%"><img src="docs/video.gif" width="100%" alt="Demo de la aplicación"/></td>
+    <td width="70%"><img src="docs/diagrama.png" width="100%" alt="Diagrama de arquitectura"/></td>
+    <td width="30%"><img src="docs/video.gif" width="100%" alt="Demo de la aplicación"/></td>
   </tr>
 </table>
 
