@@ -1,22 +1,19 @@
 package com.example.fakestoreapp.ui
 
 import app.cash.turbine.test
-import com.mango.fakestore.core.analytics.AnalyticsEvent
+import com.example.fakestoreapp.ui.navigation.AppRoute
 import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
-import com.mango.fakestore.core.analytics.TraceHandle
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.UiError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
 import com.mango.fakestore.core.network.connectivity.ConnectivityObserver
 import com.mango.fakestore.core.network.connectivity.ConnectivityStatus
-import com.mango.fakestore.core.security.biometric.BiometricAuthenticator
-import com.mango.fakestore.core.security.biometric.BiometricResult
 import com.mango.fakestore.core.security.integrity.IntegrityChecker
 import com.mango.fakestore.core.security.integrity.IntegrityResult
 import com.mango.fakestore.core.testing.CoroutineTestRule
+import com.mango.fakestore.features.auth.domain.usecase.ObtenerSesionActiva
 import com.mango.fakestore.features.favorites.domain.usecase.ObservarConteoFavoritos
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -36,15 +33,16 @@ class AppViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val conectividadFlow = MutableStateFlow<ConnectivityStatus>(ConnectivityStatus.Connected)
+    private val sesionFlow = MutableStateFlow<Int?>(null)
 
     private val connectivityObserver: ConnectivityObserver = mockk {
         every { statusFlow } returns conectividadFlow
     }
 
-    private val biometricAuthenticator: BiometricAuthenticator = mockk()
+    private val obtenerSesionActiva: ObtenerSesionActiva = mockk()
+
     private val telemetry: Telemetry = mockk(relaxed = true)
     private val eventTracker: EventTracker = mockk(relaxed = true)
-    private val traceHandle: TraceHandle = mockk(relaxed = true)
     private val uiError = mockk<UiError>(relaxed = true)
     private val errorMapper: DomainErrorToUiErrorMapper = mockk { every { map(any()) } returns uiError }
     private val observarConteoFavoritos: ObservarConteoFavoritos = mockk()
@@ -54,17 +52,17 @@ class AppViewModelTest {
 
     @Before
     fun setUp() {
+        every { obtenerSesionActiva() } returns sesionFlow
         every { observarConteoFavoritos() } returns flowOf(0)
-        every { telemetry.iniciarTraza(any()) } returns traceHandle
     }
 
     private fun crearViewModel() = AppViewModel(
         connectivityObserver = connectivityObserver,
-        biometricAuthenticator = biometricAuthenticator,
         telemetry = telemetry,
         eventTracker = eventTracker,
         errorMapper = errorMapper,
         integrityChecker = integrityChecker,
+        obtenerSesionActiva = obtenerSesionActiva,
         observarConteoFavoritos = observarConteoFavoritos,
     )
 
@@ -115,42 +113,39 @@ class AppViewModelTest {
         }
     }
 
-    // ── Biometría ──────────────────────────────────────────────────────────
+    // ── startDestination — sesión ──────────────────────────────────────────
 
     @Test
-    fun `dado biometria exitosa cuando autentica entonces sesionAutenticada es true`() = runTest {
-        val actividad = mockk<androidx.fragment.app.FragmentActivity>(relaxed = true) {
-            every { getString(any()) } returns "test"
-        }
-        coEvery { biometricAuthenticator.autenticar(any(), any(), any(), any()) } returns BiometricResult.Exito
+    fun `dado sin sesion activa entonces startDestination es Login`() = runTest {
+        sesionFlow.value = null
         val viewModel = crearViewModel()
-        val resultado = viewModel.autenticarParaPerfil(actividad)
-        assertEquals(BiometricResult.Exito, resultado)
-        assertTrue(viewModel.sesionAutenticada)
+        viewModel.startDestination.test {
+            assertEquals(AppRoute.Login, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `dado biometria cancelada cuando autentica entonces sesionAutenticada es false`() = runTest {
-        val actividad = mockk<androidx.fragment.app.FragmentActivity>(relaxed = true) {
-            every { getString(any()) } returns "test"
-        }
-        coEvery { biometricAuthenticator.autenticar(any(), any(), any(), any()) } returns BiometricResult.Cancelado
+    fun `dado sesion activa entonces startDestination es Productos`() = runTest {
+        sesionFlow.value = 1
         val viewModel = crearViewModel()
-        val resultado = viewModel.autenticarParaPerfil(actividad)
-        assertEquals(BiometricResult.Cancelado, resultado)
-        assertFalse(viewModel.sesionAutenticada)
+        coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+        viewModel.startDestination.test {
+            assertEquals(AppRoute.Productos, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
-    fun `dado biometria bloqueada cuando autentica entonces sesionAutenticada es false`() = runTest {
-        val actividad = mockk<androidx.fragment.app.FragmentActivity>(relaxed = true) {
-            every { getString(any()) } returns "test"
-        }
-        coEvery { biometricAuthenticator.autenticar(any(), any(), any(), any()) } returns BiometricResult.BloqueadoTemporalmente
+    fun `dado sesion que cambia de null a userId entonces startDestination cambia de Login a Productos`() = runTest {
+        sesionFlow.value = null
         val viewModel = crearViewModel()
-        val resultado = viewModel.autenticarParaPerfil(actividad)
-        assertEquals(BiometricResult.BloqueadoTemporalmente, resultado)
-        assertFalse(viewModel.sesionAutenticada)
+        viewModel.startDestination.test {
+            assertEquals(AppRoute.Login, awaitItem())
+            sesionFlow.value = 5
+            assertEquals(AppRoute.Productos, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     // ── Handler global de errores ──────────────────────────────────────────
@@ -175,65 +170,5 @@ class AppViewModelTest {
         viewModel.reportarErrorGlobal(throwable)
         coroutineRule.dispatcher.scheduler.advanceUntilIdle()
         verify { telemetry.reportarNoFatal(any()) }
-    }
-
-    // ── US2 — Eventos de Analytics ─────────────────────────────────────────
-
-    @Test
-    fun `dado biometria exitosa entonces registra LoginExitoso`() = runTest {
-        val actividad = mockk<androidx.fragment.app.FragmentActivity>(relaxed = true) {
-            every { getString(any()) } returns "test"
-        }
-        coEvery { biometricAuthenticator.autenticar(any(), any(), any(), any()) } returns BiometricResult.Exito
-        val viewModel = crearViewModel()
-        viewModel.autenticarParaPerfil(actividad)
-        verify { eventTracker.registrar(AnalyticsEvent.LoginExitoso) }
-    }
-
-    @Test
-    fun `dado biometria cancelada entonces registra LoginFallido con motivo cancelado`() = runTest {
-        val actividad = mockk<androidx.fragment.app.FragmentActivity>(relaxed = true) {
-            every { getString(any()) } returns "test"
-        }
-        coEvery { biometricAuthenticator.autenticar(any(), any(), any(), any()) } returns BiometricResult.Cancelado
-        val viewModel = crearViewModel()
-        viewModel.autenticarParaPerfil(actividad)
-        verify { eventTracker.registrar(AnalyticsEvent.LoginFallido("cancelado")) }
-    }
-
-    @Test
-    fun `dado biometria bloqueada entonces registra LoginFallido con motivo bloqueado`() = runTest {
-        val actividad = mockk<androidx.fragment.app.FragmentActivity>(relaxed = true) {
-            every { getString(any()) } returns "test"
-        }
-        coEvery { biometricAuthenticator.autenticar(any(), any(), any(), any()) } returns BiometricResult.BloqueadoTemporalmente
-        val viewModel = crearViewModel()
-        viewModel.autenticarParaPerfil(actividad)
-        verify { eventTracker.registrar(AnalyticsEvent.LoginFallido("bloqueado")) }
-    }
-
-    @Test
-    fun `dado biometria no disponible entonces registra LoginFallido con motivo no_disponible`() = runTest {
-        val actividad = mockk<androidx.fragment.app.FragmentActivity>(relaxed = true) {
-            every { getString(any()) } returns "test"
-        }
-        coEvery { biometricAuthenticator.autenticar(any(), any(), any(), any()) } returns BiometricResult.NoDisponible
-        val viewModel = crearViewModel()
-        viewModel.autenticarParaPerfil(actividad)
-        verify { eventTracker.registrar(AnalyticsEvent.LoginFallido("no_disponible")) }
-    }
-
-    // ── US3 — Traza de rendimiento login_biometrico ─────────────────────────
-
-    @Test
-    fun `cuando autentica entonces inicia y detiene traza login_biometrico`() = runTest {
-        val actividad = mockk<androidx.fragment.app.FragmentActivity>(relaxed = true) {
-            every { getString(any()) } returns "test"
-        }
-        coEvery { biometricAuthenticator.autenticar(any(), any(), any(), any()) } returns BiometricResult.Exito
-        val viewModel = crearViewModel()
-        viewModel.autenticarParaPerfil(actividad)
-        verify { telemetry.iniciarTraza("login_biometrico") }
-        verify { traceHandle.detener() }
     }
 }

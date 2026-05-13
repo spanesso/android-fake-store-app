@@ -8,6 +8,7 @@ import com.mango.fakestore.core.database.MangoDatabase
 import com.mango.fakestore.core.security.integrity.IntegrityPolicy
 import com.mango.fakestore.features.favorites.data.local.FavoritosDao
 import com.mango.fakestore.features.products.data.local.ProductosDao
+import com.mango.fakestore.features.profile.data.local.PerfilDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,7 +29,7 @@ object AppModule {
             AppDatabase::class.java,
             MangoDatabase.DATABASE_NAME,
         )
-            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
             .build()
 
     @Provides
@@ -40,6 +41,11 @@ object AppModule {
     @Singleton
     fun provideFavoritosDao(database: AppDatabase): FavoritosDao =
         database.favoritosDao()
+
+    @Provides
+    @Singleton
+    fun providePerfilDao(database: AppDatabase): PerfilDao =
+        database.perfilDao()
 
     @Provides
     @Singleton

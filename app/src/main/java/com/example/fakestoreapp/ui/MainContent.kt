@@ -32,6 +32,7 @@ fun MainContent(
 ) {
     val isOffline by viewModel.isOffline.collectAsStateWithLifecycle()
     val contadorFavoritos by viewModel.contadorFavoritos.collectAsStateWithLifecycle()
+    val startDestination by viewModel.startDestination.collectAsStateWithLifecycle()
     val navController = rememberNavController()
     val context = LocalContext.current
     val activity = context as? Activity
@@ -89,8 +90,7 @@ fun MainContent(
                 }
                 MangoNavHost(
                     navController = navController,
-                    sesionAutenticada = viewModel.sesionAutenticada,
-                    onAutenticarPerfil = viewModel::autenticarParaPerfil,
+                    startDestination = startDestination,
                     onMostrarSnackbar = { msg -> snackbarHostState.showSnackbar(msg) },
                     contadorFavoritos = contadorFavoritos,
                     modifier = Modifier.weight(1f),

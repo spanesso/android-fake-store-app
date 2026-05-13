@@ -10,8 +10,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class FavoritosDataModule {
+interface FavoritosDataModule {
     @Binds
     @Singleton
-    abstract fun bindFavoritosRepository(impl: FavoritosRepositoryImpl): FavoritosRepository
+    fun bindFavoritosRepository(impl: FavoritosRepositoryImpl): FavoritosRepository
 }

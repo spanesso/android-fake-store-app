@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:error"))
     implementation(project(":core:database"))
+    implementation(project(":core:datastore"))
     implementation(project(":features:favorites:domain"))
 
     implementation(libs.arrow.core)

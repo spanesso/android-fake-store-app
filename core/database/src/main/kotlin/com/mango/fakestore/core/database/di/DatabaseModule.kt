@@ -13,9 +13,9 @@ import javax.inject.Singleton
 // Ver: DatabaseMigrations.all y AndroidKeystoreDatabaseKeyManager para el patrón completo.
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DatabaseModule {
+interface DatabaseModule {
 
     @Binds
     @Singleton
-    abstract fun bindDatabaseKeyManager(impl: AndroidKeystoreDatabaseKeyManager): DatabaseKeyManager
+    fun bindDatabaseKeyManager(impl: AndroidKeystoreDatabaseKeyManager): DatabaseKeyManager
 }

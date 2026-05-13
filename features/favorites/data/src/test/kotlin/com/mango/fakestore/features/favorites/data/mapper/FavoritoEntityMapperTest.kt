@@ -9,6 +9,7 @@ class FavoritoEntityMapperTest {
 
     private val entity = FavoritoEntity(
         productoId = 1,
+        userId = 5,
         titulo = "Camiseta de lino",
         precio = 49.99,
         imagenUrl = "https://fakestoreapi.com/img/1.jpg",
@@ -39,9 +40,10 @@ class FavoritoEntityMapperTest {
 
     @Test
     fun `dado Favorito domain cuando se mapea a entity entonces todos los campos son correctos`() {
-        val resultado = domain.toEntity()
+        val resultado = domain.toEntity(userId = 7)
 
         assertThat(resultado.productoId).isEqualTo(domain.productoId)
+        assertThat(resultado.userId).isEqualTo(7)
         assertThat(resultado.titulo).isEqualTo(domain.titulo)
         assertThat(resultado.precio).isEqualTo(domain.precio)
         assertThat(resultado.imagenUrl).isEqualTo(domain.imagenUrl)

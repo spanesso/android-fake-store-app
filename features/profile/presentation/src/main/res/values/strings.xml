@@ -12,4 +12,6 @@
     <string name="perfil_campo_ciudad">Ciudad</string>
     <string name="perfil_campo_calle">Dirección</string>
     <string name="perfil_campo_codigo_postal">Código postal</string>
+    <string name="perfil_campo_numero_calle">Número</string>
+    <string name="perfil_cerrar_sesion">Cerrar sesión</string>
 </resources>

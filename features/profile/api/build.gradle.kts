@@ -2,3 +2,7 @@
 plugins {
     id("mango.kotlin.library")
 }
+
+dependencies {
+    api(project(":features:profile:domain"))
+}

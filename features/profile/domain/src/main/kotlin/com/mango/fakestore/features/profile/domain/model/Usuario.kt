@@ -8,5 +8,6 @@ data class Usuario(
     val telefono: String,
     val ciudad: String,
     val calle: String,
+    val numeroCalle: Int = 0,
     val codigoPostal: String,
 )

@@ -23,9 +23,9 @@ object ProductsDataProvidesModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ProductsDataBindsModule {
+interface ProductsDataBindsModule {
 
     @Binds
     @Singleton
-    abstract fun bindProductosRepository(impl: ProductosRepositoryImpl): ProductosRepository
+    fun bindProductosRepository(impl: ProductosRepositoryImpl): ProductosRepository
 }

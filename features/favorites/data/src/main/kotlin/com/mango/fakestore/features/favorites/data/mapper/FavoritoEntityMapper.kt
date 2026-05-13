@@ -12,8 +12,9 @@ fun FavoritoEntity.toDomain(): Favorito = Favorito(
     fechaMarcado = fechaMarcado,
 )
 
-fun Favorito.toEntity(): FavoritoEntity = FavoritoEntity(
+fun Favorito.toEntity(userId: Int = 0): FavoritoEntity = FavoritoEntity(
     productoId = productoId,
+    userId = userId,
     titulo = titulo,
     precio = precio,
     imagenUrl = imagenUrl,

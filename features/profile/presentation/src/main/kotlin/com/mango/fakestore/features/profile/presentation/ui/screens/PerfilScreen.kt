@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -14,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.mango.fakestore.core.designsystem.component.MangoButton
+import com.mango.fakestore.core.designsystem.component.MangoButtonVariant
 import com.mango.fakestore.core.designsystem.component.MangoErrorState
 import com.mango.fakestore.core.designsystem.component.MangoLoadingIndicator
 import com.mango.fakestore.core.designsystem.component.MangoTopAppBar
@@ -70,6 +73,15 @@ fun PerfilScreen(
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Spacer(Modifier.height(MangoSpacing.xl))
+                    MangoButton(
+                        text = stringResource(R.string.perfil_cerrar_sesion),
+                        onClick = { onEvent(PerfilUiEvent.CerrarSesion) },
+                        variant = MangoButtonVariant.Destructive,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = MangoSpacing.md),
+                    )
+                    Spacer(Modifier.height(MangoSpacing.xl))
                 }
             }
         }
@@ -85,7 +97,8 @@ private val sampleUsuario = PerfilContenidoUi(
     email = "john@example.com",
     telefono = "1-570-236-7033",
     ciudad = "kilcoole",
-    calle = "new road 7835",
+    calle = "new road",
+    numeroCalle = 7835,
     codigoPostal = "12926-3874",
     contadorFavoritos = 5,
 )

@@ -11,11 +11,14 @@ import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.UiError
 import com.mango.fakestore.core.testing.CoroutineTestRule
+import com.mango.fakestore.features.auth.domain.usecase.CerrarSesion
+import com.mango.fakestore.features.auth.domain.usecase.ObtenerSesionActiva
 import com.mango.fakestore.features.favorites.api.ObservarConteoFavoritos
 import com.mango.fakestore.features.profile.domain.model.Usuario
 import com.mango.fakestore.features.profile.domain.usecase.ObtenerPerfil
 import com.mango.fakestore.features.profile.presentation.mapper.PerfilUiErrorMapper
 import com.mango.fakestore.features.profile.presentation.model.PerfilContenidoUi
+import com.mango.fakestore.features.profile.presentation.ui.state.PerfilUiEffect
 import com.mango.fakestore.features.profile.presentation.ui.state.PerfilUiEvent
 import com.mango.fakestore.features.profile.presentation.ui.state.PerfilUiState
 import io.mockk.coEvery
@@ -30,10 +33,20 @@ import org.junit.Test
 
 class PerfilViewModelTest {
 
+    companion object {
+        private const val NOMBRE_COMPLETO = "John Doe"
+        private const val EMAIL = "john@example.com"
+        private const val TELEFONO = "1-570-236-7033"
+        private const val CALLE = "new road 7835"
+        private const val CODIGO_POSTAL = "12926-3874"
+    }
+
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private val obtenerPerfil: ObtenerPerfil = mockk()
+    private val obtenerSesionActiva: ObtenerSesionActiva = mockk()
+    private val cerrarSesion: CerrarSesion = mockk()
     private val observarConteoFavoritos: ObservarConteoFavoritos = mockk()
     private val telemetry: Telemetry = mockk(relaxed = true)
     private val eventTracker: EventTracker = mockk(relaxed = true)
@@ -41,13 +54,13 @@ class PerfilViewModelTest {
 
     private val usuarioEjemplo = Usuario(
         id = 8,
-        nombreCompleto = "John Doe",
+        nombreCompleto = NOMBRE_COMPLETO,
         nombreUsuario = "johnd",
-        email = "john@example.com",
-        telefono = "1-570-236-7033",
+        email = EMAIL,
+        telefono = TELEFONO,
         ciudad = "kilcoole",
-        calle = "new road 7835",
-        codigoPostal = "12926-3874",
+        calle = CALLE,
+        codigoPostal = CODIGO_POSTAL,
     )
 
     private val uiErrorNotFound = UiError(
@@ -66,6 +79,7 @@ class PerfilViewModelTest {
 
     @Before
     fun setUp() {
+        every { obtenerSesionActiva() } returns flowOf(8)
         every { observarConteoFavoritos() } returns flowOf(0)
         every { errorMapper.map(any()) } returns uiErrorNoConnection
     }
@@ -99,13 +113,13 @@ class PerfilViewModelTest {
 
         val contenidoEsperado = PerfilContenidoUi(
             id = 8,
-            nombreCompleto = "John Doe",
+            nombreCompleto = NOMBRE_COMPLETO,
             nombreUsuario = "johnd",
-            email = "john@example.com",
-            telefono = "1-570-236-7033",
+            email = EMAIL,
+            telefono = TELEFONO,
             ciudad = "kilcoole",
-            calle = "new road 7835",
-            codigoPostal = "12926-3874",
+            calle = CALLE,
+            codigoPostal = CODIGO_POSTAL,
             contadorFavoritos = 5,
         )
 
@@ -179,13 +193,13 @@ class PerfilViewModelTest {
 
         val contenidoEsperado = PerfilContenidoUi(
             id = 8,
-            nombreCompleto = "John Doe",
+            nombreCompleto = NOMBRE_COMPLETO,
             nombreUsuario = "johnd",
-            email = "john@example.com",
-            telefono = "1-570-236-7033",
+            email = EMAIL,
+            telefono = TELEFONO,
             ciudad = "kilcoole",
-            calle = "new road 7835",
-            codigoPostal = "12926-3874",
+            calle = CALLE,
+            codigoPostal = CODIGO_POSTAL,
             contadorFavoritos = 0,
         )
 
@@ -206,17 +220,13 @@ class PerfilViewModelTest {
     }
 
     // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    // -------------------------------------------------------------------------
     // US2 — Evento PerfilVisto
     // -------------------------------------------------------------------------
 
     @Test
     fun `cuando perfil carga con exito entonces registra PerfilVisto`() = runTest {
         coEvery { obtenerPerfil(8) } returns Either.Right(usuarioEjemplo)
-        val viewModel = crearViewModel()
+        crearViewModel()
         coroutineRule.dispatcher.scheduler.advanceUntilIdle()
         verify { eventTracker.registrar(AnalyticsEvent.PerfilVisto) }
     }
@@ -224,9 +234,29 @@ class PerfilViewModelTest {
     @Test
     fun `cuando perfil falla entonces NO registra PerfilVisto`() = runTest {
         coEvery { obtenerPerfil(8) } returns Either.Left(DomainError.Network.NoConnection())
-        val viewModel = crearViewModel()
+        crearViewModel()
         coroutineRule.dispatcher.scheduler.advanceUntilIdle()
         verify(exactly = 0) { eventTracker.registrar(AnalyticsEvent.PerfilVisto) }
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. CerrarSesion — emite NavLogin tras ejecutar el caso de uso
+    // -------------------------------------------------------------------------
+
+    @Test
+    fun `cuando onEvent CerrarSesion entonces llama cerrarSesion y emite NavLogin`() = runTest {
+        coEvery { obtenerPerfil(any()) } returns Either.Right(usuarioEjemplo)
+        coEvery { cerrarSesion() } returns Either.Right(Unit)
+
+        val viewModel = crearViewModel()
+        coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.uiEffect.test {
+            viewModel.onEvent(PerfilUiEvent.CerrarSesion)
+            coroutineRule.dispatcher.scheduler.advanceUntilIdle()
+            assertThat(awaitItem()).isEqualTo(PerfilUiEffect.NavLogin)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -235,6 +265,8 @@ class PerfilViewModelTest {
 
     private fun crearViewModel() = PerfilViewModel(
         obtenerPerfil = obtenerPerfil,
+        obtenerSesionActiva = obtenerSesionActiva,
+        cerrarSesion = cerrarSesion,
         observarConteoFavoritos = observarConteoFavoritos,
         telemetry = telemetry,
         eventTracker = eventTracker,

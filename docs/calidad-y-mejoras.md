@@ -38,7 +38,6 @@ Los tres módulos de presentación cuentan con tests de UI que usan `createCompo
 La app implementa defensa en profundidad:
 
 - **Cifrado en reposo**: Room con SQLCipher, DataStore con Tink AES-256-GCM.
-- **Autenticación biométrica** `BIOMETRIC_STRONG` como gateway de la app.
 - **Certificate pinning** con pin de backup en `network_security_config.xml`.
 - **R8 agresivo** con reglas por módulo.
 - **`IntegrityChecker`**: detecta root, depurador adjunto, Frida/Xposed, firma APK incorrecta.
