@@ -49,7 +49,7 @@ fun MangoProductCard(
     onFavoritoClick: (() -> Unit)? = null,
     isLoading: Boolean = false,
 ) {
-    ElevatedCard(modifier = modifier) {
+    ElevatedCard(modifier = modifier.padding(MangoSpacing.sm)) {
         if (isLoading) {
             Box(
                 Modifier

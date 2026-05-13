@@ -968,26 +968,115 @@ Con `isMinifyEnabled = true` en el flavor `release`:
 - Código muerto se elimina
 - Instrucciones se reorganizan
 
+Sin ofuscación, cualquier atacante puede descompilar el APK con herramientas como `jadx` y leer toda la lógica de negocio con nombres legibles.
+
+#### consumer-rules.pro por módulo — qué se preserva y por qué
+
+Cada módulo tiene su propio `consumer-rules.pro`. El resto se ofusca agresivamente. Solo se salva lo estrictamente necesario:
+
+**`core:database`** — Room KSP genera código en tiempo de compilación que accede a los nombres de clase y campo para las migraciones de esquema. Si se ofuscan, las migraciones que comparan `tableName` fallan en runtime:
 ```
-# proguard-rules.pro del módulo data:
--keepclassmembers class com.mango.fakestore.**.data.** { @com.google.gson.annotations.SerializedName <fields>; }
-# Sin esta regla, R8 renombraría los campos que Gson necesita por nombre
+-keep @androidx.room.Entity class * { *; }
+-keep @androidx.room.Dao interface * { *; }
+-keep @androidx.room.Database class * { *; }
+-keep @androidx.room.TypeConverter class * { *; }
 ```
+
+**`core:network`** — Retrofit implementa las interfaces de API mediante un Proxy Java en runtime usando reflexión. Si los métodos se renombran, el proxy no los encuentra:
+```
+-keep interface com.mango.fakestore.core.network.** { *; }
+-keepclassmembers interface * {
+    @retrofit2.http.GET <methods>;
+    @retrofit2.http.POST <methods>;
+    ...
+}
+```
+
+**`core:error`** — Crashlytics clasifica errores por `simpleName`. Si `DomainError.Network.NoConnection` se ofusca a `a.b`, todos los errores en el dashboard quedan agrupados bajo el mismo nombre ilegible:
+```
+-keep class com.mango.fakestore.core.error.DomainError { *; }
+-keep class com.mango.fakestore.core.error.DomainError$* { *; }
+```
+
+**`core:security`** — Hilt genera fábricas (e.g., `IntegrityCheckerImpl_Factory`) que instancian la clase por nombre concreto. Si R8 reempaqueta la clase, el grafo de dependencias falla en runtime. Además, `IntegrityPolicy.valueOf()` depende del nombre del enum:
+```
+-keep class com.mango.fakestore.core.security.** implements * { *; }
+-keep enum com.mango.fakestore.core.security.integrity.IntegrityPolicy { *; }
+```
+
+**`core:datastore`** — DataStore puede instanciar las implementaciones de `Serializer<T>` mediante reflexión durante la inicialización:
+```
+-keep class * implements androidx.datastore.core.Serializer { *; }
+```
+
+Lo que **sí** se ofusca: toda la lógica de negocio — ViewModels, UseCases, Repositorios — quedan como `a.b.c()` en el APK descompilado.
 
 ### IntegrityChecker: detección de manipulación
 
-```
-Comprobaciones en orden:
-1. ¿Está rooteado? (RootBeer)
-2. ¿Hay depurador conectado? (Debug.isDebuggerConnected)
-3. ¿Hay Frida/Xposed activo? (buscar procesos sospechosos)
-4. ¿La firma del APK coincide con la esperada?
+`IntegrityCheckerImpl` realiza 5 verificaciones independientes al arrancar:
 
-Política por flavor:
-- dev     → LOG   (registrar en Timber, continuar)
-- staging → WARN  (registrar + mostrar advertencia)
-- prod    → BLOCK (DomainError.Security.IntegrityFailed → pantalla de error fatal)
+| Verificación | Técnica usada | Amenaza que mitiga |
+|---|---|---|
+| **Root** | `RootBeer.isRooted()` (>20 indicadores) | Root permite leer archivos privados de la app directamente |
+| **Depurador activo** | `Debug.isDebuggerConnected()` | Un debugger puede pausar la ejecución y modificar valores en memoria |
+| **Frida** | Lee `/proc/self/maps` buscando `frida`, `gum-js-loop`, `re.frida`, `gum-init` | Frida es el framework más usado para hooking dinámico de funciones |
+| **Xposed** | Carga `de.robv.android.xposed.XposedBridge` via reflexión | Xposed modifica el comportamiento de cualquier método Java en runtime |
+| **Firma APK** | SHA-256 del certificado comparado con el hash esperado | Detecta APKs reempaquetados con código malicioso insertado |
+
+Código real de detección de Frida (lee el mapa de memoria del proceso):
+```kotlin
+private fun esFridaActivo(): Boolean {
+    val fridaArtefactos = listOf("frida", "gum-js-loop", "re.frida", "gum-init")
+    return try {
+        BufferedReader(FileReader("/proc/self/maps")).use { reader ->
+            reader.lines().anyMatch { linea ->
+                fridaArtefactos.any { artefacto -> linea.contains(artefacto) }
+            }
+        }
+    } catch (_: Exception) { false }
+}
 ```
+
+Código real de detección de Xposed (si la clase existe, el framework está cargado):
+```kotlin
+private fun esXposedActivo(): Boolean = try {
+    Class.forName("de.robv.android.xposed.XposedBridge")
+    true
+} catch (_: ClassNotFoundException) { false }
+```
+
+#### Política de respuesta por flavor (`IntegrityPolicy`)
+
+La respuesta ante una detección varía según el entorno — los emuladores de desarrollo siempre tienen root:
+
+| Flavor | Política | Efecto |
+|---|---|---|
+| `dev` | `LOG` | Solo registra en Timber, la app continúa normalmente |
+| `staging` | `WARN` | Muestra advertencia al QA pero permite continuar |
+| `prod` | `BLOCK` | Diálogo bloqueante sin opción de continuar — protección máxima |
+
+```kotlin
+// AppModule.kt — el flavor determina el comportamiento en runtime
+@Provides @Singleton
+fun provideIntegrityPolicy(): IntegrityPolicy =
+    IntegrityPolicy.valueOf(BuildConfig.INTEGRITY_POLICY)
+```
+
+### Cadena de defensa — resumen
+
+Cada capa asume que la anterior fue comprometida:
+
+```
+1. Datos robados del disco → ilegibles (SQLCipher + Tink)
+        ↓ si eso falla...
+2. Tráfico interceptado → certificado no coincide, conexión rechazada (certificate pinning)
+        ↓ si eso falla...
+3. APK descompilado → nombres ofuscados, lógica ilegible (R8)
+        ↓ si eso falla...
+4. Entorno manipulado → app detecta root/Frida/debugger y se niega a ejecutar (IntegrityChecker)
+```
+
+No existe una bala de plata. La seguridad real es la suma de todas las capas.
 
 ---
 
