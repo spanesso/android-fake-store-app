@@ -67,9 +67,9 @@ La aplicación implementa múltiples capas de protección:
 
 - **Tráfico cifrado** — certificate pinning sobre HTTPS: si el certificado del servidor no coincide con el pin esperado, la conexión se rechaza.
 - **Datos en reposo cifrados** — la base de datos usa SQLCipher y la sesión del usuario se guarda con cifrado AES-256-GCM. Las claves viven en el Android Keystore del dispositivo.
-- **Detección de dispositivos comprometidos** — la app detecta si el dispositivo tiene root, si hay un depurador conectado o si herramientas de análisis como Frida o Xposed están activas.
-- **Protección de pantalla** — la pantalla de perfil bloquea las capturas de pantalla y la previsualización en el selector de apps.
-- **Ofuscación de código** — en producción el código se ofusca con R8 para dificultar la ingeniería inversa.
+- **Detección de dispositivos comprometidos** — `IntegrityCheckerImpl` ejecuta cinco verificaciones antes de permitir el acceso: presencia de root (vía RootBeer), depurador conectado (`Debug.isDebuggerConnected`), Frida activo (inspección de `/proc/self/maps`), Xposed cargado (`Class.forName` del `XposedBridge`) y firma APK válida (SHA-256 contra la firma de release). El comportamiento ante una detección positiva varía por entorno: bloqueo total en producción (`IntegrityPolicy.BLOCK`), advertencia al usuario en staging (`WARN`) y solo registro en depuración (`LOG`).
+- **Protección de pantalla** — el composable `SecureScreen` activa `FLAG_SECURE` mediante un `DisposableEffect` en las pantallas sensibles, impidiendo capturas de pantalla y la previsualización en el selector de aplicaciones recientes.
+- **Ofuscación de código** — en producción R8 aplica `-repackageclasses 'o'`, `-overloadaggressively` y cinco pasadas de optimización, haciendo que el bytecode resultante sea extremadamente difícil de reconstruir mediante ingeniería inversa.
 
 Más detalles en [docs/seguridad.md](docs/seguridad.md).
 
@@ -127,7 +127,10 @@ Más detalles en [docs/observabilidad.md](docs/observabilidad.md).
 La calidad se verifica de forma automática en cada cambio:
 
 - **350+ tests** que cubren casos de uso, repositorios, ViewModels, mappers de error y pantallas Compose
-- **Detekt** — análisis estático de código Kotlin que detecta problemas de estilo y complejidad
+- **Robolectric + ComposeRule** — los tests de interfaz Compose se ejecutan sobre la JVM sin emulador ni dispositivo físico. `createComposeRule()` permite interactuar con los componentes, simular eventos de usuario y verificar el árbol semántico, todo en tests unitarios rápidos integrados en el pipeline de CI.
+- **Paparazzi** — tests de snapshot visual para el sistema de diseño. Cada componente genera una imagen golden de referencia; si un cambio futuro altera el renderizado, el test falla con un diff visual antes de que llegue a producción. Las imágenes se regeneran con `recordPaparazziDebug` cuando el cambio es intencionado.
+- **Detekt** — análisis estático de código Kotlin aplicado a todos los módulos mediante un `DetektConventionPlugin`. Detecta problemas de complejidad, nomenclatura y estilo; los problemas conocidos y aceptados se gestionan con archivos de baseline para evitar falsos positivos.
+- **ktlint** — formateador de código Kotlin integrado en Detekt vía `detekt-formatting`. Garantiza estilo consistente en todo el repositorio: indentación de 4 espacios, imports ordenados y longitud máxima de línea de 120 caracteres.
 - **Kover** — medición de cobertura de tests por módulo
 - **SonarCloud** — informe centralizado de calidad y seguridad en cada PR
 - **Konsist** — reglas de arquitectura verificadas automáticamente: si algún módulo viola las dependencias definidas, la build falla
