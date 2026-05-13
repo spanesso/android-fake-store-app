@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_titulo">Selecciona tu usuario</string>
+    <string name="login_subtitulo">Elige el usuario con el que deseas continuar.</string>
+    <string name="login_boton_continuar">Continuar</string>
+    <string name="login_usuario_etiqueta">Usuario %1$d</string>
+</resources>
