@@ -2,28 +2,6 @@
 
 Este documento explica cómo está organizado el código de Mango Fake Store: por qué está dividido en piezas separadas, qué hace cada pieza y cómo se relacionan entre sí.
 
----
-
-## La idea central: separación de responsabilidades
-
-Imagina un restaurante:
-
-- **La sala** (lo que ve el cliente) muestra los platos y toma nota del pedido.
-- **La cocina** sabe exactamente cómo preparar cada plato; no necesita saber cómo está decorada la sala.
-- **Los proveedores** entregan los ingredientes; la cocina les exige ciertos estándares pero no les importa qué marca de silla tienen en la sala.
-
-En esta app, el código funciona igual:
-
-| Restaurante | App | Qué hace |
-|---|---|---|
-| La sala | **Presentation** | Muestra la pantalla al usuario y captura sus acciones |
-| La cocina | **Domain** | Contiene las reglas de negocio (qué pasa cuando añades un favorito, etc.) |
-| Los proveedores | **Data** | Habla con la API de internet y la base de datos del teléfono |
-
-La cocina no sabe si la sala es bonita o fea — solo recibe pedidos y devuelve platos. Los proveedores no saben cómo cocina la cocina — solo entregan ingredientes según se les pide. Esa independencia hace que cualquier parte pueda cambiarse sin romper las demás.
-
----
-
 ## Módulos: las piezas del código
 
 La app está dividida en módulos independientes. Hay dos grupos principales:
