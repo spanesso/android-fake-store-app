@@ -27,13 +27,10 @@ cd repository/android-fake-store-app
 | `dado Disconnected cuando observa entonces isOffline es true` | US3 — ConnectivityObserver disconnected | ✅ |
 | `dado Unavailable cuando observa entonces isOffline es true` | US3 — ConnectivityObserver unavailable | ✅ |
 | `dado recupera conexion entonces isOffline vuelve a false` | US3 — Reconexión reactiva | ✅ |
-| `dado biometria exitosa cuando autentica entonces sesionAutenticada es true` | US2 — Gateway Exito | ✅ |
-| `dado biometria cancelada cuando autentica entonces sesionAutenticada es false` | US2 — Gateway Cancelado | ✅ |
-| `dado biometria bloqueada cuando autentica entonces sesionAutenticada es false` | US2 — Gateway Bloqueado | ✅ |
 | `dado throwable inesperado cuando reportarErrorGlobal entonces emite MostrarErrorGlobal` | US4 — Handler global | ✅ |
 | `dado throwable cuando reportarErrorGlobal entonces telemetria reporta noFatal` | US4 — Telemetría | ✅ |
 
-**Total**: 9 tests — 0 fallos
+**Total**: 6 tests — 0 fallos
 
 ---
 
@@ -45,31 +42,6 @@ cd repository/android-fake-store-app
 |---|---|---|
 | `app_arranca_y_muestra_pantalla_productos` | US1 — Arranque en Productos | ⚙️ (requiere emulador) |
 | `navegar_a_favoritos_muestra_pantalla_favoritos` | US1 — Navegación a Favoritos | ⚙️ |
-| `navegar_a_perfil_con_biometria_exitosa_muestra_pantalla_perfil` | US2 — Gateway OK | ⚙️ |
-| `navegar_a_perfil_sin_biometria_permanece_en_pantalla_anterior` | US2 — Gateway cancelado | ⚙️ |
-
-**Nota**: Los tests E2E usan `FakeBiometricAuthenticator` (configurable) a través de `@TestInstallIn(replaces = [SecurityModule::class])`.
-
----
-
-## Fake modules para tests
-
-**`TestSecurityModule.kt`**:
-```kotlin
-@Module
-@TestInstallIn(components = [SingletonComponent::class], replaces = [SecurityModule::class])
-object TestSecurityModule {
-    @Provides @Singleton
-    fun provideBiometricAuthenticator(): BiometricAuthenticator =
-        FakeBiometricAuthenticator(defaultResult = BiometricResult.Exito)
-}
-```
-
-`FakeBiometricAuthenticator.defaultResult` es mutable — permite cambiar el resultado en cada test:
-```kotlin
-(biometricAuthenticator as? FakeBiometricAuthenticator)?.defaultResult = BiometricResult.Cancelado
-```
-
 ---
 
 ## Cobertura esperada
@@ -87,5 +59,3 @@ object TestSecurityModule {
 
 - `AppViewModelTest` — tests unitarios del ViewModel raíz
 - `NavigacionE2ETest` — tests E2E de navegación completa
-- `TestSecurityModule` — módulo Hilt de test que reemplaza `SecurityModule`
-- `FakeBiometricAuthenticator` — fake configurable del autenticador biométrico

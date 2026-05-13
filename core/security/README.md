@@ -2,7 +2,7 @@
 
 **Estado**: estructura vacía (ETAPA 0.5).
 **Implementación prevista**: ETAPA 1.9.
-**Propósito**: Biometría, anti-screenshot (FLAG_SECURE), root detection, secret obfuscation.
+**Propósito**: Anti-screenshot (FLAG_SECURE), root detection, secret obfuscation.
 
 ## Convention plugin
 

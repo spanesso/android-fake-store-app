@@ -17,7 +17,6 @@ flowchart TB
     AVM -->|statusFlow.map| ISO[isOffline: StateFlow]
     AVM -->|observarConteoFavoritos| CF[contadorFavoritos: StateFlow]
     AVM -->|_uiEffect.emit| UE[uiEffect: SharedFlow]
-    AVM -->|biometricAuthenticator.autenticar| BA[BiometricAuthenticator]
     AVM -->|telemetry.reportarNoFatal| TEL[Telemetry]
     AVM -->|errorMapper.map| EM[DomainErrorToUiErrorMapper]
 
@@ -29,7 +28,6 @@ flowchart TB
 
   subgraph core["`:core:*`"]
     CO[ConnectivityObserver] -->|statusFlow| AVM
-    BA
     TEL
     EM
   end
@@ -50,18 +48,8 @@ flowchart TB
 AppRoute
 ├── Productos  (startDestination)
 ├── Favoritos
-└── Perfil     [protegido por gateway biométrico]
+└── Perfil
 ```
-
-**Gateway biométrico** (MangoNavHost):
-1. Usuario toca "Perfil" en la BottomBar
-2. `sesionAutenticada == true` → navegar directamente
-3. `sesionAutenticada == false` → `AppViewModel.autenticarParaPerfil(actividad)`
-   - `BiometricResult.Exito` → `sesionAutenticada = true`, navegar
-   - `BiometricResult.Cancelado` → Snackbar con `R.string.biometria_cancelado`
-   - `BiometricResult.BloqueadoTemporalmente` → Snackbar con `R.string.biometria_bloqueado`
-   - `BiometricResult.NoDisponible` → Snackbar con `R.string.biometria_no_disponible`
-   - `BiometricResult.Error(mensaje)` → Snackbar con `mensaje`
 
 **Handler global** (MainActivity + AppViewModel):
 1. Excepción no capturada en `lifecycleScope.launch(errorHandler)`
@@ -88,4 +76,3 @@ AppRoute
 
 - Añadir nuevos destinos: crear `@Serializable data object NuevoDestino : AppRoute`, añadir `composable<AppRoute.NuevoDestino>` en `MangoNavHost`, y añadir `MangoNavItem` en la lista.
 - Añadir deep links adicionales: añadir `navDeepLink { uriPattern = "mango://fakestore/nuevo" }` en el `composable<>` correspondiente y el `<intent-filter>` en `AndroidManifest.xml`.
-- Proteger más destinos con biometría: reusar el patrón del gateway en el `onClick` del ítem correspondiente.

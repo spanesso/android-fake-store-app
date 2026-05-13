@@ -33,7 +33,6 @@
 | Detección de Xposed | `Class.forName("de.robv.android.xposed.XposedBridge")` | `core/security/integrity/IntegrityCheckerImpl.kt` |
 | IntegrityPolicy | BLOCK/WARN/LOG por flavor (prod/staging/dev) | `core/security/integrity/IntegrityPolicy.kt`, `app/build.gradle.kts` |
 | FLAG_SECURE | Pantalla de perfil protegida contra capturas | `core/security/ui/SecureScreen.kt` |
-| Autenticación biométrica | `BiometricAuthenticator` con BIOMETRIC_STRONG | `core/security/biometric/BiometricAuthenticatorImpl.kt` |
 
 ---
 

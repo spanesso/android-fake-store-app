@@ -161,7 +161,6 @@ combine(
 | DataStore + Tink | tokens expuestos en `shared_prefs` plano |
 | Android Keystore | clave de BD extraída fuera del dispositivo |
 | Certificate pinning | MITM con cert de CA comprometida |
-| BiometricPrompt STRONG | acceso sin autenticación del propietario |
 | FLAG_SECURE / SecureScreen | captura de pantalla y previews en task switcher |
 | RootBeer + IntegrityChecker | ejecución en entorno rooteado / Frida / Xposed |
 | R8 + ProGuard | ingeniería inversa del APK |

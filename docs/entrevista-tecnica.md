@@ -37,7 +37,6 @@ decisiones de diseño y preguntas frecuentes con ejemplos de código real.
 
 | Pantalla | Función |
 |----------|---------|
-| Gateway biométrico | Autenticación con huella antes de entrar a la app |
 | Productos | Catálogo en grid 2 columnas; toggle de favorito por item |
 | Favoritos | Lista de productos marcados; posibilidad de desmarcar |
 | Perfil | Datos del usuario + contador de favoritos reactivo |
@@ -46,12 +45,10 @@ decisiones de diseño y preguntas frecuentes con ejemplos de código real.
 
 ```
 App launch
-    → BiometricGateway (autenticación BIOMETRIC_STRONG)
-        → Éxito → BottomNavigation con 3 tabs
-            ├─ Productos   → cargar catálogo → toggle favoritos
-            ├─ Favoritos   → ver/quitar favoritos
-            └─ Perfil      → ver datos + conteo favoritos
-        → Error/Cancelado → mensaje y bloqueo de navegación
+    → BottomNavigation con 3 tabs
+        ├─ Productos   → cargar catálogo → toggle favoritos
+        ├─ Favoritos   → ver/quitar favoritos
+        └─ Perfil      → ver datos + conteo favoritos
 ```
 
 ---
@@ -73,7 +70,7 @@ android-fake-store-app/
 │   ├── datastore/               ← DataStore cifrado con Tink
 │   ├── logging/                 ← Logger interface (Timber/NoOp)
 │   ├── analytics/               ← Telemetry + EventTracker (Firebase)
-│   ├── security/                ← BiometricPrompt, RootBeer, SecureScreen
+│   ├── security/                ← RootBeer, SecureScreen
 │   └── testing/                 ← helpers para tests unitarios
 └── features/
     ├── products/
@@ -143,7 +140,7 @@ graph TD
 
 1. **Hilt wiring**: provee `ProductosDao`, `FavoritosDao`, `AppDatabase` a través de `AppModule`.
 2. **Navigation**: define el `NavHost` con las rutas type-safe hacia cada feature.
-3. **Application class**: inicializa Firebase, Timber y el gateway biométrico.
+3. **Application class**: inicializa Firebase y Timber.
 
 ```kotlin
 // app/src/main/java/com/example/fakestoreapp/di/AppModule.kt
@@ -437,7 +434,6 @@ sealed interface DomainError {
 
     sealed interface Security : DomainError {
         data object RootDetected : Security { override val cause: Throwable? = null }
-        data object BiometricLockout : Security { override val cause: Throwable? = null }
         // ...
     }
 
@@ -898,7 +894,6 @@ No existe una única bala de plata. La seguridad es un conjunto de capas donde c
 
 | Capa | Medida | Amenaza que mitiga |
 |------|--------|-------------------|
-| Autenticación | `BiometricPrompt BIOMETRIC_STRONG` | Acceso no autorizado al dispositivo |
 | UI | `SecureScreen (FLAG_SECURE)` | Captura de pantalla, grabación, screen overlay |
 | Base de datos | `SQLCipher AES-256` | Extracción del archivo .db desde el sistema de archivos |
 | Preferencias | `DataStore + Tink AES-256-GCM` | Extracción de tokens desde SharedPreferences |
@@ -908,39 +903,6 @@ No existe una única bala de plata. La seguridad es un conjunto de capas donde c
 | Firma del APK | `Verificación de firma` | APK reempaquetado con código malicioso |
 | Binario | `R8 / ProGuard` | Ingeniería inversa, decompilación |
 | Detección de depurador | `isDebuggerConnected` | Análisis dinámico con debugger adjunto |
-
-### BiometricPrompt: autenticación fuerte
-
-```kotlin
-// core/security/.../biometric/BiometricAuthenticatorImpl.kt
-override suspend fun autenticar(
-    actividad: FragmentActivity, titulo: String, ...
-): BiometricResult = suspendCoroutine { cont ->
-    val callback = object : BiometricPrompt.AuthenticationCallback() {
-        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-            cont.resume(BiometricResult.Exitoso)
-        }
-        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-            val resultado = when (errorCode) {
-                BiometricPrompt.ERROR_LOCKOUT -> BiometricResult.BloqueadoTemporalmente
-                BiometricPrompt.ERROR_HW_UNAVAILABLE -> BiometricResult.NoDisponible
-                BiometricPrompt.ERROR_USER_CANCELED -> BiometricResult.Cancelado
-                else -> BiometricResult.Error(errString.toString())
-            }
-            cont.resume(resultado)
-        }
-    }
-    BiometricPrompt(actividad, executor, callback).authenticate(
-        BiometricPrompt.PromptInfo.Builder()
-            .setAllowedAuthenticators(
-                BiometricManager.Authenticators.BIOMETRIC_STRONG  // solo huella/cara clase 3
-            )
-            .build()
-    )
-}
-```
-
-`BIOMETRIC_STRONG` requiere hardware biométrico de Clase 3 (el más seguro). Rechaza PINs y patrones como fallback.
 
 ### SecureScreen: FLAG_SECURE
 
@@ -1579,19 +1541,15 @@ El caso más interesante es `PerfilViewModel`, que combina dos flows con `combin
 
 **Respuesta**: `StateFlow` siempre tiene un valor (el estado actual) y los nuevos colectores reciben inmediatamente el último valor. Es perfecto para el estado de la UI. `SharedFlow` no tiene estado — es un bus de eventos. Los eventos emitidos antes de que haya colectores se pierden (por defecto). En este proyecto uso `StateFlow` para `uiState` (el estado de la pantalla) y `SharedFlow` para `uiEffect` (eventos únicos como mostrar un Snackbar). Si cambiara `uiEffect` a `StateFlow`, el Snackbar reaparecería cada vez que se recomponga la pantalla.
 
-### P15: ¿Cómo funciona el gateway biométrico?
-
-**Respuesta**: Al lanzar la app, antes de mostrar el `NavHost`, verifico si la autenticación biométrica está disponible con `BiometricManager.canAuthenticate(BIOMETRIC_STRONG)`. Si lo está, muestro el prompt. Si el usuario cancela o falla, la app muestra un botón para reintentar. Solo cuando la autenticación es exitosa se navega al BottomNavigation principal. La sesión biométrica dura mientras el proceso vive — si el usuario cambia de app y vuelve, no se vuelve a pedir la biometría a menos que el proceso haya sido destruido.
-
-### P16: ¿Por qué el ViewModel no tiene referencia al Context?
+### P15: ¿Por qué el ViewModel no tiene referencia al Context?
 
 **Respuesta**: Porque el ViewModel sobrevive a los cambios de configuración (rotación de pantalla). Si tuviera una referencia a `Activity` o `Context`, podría provocar memory leaks — el ViewModel retendría la Activity antigua después de ser recreada. Si necesito el contexto (para strings, por ejemplo), uso `@StringRes` en el `UiError` y el Composable llama a `stringResource()`. Para contexto en el ViewModel sí se puede usar `ApplicationContext` con `@ApplicationContext`, que es seguro porque la Application vive tanto como el proceso.
 
-### P17: ¿Cómo escalas este proyecto a un equipo de 5 personas?
+### P16: ¿Cómo escalas este proyecto a un equipo de 5 personas?
 
 **Respuesta**: La arquitectura multi-módulo está diseñada exactamente para esto. Cada feature (`products`, `favorites`, `profile`) es independiente: tiene sus propios módulos Gradle, sus propios tests, y se comunica con otros features solo a través del módulo `:api`. Dos equipos pueden trabajar en `products` y `favorites` simultáneamente sin conflictos de merge. La rama de CI/CD valida cada PR independientemente. Konsist y Detekt garantizan que ningún equipo rompe las reglas arquitectónicas.
 
-### P18: ¿Qué harías diferente en producción real?
+### P17: ¿Qué harías diferente en producción real?
 
 **Respuesta**: Varias cosas:
 
@@ -1602,7 +1560,7 @@ El caso más interesante es `PerfilViewModel`, que combina dos flows con `combin
 5. Activaría Firebase App Distribution para distribución a QA y testers.
 6. Consideraría `WorkManager` para sincronización en background de favoritos.
 
-### P19: ¿Cómo implementarías navegación entre features?
+### P18: ¿Cómo implementarías navegación entre features?
 
 **Respuesta**: En esta app, el `NavHost` está en `:app` y conoce todos los `Route` de todos los features. Para features más desacoplados, usaría un patrón de "navigation contracts" donde cada feature expone una interfaz de navegación en su módulo `:api` (e.g., `interface ProductosNavigator { fun navegarADetalle(productoId: Int) }`), y `:app` proporciona la implementación. Así el feature no necesita conocer el `NavController` directamente.
 

@@ -1,6 +1,6 @@
 # Módulo `:app`
 
-**Propósito**: Punto de ensamblaje de la aplicación Mango Fake Store; conecta todos los módulos `:features:*` y `:core:*` en un NavHost raíz con BottomBar, gateway biométrico ante Perfil, banner offline global y handler de excepciones de corrutinas.
+**Propósito**: Punto de ensamblaje de la aplicación Mango Fake Store; conecta todos los módulos `:features:*` y `:core:*` en un NavHost raíz con BottomBar, banner offline global y handler de excepciones de corrutinas.
 
 ---
 
@@ -12,9 +12,8 @@ El módulo `:app` es el punto de entrada de la aplicación y no expone contratos
 |---|---|---|
 | `ProductosRoute` | `:features:products:presentation` | Composable de destino NavHost — listado de productos |
 | `FavoritosRoute` | `:features:favorites:presentation` | Composable de destino NavHost — pantalla de favoritos |
-| `PerfilRoute` | `:features:profile:presentation` | Composable de destino NavHost — perfil del usuario (protegido con biometría) |
+| `PerfilRoute` | `:features:profile:presentation` | Composable de destino NavHost — perfil del usuario |
 | `ObservarConteoFavoritos` | `:features:favorites:domain` | UseCase reactivo — contador de favoritos para el badge de la BottomBar |
-| `BiometricAuthenticator` | `:core:security` | Gateway biométrico para acceder a Perfil |
 | `ConnectivityObserver` | `:core:network` | Observable de estado de red para `isOffline` |
 | `Telemetry` | `:core:analytics` | Reporte de errores no fatales al sistema de telemetría |
 | `DomainErrorToUiErrorMapper` | `:core:error` | Mapeo de excepciones → `UiError` localizado para el Snackbar global |
@@ -29,7 +28,6 @@ El módulo `:app` es el punto de entrada de la aplicación y no expone contratos
 ├── :core:ui               (MangoOfflineBanner)
 ├── :core:network          (ConnectivityObserver)
 ├── :core:analytics        (Telemetry)
-├── :core:security         (BiometricAuthenticator)
 ├── :core:error            (DomainError, UiError, DomainErrorToUiErrorMapper)
 ├── :core:common           (AppDispatchers)
 ├── :core:logging          (Logger / TimberLogger)
@@ -83,7 +81,7 @@ val isOffline: StateFlow<Boolean> = connectivityObserver.statusFlow
 |---|---|
 | `mango://fakestore/productos` | `AppRoute.Productos` |
 | `mango://fakestore/favoritos` | `AppRoute.Favoritos` |
-| `mango://fakestore/perfil` | `AppRoute.Perfil` (requiere autenticación biométrica) |
+| `mango://fakestore/perfil` | `AppRoute.Perfil` |
 
 ---
 
@@ -99,19 +97,18 @@ app/src/main/java/com/example/fakestoreapp/
 │   └── AppModule.kt                   — Provides DAOs y AppDatabase
 └── ui/
     ├── AppUiEffect.kt                 — sealed interface AppUiEffect (MostrarErrorGlobal)
-    ├── AppViewModel.kt                — ViewModel raíz: conectividad, biometría, errores, favoritos
+    ├── AppViewModel.kt                — ViewModel raíz: conectividad, errores, favoritos
     ├── MainContent.kt                 — Composable raíz: MangoTheme + MangoNavHost + SnackbarHost
     └── navigation/
         ├── AppRoutes.kt               — sealed interface AppRoute (@Serializable)
-        └── MangoNavHost.kt            — NavHost + BottomBar + gateway biométrico
+        └── MangoNavHost.kt            — NavHost + BottomBar
 
 app/src/test/
-└── AppViewModelTest.kt                — 9 tests unitarios (biometría, conectividad, handler global)
+└── AppViewModelTest.kt                — tests unitarios (conectividad, handler global)
 
 app/src/androidTest/
 ├── NavigacionE2ETest.kt               — Tests E2E instrumentados (HiltAndroidTest)
 └── di/
-    └── TestSecurityModule.kt          — FakeBiometricAuthenticator para tests
 ```
 
 ---

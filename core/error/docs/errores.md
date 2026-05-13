@@ -15,9 +15,7 @@ Tabla maestra de todos los `DomainError` del sistema y su traducción a `UiError
 | `Database.WriteFailed` | `SQLiteException` | `Blocking` | `DB-002` | `error_bd_escritura` |
 | `Database.NotFound` | Elemento no hallado en BD | `Info` | `DB-003` | `error_bd_no_encontrado` |
 | `Database.IntegrityViolation` | `SQLiteConstraintException` | `Blocking` | `DB-004` | `error_bd_integridad` |
-| `Security.BiometricUnavailable` | Biometría no disponible | `Warning` | `SEC-001` | `error_seg_biometria_no_disponible` |
-| `Security.BiometricLockout` | Demasiados intentos biométricos | `Blocking` | `SEC-002` | `error_seg_biometria_bloqueada` |
-| `Security.RootDetected` | Dispositivo comprometido | `Fatal` | `SEC-003` | `error_seg_root_detectado` |
+| `Security.RootDetected` | Dispositivo comprometido | `Fatal` | `SEC-001` | `error_seg_root_detectado` |
 | `Security.IntegrityFailed` | Firma de la app inválida | `Fatal` | `SEC-004` | `error_seg_integridad` |
 | `Security.SessionExpired` | Token expirado / revocado | `Fatal` | `SEC-005` | `error_seg_sesion_expirada` |
 | `Validation` | Campo inválido o faltante | `Warning` | `VAL-001` | `error_validacion_formulario` |
@@ -39,7 +37,7 @@ Tabla maestra de todos los `DomainError` del sistema y su traducción a `UiError
 | `Retry` | Reintenta la última operación |
 | `Dismiss` | Descarta el error |
 | `Login` | Navega a la pantalla de inicio de sesión |
-| `OpenSettings` | Abre los ajustes del sistema (biometría) |
+| `OpenSettings` | Abre los ajustes del sistema |
 
 ## Añadir un nuevo error
 

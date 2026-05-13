@@ -52,7 +52,7 @@ Hay dos tipos de módulos:
 | `:core:datastore` | Almacenamiento seguro de la sesión |
 | `:core:error` | Sistema tipado de errores para toda la app |
 | `:core:analytics` | Registro de eventos y errores en Firebase |
-| `:core:security` | Detección de dispositivos comprometidos y autenticación biométrica |
+| `:core:security` | Detección de dispositivos comprometidos y protección de pantallas sensibles |
 | `:core:logging` | Registro de mensajes de depuración |
 | `:core:common` | Utilidades compartidas de Kotlin |
 | `:core:testing` | Herramientas para tests automáticos |

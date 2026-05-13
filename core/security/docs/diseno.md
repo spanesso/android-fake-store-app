@@ -5,17 +5,12 @@
 ```mermaid
 flowchart TB
   subgraph security[core:security]
-    BA[BiometricAuthenticator<br>interface]
-    BAI[BiometricAuthenticatorImpl]
-    BR[BiometricResult<br>sealed]
     IC[IntegrityChecker<br>interface]
     ICI[IntegrityCheckerImpl]
     SS[SecureScreen<br>@Composable]
   end
 
   subgraph android[Android SDK]
-    BP[BiometricPrompt]
-    BM[BiometricManager<br>BIOMETRIC_STRONG]
     FLAG[FLAG_SECURE]
   end
 
@@ -23,28 +18,15 @@ flowchart TB
     RB[RootBeer]
   end
 
-  BAI -.implementa.-> BA
-  BAI --> BP
-  BAI --> BM
-  BP --> BR
   ICI -.implementa.-> IC
   ICI --> RB
   SS --> FLAG
 
-  VM[ViewModels] --> BA
-  VM --> IC
+  VM[ViewModels] --> IC
   screens[Screens] --> SS
 ```
 
 ## Decisiones de diseño
-
-### BIOMETRIC_STRONG obligatorio
-
-`BiometricPrompt.PromptInfo` se construye con `setAllowedAuthenticators(BIOMETRIC_STRONG)`. No se permite `DEVICE_CREDENTIAL` solo, ya que el PIN/patrón no es biometría fuerte. Si el dispositivo no tiene biometría fuerte, se retorna `BiometricResult.NoDisponible`.
-
-### suspendCoroutine con bandera `reanudado`
-
-`BiometricPrompt.AuthenticationCallback` puede llamar tanto `onAuthenticationError` como `onAuthenticationFailed`. `onAuthenticationFailed` no reanuda la corrutina (el usuario puede reintentar). Para evitar reanudar dos veces, se usa una bandera `reanudado`.
 
 ### IntegrityChecker como interfaz
 

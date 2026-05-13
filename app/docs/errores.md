@@ -13,10 +13,6 @@ El módulo `:app` no define `DomainError` propios. Es el punto de interceptació
 | Condición | `DomainError` | `UiError.severity` | `R.string` |
 |---|---|---|---|
 | Excepción no capturada en corrutinas de la app | `DomainError.Unknown(cause)` | `Info` | `error_desconocido` (de `:core:error`) |
-| Biometría cancelada por el usuario | — (no es error, mensaje informativo) | N/A | `biometria_cancelado` |
-| Biometría bloqueada temporalmente | — (mensaje informativo) | N/A | `biometria_bloqueado` |
-| Biometría no disponible en el dispositivo | — (mensaje informativo) | N/A | `biometria_no_disponible` |
-| Error biométrico del sistema | `BiometricResult.Error(mensaje)` | N/A | `mensaje` del sistema (string nativo) |
 
 ---
 
@@ -26,12 +22,6 @@ El módulo `:app` no define `DomainError` propios. Es el punto de interceptació
 
 | Key | Valor | Contexto |
 |---|---|---|
-| `biometria_titulo` | "Acceso al perfil" | Título del prompt biométrico |
-| `biometria_subtitulo` | "Verifica tu identidad" | Subtítulo del prompt |
-| `biometria_cancelar` | "Cancelar" | Botón de cancelación del prompt |
-| `biometria_cancelado` | "Autenticación cancelada" | Snackbar al cancelar biometría |
-| `biometria_bloqueado` | "Biometría bloqueada temporalmente. Inténtalo de nuevo." | Snackbar cuando biometría bloqueada |
-| `biometria_no_disponible` | "Biometría no disponible en este dispositivo." | Snackbar sin hardware biométrico |
 | `error_global_inesperado` | "Ocurrió un error inesperado. La app continuará funcionando." | Snackbar de handler global |
 
 ---

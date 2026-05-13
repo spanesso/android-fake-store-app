@@ -55,4 +55,3 @@ Si Tink falla al descifrar un token almacenado (por ejemplo, tras rotación de c
 
 - Añadir campos a `SessionData` (por ejemplo, `expiresAt: Instant`) sin romper el esquema existente — DataStore es más flexible que Room para migraciones de preferencias.
 - Implementar `EncryptedDataStore` (cifrado a nivel de fichero) como alternativa a Tink si los requisitos de seguridad cambian.
-- Añadir `biometricSessionFlow` con preferencias de tiempo de inactividad para re-autenticación biométrica (ETAPA 2).

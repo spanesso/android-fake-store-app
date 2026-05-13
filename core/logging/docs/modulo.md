@@ -32,7 +32,6 @@
 |--------|-----|
 | `:core:analytics` — `FirebaseTelemetryImpl` | `warn` en no-fatales, `info` en eventos y trazas |
 | `:core:analytics` — `ConsoleTelemetryImpl` | `info`/`warn` para debugging local |
-| `:core:security` — `BiometricAuthenticatorImpl` | `info` éxito, `warn` lockout/no-disponible, `error` fallo inesperado |
 | `:core:security` — `IntegrityCheckerImpl` | `warn` si detecta root, `info` si dispositivo es íntegro |
 
 ## Ejemplos de uso en feature modules

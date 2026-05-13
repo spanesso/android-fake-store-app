@@ -2,7 +2,7 @@
 
 **Estado**: estructura vacía (ETAPA 0.5).
 **Implementación prevista**: ETAPA 2.
-**Propósito**: Login biométrico, gestión de sesión, rotación de claves.
+**Propósito**: Login, gestión de sesión, rotación de claves.
 
 Submódulos:
 

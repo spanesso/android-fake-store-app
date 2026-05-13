@@ -1,10 +1,9 @@
 # Pruebas — `:core:security`
 
-## Tests unitarios (8 tests totales)
+## Tests unitarios (2 tests totales)
 
 | Clase de test | Tests | Descripción |
 |---------------|-------|-------------|
-| `BiometricResultTest` | 6 | Verifica cada caso del sealed interface y el when exhaustivo |
 | `IntegrityCheckerTest` | 2 | Verifica contrato de `IntegrityChecker` con fake (sin Android Keystore ni RootBeer real) |
 
 ## Herramientas de test
@@ -25,14 +24,11 @@
 
 | Componente | Estado |
 |------------|--------|
-| `BiometricResult` sealed interface | ✅ todos los casos cubiertos |
 | `IntegrityChecker` contrato | ✅ 2 ramas (comprometido / no comprometido) |
-| `BiometricAuthenticatorImpl` | _(requiere `FragmentActivity` real — test instrumentado)_ |
 | `IntegrityCheckerImpl` (RootBeer real) | _(requiere dispositivo real — test instrumentado)_ |
 | `SecureScreen` | _(requiere Compose + Activity — Paparazzi o test instrumentado)_ |
 
 ## Tests instrumentados (pendiente — ETAPA 7)
 
-- `BiometricAuthenticatorImpl`: requiere `FragmentActivity` real y dispositivo/emulador con biometría.
 - `IntegrityCheckerImpl`: prueba con dispositivo rooteado real o emulador con root.
 - `SecureScreen`: Paparazzi o `ComposeTestRule` con verificación de `FLAG_SECURE`.

@@ -51,8 +51,6 @@ DomainError (sealed)
 │   ├── NotFound(cause)        — elemento no hallado en BD
 │   └── IntegrityViolation(c)  — SQLiteConstraintException
 ├── Security (sealed)
-│   ├── BiometricUnavailable(c)
-│   ├── BiometricLockout(c)
 │   ├── RootDetected(c)
 │   ├── IntegrityFailed(c)
 │   └── SessionExpired(c)

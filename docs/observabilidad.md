@@ -37,8 +37,6 @@ Los parámetros solo contienen IDs enteros de producto o literales de motivo de 
 |---|---|---|
 | `cargar_productos` | Carga de lista de productos desde API | `ProductosViewModel.cargarProductos()` |
 | `toggle_favorito` | Toggle de favorito (escritura en Room) | `ProductosViewModel.toggleFavorito()` y `FavoritosViewModel.toggleFavorito()` |
-| `login_biometrico` | Flujo completo de autenticación biométrica | `AppViewModel.autenticarParaPerfil()` |
-
 Todas las trazas usan `try/finally` para garantizar que `TraceHandle.detener()` siempre se llama, incluso si hay error.
 
 ---
@@ -51,7 +49,7 @@ Todas las trazas usan `try/finally` para garantizar que `TraceHandle.detener()` 
 
 ## Política PII
 
-**Jamás se loguea**: tokens de sesión, contraseñas, datos biométricos, nombres, emails ni ningún otro dato de identificación personal.
+**Jamás se loguea**: tokens de sesión, contraseñas, nombres, emails ni ningún otro dato de identificación personal.
 
 En Crashlytics, el `userId` se almacena como SHA-256 truncado a 16 caracteres (no reversible). El `sessionId` es un UUID v4 generado en memoria al arrancar — no se persiste.
 
