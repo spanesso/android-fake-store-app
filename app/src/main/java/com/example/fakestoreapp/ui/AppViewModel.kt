@@ -50,12 +50,12 @@ class AppViewModel @Inject constructor(
             initialValue = false,
         )
 
-    val startDestination: StateFlow<AppRoute> = obtenerSesionActiva()
+    val startDestination: StateFlow<AppRoute?> = obtenerSesionActiva()
         .map { userId -> if (userId != null) AppRoute.Productos else AppRoute.Login }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = AppRoute.Login,
+            initialValue = null,
         )
 
     val contadorFavoritos: StateFlow<Int> = observarConteoFavoritos()

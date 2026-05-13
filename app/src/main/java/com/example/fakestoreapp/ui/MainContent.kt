@@ -88,13 +88,16 @@ fun MainContent(
                 if (isOffline) {
                     MangoOfflineBanner()
                 }
-                MangoNavHost(
-                    navController = navController,
-                    startDestination = startDestination,
-                    onMostrarSnackbar = { msg -> snackbarHostState.showSnackbar(msg) },
-                    contadorFavoritos = contadorFavoritos,
-                    modifier = Modifier.weight(1f),
-                )
+                val destination = startDestination
+                if (destination != null) {
+                    MangoNavHost(
+                        navController = navController,
+                        startDestination = destination,
+                        onMostrarSnackbar = { msg -> snackbarHostState.showSnackbar(msg) },
+                        contadorFavoritos = contadorFavoritos,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
             SnackbarHost(
                 hostState = snackbarHostState,

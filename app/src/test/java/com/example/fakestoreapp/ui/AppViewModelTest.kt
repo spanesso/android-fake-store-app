@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -120,6 +121,7 @@ class AppViewModelTest {
         sesionFlow.value = null
         val viewModel = crearViewModel()
         viewModel.startDestination.test {
+            assertNull(awaitItem())
             assertEquals(AppRoute.Login, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
@@ -141,6 +143,7 @@ class AppViewModelTest {
         sesionFlow.value = null
         val viewModel = crearViewModel()
         viewModel.startDestination.test {
+            assertNull(awaitItem())
             assertEquals(AppRoute.Login, awaitItem())
             sesionFlow.value = 5
             assertEquals(AppRoute.Productos, awaitItem())
