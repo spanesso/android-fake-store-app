@@ -1,5 +1,6 @@
 package com.mango.fakestore.features.auth.presentation.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mango.fakestore.core.analytics.AnalyticsEvent
@@ -8,11 +9,13 @@ import com.mango.fakestore.core.analytics.Telemetry
 import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
 import com.mango.fakestore.features.auth.domain.usecase.SeleccionarUsuario
+import com.mango.fakestore.features.auth.presentation.R
 import com.mango.fakestore.features.auth.presentation.model.UsuarioSeleccionUi
 import com.mango.fakestore.features.auth.presentation.state.LoginUiEffect
 import com.mango.fakestore.features.auth.presentation.state.LoginUiEvent
 import com.mango.fakestore.features.auth.presentation.state.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +31,7 @@ private const val TOTAL_USUARIOS = 10
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val seleccionarUsuario: SeleccionarUsuario,
     private val telemetry: Telemetry,
     private val eventTracker: EventTracker,
@@ -35,7 +39,7 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val listaUsuarios = (1..TOTAL_USUARIOS).map { id ->
-        UsuarioSeleccionUi(id = id, etiqueta = "Usuario $id")
+        UsuarioSeleccionUi(id = id, etiqueta = context.getString(R.string.login_usuario_etiqueta, id))
     }
 
     private val _uiState: MutableStateFlow<LoginUiState> =

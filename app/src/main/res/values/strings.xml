@@ -3,12 +3,6 @@
     <string name="nav_productos">Productos</string>
     <string name="nav_favoritos">Favoritos</string>
     <string name="nav_perfil">Perfil</string>
-    <string name="biometria_titulo">Acceso al perfil</string>
-    <string name="biometria_subtitulo">Verifica tu identidad</string>
-    <string name="biometria_cancelar">Cancelar</string>
-    <string name="biometria_cancelado">Autenticación cancelada</string>
-    <string name="biometria_bloqueado">Biometría bloqueada temporalmente. Inténtalo de nuevo.</string>
-    <string name="biometria_no_disponible">Biometría no disponible en este dispositivo.</string>
     <string name="error_global_inesperado">Ocurrió un error inesperado. La app continuará funcionando.</string>
     <string name="integridad_titulo">Dispositivo comprometido</string>
     <string name="integridad_mensaje_bloqueo">Se ha detectado que este dispositivo puede estar comprometido (root, depurador o manipulación de la app). Por seguridad, la aplicación no puede continuar.</string>

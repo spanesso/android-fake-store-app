@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,6 +43,7 @@ import com.mango.fakestore.core.designsystem.theme.MangoSpacing
 import com.mango.fakestore.core.designsystem.theme.MangoTextStyles
 import com.mango.fakestore.core.designsystem.theme.MangoTheme
 import com.mango.fakestore.core.error.UiError
+import com.mango.fakestore.features.auth.presentation.R
 import com.mango.fakestore.features.auth.presentation.model.UsuarioSeleccionUi
 import com.mango.fakestore.features.auth.presentation.state.LoginUiEvent
 import com.mango.fakestore.features.auth.presentation.state.LoginUiState
@@ -114,7 +116,7 @@ private fun LoginIdleContent(
         Spacer(modifier = Modifier.height(MangoSpacing.md))
 
         MangoButton(
-            text = "Continuar",
+            text = stringResource(R.string.login_boton_continuar),
             onClick = { seleccionadoId?.let(onConfirmar) },
             modifier = Modifier.fillMaxWidth(),
             state = if (seleccionadoId == null) MangoButtonState.Disabled else MangoButtonState.Idle,
@@ -145,14 +147,14 @@ private fun LoginHeader(modifier: Modifier = Modifier) {
         }
 
         MangoText(
-            text = "Selecciona tu usuario",
+            text = stringResource(R.string.login_titulo),
             style = MangoTextStyles.headlineSmall.copy(letterSpacing = 0.sp),
             color = MangoColorTokens.onBackground,
             modifier = Modifier.padding(top = MangoSpacing.xs),
         )
 
         MangoText(
-            text = "Elige el usuario con el que deseas continuar.",
+            text = stringResource(R.string.login_subtitulo),
             style = MangoTextStyles.bodyMedium,
             color = MangoColorTokens.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth(),
