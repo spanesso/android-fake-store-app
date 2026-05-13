@@ -217,7 +217,6 @@ private fun LoginLoadingContent(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(MangoSpacing.xxl))
-        LoginHeader()
         Box(
             modifier = Modifier.weight(1f).fillMaxWidth(),
             contentAlignment = Alignment.Center,
