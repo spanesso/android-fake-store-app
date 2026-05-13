@@ -1,175 +1,129 @@
-# Mango Fake Store App
+# Mango Fake Store
 
-[![CI](https://github.com/spanesso/android-fake-store-app/actions/workflows/pr.yml/badge.svg?branch=develop)](https://github.com/spanesso/android-fake-store-app/actions/workflows/pr.yml)
+[![CI](https://github.com/spanesso/android-fake-store-app/actions/workflows/sonar-main.yml/badge.svg?branch=main)](https://github.com/spanesso/android-fake-store-app/actions/workflows/sonar-main.yml)
+[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=spanesso_android-fake-store-app&metric=alert_status)](https://sonarcloud.io/project/overview?id=spanesso_android-fake-store-app)
 [![Android](https://img.shields.io/badge/Android-24%2B-green.svg)](https://developer.android.com/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-blue.svg)](https://kotlinlang.org/)
 
-Aplicación Android de catálogo de moda que consume la [Fake Store API](https://fakestoreapi.com/). Desarrollada como prueba técnica con arquitectura Clean Architecture + MVVM y módulos Gradle independientes.
-
-**Funcionalidades:**
-- Selección de usuario (1-10) y sesión persistente
-- Catálogo de productos con imágenes cacheadas, rating y descripción
-- Sistema de favoritos por usuario (cada usuario tiene sus propios favoritos)
-- Perfil de usuario completo con cierre de sesión
+Aplicación Android de catálogo de moda construida con las mismas exigencias de calidad de una app de producción real. Consume la [Fake Store API](https://fakestoreapi.com/) y está diseñada para demostrar arquitectura profesional, seguridad, diseño y calidad de código en Android moderno.
 
 ---
 
-## Cómo correr en local
+## Qué hace la aplicación
 
-**Requisitos:** JDK 11, Android Studio Hedgehog+, SDK minSdk 24 / compileSdk 36
+La app permite a cualquiera de los 10 usuarios disponibles iniciar sesión, explorar el catálogo de productos, guardar sus favoritos y consultar su perfil personal.
 
-```bash
-git clone https://github.com/spanesso/android-fake-store-app.git
-cd android-fake-store-app
-
-./gradlew assembleDevDebug   # compilar
-./gradlew installDevDebug    # instalar en emulador/dispositivo
-```
-
-La app tiene tres flavors: `dev` (desarrollo), `staging` (QA), `prod` (producción).
-
----
-
-## Cómo ejecutar los tests
-
-```bash
-# Todos los tests unitarios (334 tests)
-./gradlew testDevDebugUnitTest
-
-# Análisis estático
-./gradlew detekt
-./gradlew lint
-
-# Cobertura (informe HTML)
-./gradlew koverHtmlReportDevDebug
-open build/reports/kover/html/index.html
-```
-
-Tests por módulo si se quiere revisar uno concreto:
-
-```bash
-./gradlew :features:auth:domain:testDebugUnitTest
-./gradlew :features:auth:data:testDebugUnitTest
-./gradlew :features:auth:presentation:testDebugUnitTest
-./gradlew :features:products:domain:testDebugUnitTest
-./gradlew :features:products:presentation:testDebugUnitTest
-./gradlew :features:favorites:domain:testDebugUnitTest
-./gradlew :features:favorites:data:testDebugUnitTest
-./gradlew :features:profile:presentation:testDebugUnitTest
-./gradlew :core:error:testDebugUnitTest
-./gradlew :core:network:testDevDebugUnitTest
-```
+- **Inicio de sesión** — el usuario elige su cuenta entre los 10 disponibles. La sesión se mantiene al cerrar y reabrir la app.
+- **Catálogo de productos** — lista completa de artículos con imagen, precio, descripción, categoría y puntuación. Las imágenes se descargan una sola vez y quedan guardadas en caché.
+- **Favoritos por usuario** — cada usuario tiene su propia lista de favoritos. Al cambiar de cuenta, los favoritos cambian con ella.
+- **Perfil** — muestra los datos completos del usuario (nombre, email, dirección, teléfono) y permite cerrar sesión.
 
 ---
 
 ## Arquitectura
 
-Clean Architecture + MVVM. Cada feature tiene cuatro submódulos: `domain`, `data`, `presentation` y `api` (contratos públicos para consumo entre features).
+La app sigue **Clean Architecture + MVVM** organizada en módulos Gradle independientes. Esto significa que cada parte de la aplicación tiene una responsabilidad única y no depende de las demás más de lo necesario.
 
-```
-:app
-├── :features:auth         (login, sesión)
-├── :features:products     (catálogo)
-├── :features:favorites    (favoritos por usuario)
-└── :features:profile      (perfil + logout)
+Hay dos tipos de módulos:
 
-:core
-├── :design-system         (tokens visuales + componentes Compose)
-├── :ui                    (estados genéricos: Loading, Error, Empty)
-├── :error                 (DomainError sealed, UiError, safeApiCall)
-├── :network               (Retrofit + OkHttp + certificate pinning)
-├── :database              (Room + SQLCipher)
-├── :datastore             (DataStore cifrado con Tink AES-256-GCM)
-├── :analytics             (Firebase Crashlytics + Analytics + Performance)
-├── :security              (IntegrityChecker, SecureScreen)
-├── :logging               (TimberLogger en debug, NoOpLogger en prod)
-├── :common                (Dispatchers, extensiones Either/Flow)
-└── :testing               (helpers para tests unitarios)
-```
+**Funcionalidades** — cada pantalla tiene su propio conjunto de módulos separados:
 
-Los errores fluyen siempre tipados:
+| Módulo | Qué contiene |
+|--------|-------------|
+| `:features:auth` | Inicio de sesión y gestión de sesión |
+| `:features:products` | Catálogo de productos |
+| `:features:favorites` | Lista de favoritos por usuario |
+| `:features:profile` | Perfil del usuario y cierre de sesión |
 
-```
-Repositorio → safeApiCall → Either<DomainError, T>
-    → UseCase → Either<DomainError, T>
-    → ViewModel → DomainErrorToUiErrorMapper → UiError
-    → UI → stringResource(uiError.messageRes)
-```
+**Módulos compartidos** — herramientas que usan todas las funcionalidades:
 
-La UI nunca lee `throwable.message` directamente.
+| Módulo | Para qué sirve |
+|--------|---------------|
+| `:core:design-system` | Sistema de diseño Mango: colores, tipografía y 19 componentes visuales |
+| `:core:ui` | Pantallas de carga, error y estado vacío |
+| `:core:network` | Conexión HTTP con reintentos y seguridad TLS |
+| `:core:database` | Base de datos local cifrada |
+| `:core:datastore` | Almacenamiento seguro de la sesión |
+| `:core:error` | Sistema tipado de errores para toda la app |
+| `:core:analytics` | Registro de eventos y errores en Firebase |
+| `:core:security` | Detección de dispositivos comprometidos y autenticación biométrica |
+| `:core:logging` | Registro de mensajes de depuración |
+| `:core:common` | Utilidades compartidas de Kotlin |
+| `:core:testing` | Herramientas para tests automáticos |
+
+Más detalles en [docs/arquitectura.md](docs/arquitectura.md).
 
 ---
 
-## Stack tecnológico
+## Seguridad
 
-| Tecnología | Versión | Uso |
-|------------|---------|-----|
-| Kotlin | 2.0.21 | Lenguaje principal |
-| Jetpack Compose BOM | 2024.09.00 | UI declarativa |
-| Arrow Core | 1.2.4 | `Either<DomainError, T>` para errores tipados |
-| Hilt | 2.52 | Inyección de dependencias |
-| Room + SQLCipher | 2.7.1 / 4.6.0 | Base de datos local cifrada |
-| DataStore + Tink | 1.1.1 / 1.15.0 | Preferencias cifradas AES-256-GCM |
-| Retrofit + OkHttp | 2.11.0 / 4.12.0 | HTTP + certificate pinning |
-| Coil | 2.7.0 | Carga de imágenes con caché |
-| Firebase BOM | 33.6.0 | Crashlytics + Analytics + Performance |
-| Kover | 0.9.8 | Cobertura de tests |
-| Detekt | 1.23.7 | Análisis estático Kotlin |
-| Konsist | 0.17.3 | Reglas de arquitectura verificadas en CI |
-| Paparazzi | 1.3.5 | Snapshot tests de Compose |
+La aplicación implementa múltiples capas de protección:
+
+- **Tráfico cifrado** — certificate pinning sobre HTTPS: si el certificado del servidor no coincide con el pin esperado, la conexión se rechaza.
+- **Datos en reposo cifrados** — la base de datos usa SQLCipher y la sesión del usuario se guarda con cifrado AES-256-GCM. Las claves viven en el Android Keystore del dispositivo.
+- **Detección de dispositivos comprometidos** — la app detecta si el dispositivo tiene root, si hay un depurador conectado o si herramientas de análisis como Frida o Xposed están activas.
+- **Protección de pantalla** — la pantalla de perfil bloquea las capturas de pantalla y la previsualización en el selector de apps.
+- **Ofuscación de código** — en producción el código se ofusca con R8 para dificultar la ingeniería inversa.
+
+Más detalles en [docs/seguridad.md](docs/seguridad.md).
 
 ---
 
-## Documentación por módulo
+## Sistema de diseño
 
-### Features
+La interfaz está construida sobre un sistema de diseño propio llamado **Mango Design System** que unifica la identidad visual en toda la app:
 
-| Feature | Descripción | Docs |
-|---------|-------------|------|
-| `:features:auth` | Login por selección de usuario, sesión en DataStore | [README](features/auth/README.md) |
-| `:features:products` | Catálogo SSOT (Room + Retrofit), MangoProductCard con Coil | [README](features/products/README.md) · [diseño](features/products/docs/diseno.md) · [pruebas](features/products/docs/pruebas.md) · [errores](features/products/docs/errores.md) |
-| `:features:favorites` | Favoritos por usuario en Room, toggle reactivo con Flow | [README](features/favorites/README.md) · [diseño](features/favorites/docs/diseno.md) · [pruebas](features/favorites/docs/pruebas.md) · [errores](features/favorites/docs/errores.md) |
-| `:features:profile` | Perfil completo (10 campos), cerrar sesión | [README](features/profile/README.md) · [diseño](features/profile/presentation/docs/diseno.md) · [pruebas](features/profile/presentation/docs/pruebas.md) |
+- Paleta de colores, tipografía y formas definidas como tokens reutilizables
+- 19 componentes Compose listos para usar: botones, tarjetas de producto, barras de navegación, diálogos, snackbars, chips, campos de texto y estados de carga con efecto shimmer
+- Soporte para modo claro y modo oscuro
+- Todos los componentes son accesibles y siguen las guías de Material 3
 
-### Core
+---
 
-| Módulo | Descripción | Docs |
-|--------|-------------|------|
-| `:core:error` | `DomainError` sealed, `UiError`, `safeApiCall`/`safeDbCall`, mappers | [módulo](core/error/docs/modulo.md) · [diseño](core/error/docs/diseno.md) · [pruebas](core/error/docs/pruebas.md) |
-| `:core:design-system` | Tokens visuales Mango + 19 componentes Compose | [módulo](core/design-system/docs/modulo.md) · [diseño](core/design-system/docs/diseno.md) |
-| `:core:network` | Retrofit + certificate pinning + retry + ConnectivityObserver | [módulo](core/network/docs/modulo.md) · [diseño](core/network/docs/diseno.md) |
-| `:core:database` | Room abstracta cifrada con SQLCipher + Android Keystore | [módulo](core/database/docs/modulo.md) · [diseño](core/database/docs/diseno.md) |
-| `:core:datastore` | DataStore cifrado con Tink AES-256-GCM | [módulo](core/datastore/docs/modulo.md) · [diseño](core/datastore/docs/diseno.md) |
-| `:core:analytics` | Telemetry + EventTracker; Firebase impl; Console + NoOp | [módulo](core/analytics/docs/modulo.md) · [diseño](core/analytics/docs/diseno.md) |
-| `:core:security` | IntegrityChecker (root/Frida/debugger), SecureScreen | [módulo](core/security/docs/modulo.md) · [diseño](core/security/docs/diseno.md) |
-| `:core:common` | Dispatchers inyectables, extensiones Either/Flow | [módulo](core/common/docs/modulo.md) |
-| `:core:ui` | LoadingContent, ErrorContent, MangoOfflineBanner, shimmer | [módulo](core/ui/docs/modulo.md) |
-| `:core:logging` | Logger interface; TimberLogger (debug) + NoOpLogger (prod) | [módulo](core/logging/docs/modulo.md) |
+## Observabilidad
 
-### Documentación transversal
+La app registra de forma automática lo que ocurre en producción:
+
+- **Firebase Crashlytics** — captura errores inesperados con contexto suficiente para reproducirlos, sin exponer datos personales de los usuarios.
+- **Firebase Analytics** — registra eventos de negocio: vistas de producto, favoritos añadidos o quitados, inicios de sesión.
+- **Firebase Performance** — mide los tiempos de carga del catálogo y de las operaciones de favoritos.
+
+Más detalles en [docs/observabilidad.md](docs/observabilidad.md).
+
+---
+
+## Calidad
+
+La calidad se verifica de forma automática en cada cambio:
+
+- **334 tests unitarios** que cubren casos de uso, repositorios, ViewModels y mappers de error
+- **Detekt** — análisis estático de código Kotlin que detecta problemas de estilo y complejidad
+- **Kover** — medición de cobertura de tests por módulo
+- **SonarCloud** — informe centralizado de calidad y seguridad en cada PR
+- **Konsist** — reglas de arquitectura verificadas automáticamente: si algún módulo viola las dependencias definidas, la build falla
+
+---
+
+## Integración continua
+
+Cada cambio en el repositorio pasa por un pipeline automático en GitHub Actions:
+
+| Pipeline | Se activa | Qué verifica |
+|----------|-----------|-------------|
+| `pr.yml` | Al abrir un Pull Request | Lint · Tests · Cobertura · Build · SonarCloud |
+| `sonar-main.yml` | Al hacer push a `main` | Lint · Tests · Cobertura · Build · SonarCloud |
+| `main.yml` | Al hacer push a `develop` | Tests · Build · Firebase Test Lab · Distribución QA |
+| `release.yml` | Al crear un tag `v*` | Build de release firmado |
+
+Más detalles en [docs/ci-cd.md](docs/ci-cd.md).
+
+---
+
+## Documentación
 
 | Documento | Contenido |
 |-----------|-----------|
-| [docs/arquitectura.md](docs/arquitectura.md) | Diagrama de módulos, matriz de dependencias, convenciones |
-| [docs/seguridad.md](docs/seguridad.md) | Threat model STRIDE, certificate pinning, gestión de secretos |
-| [docs/observabilidad.md](docs/observabilidad.md) | Firebase Crashlytics, Analytics, Performance; política PII |
-| [docs/ci-cd.md](docs/ci-cd.md) | Pipeline GitHub Actions, jobs y secretos necesarios |
-| [docs/decisiones-tecnicas.md](docs/decisiones-tecnicas.md) | Decisiones técnicas no obvias documentadas |
-| [docs/adr/0001-manejo-errores.md](docs/adr/0001-manejo-errores.md) | ADR: estrategia de errores tipados con Either |
-| [docs/adr/0002-stack-tier-gratuito.md](docs/adr/0002-stack-tier-gratuito.md) | ADR: elección de stack compatible con tier gratuito |
-| [docs/adr/0003-observar-conteo-flow-int.md](docs/adr/0003-observar-conteo-flow-int.md) | ADR: contador de favoritos como `Flow<Int>` |
-| [docs/adr/0004-app-depende-de-features-data.md](docs/adr/0004-app-depende-de-features-data.md) | ADR: wiring de Hilt en `:app` |
-
----
-
-## CI/CD
-
-El repositorio tiene tres workflows en GitHub Actions:
-
-| Workflow | Se activa en | Qué hace |
-|----------|-------------|----------|
-| `pr.yml` | PR a `develop` | lint → test → cobertura → build → SonarCloud |
-| `main.yml` | Push a `main` | build + test + distribución Firebase |
-| `release.yml` | Tag `v*` | APK firmado + subida a Google Play (internal track) |
-
-Los secretos de CI están documentados en [`docs/configuracion-ci.md`](docs/configuracion-ci.md).
+| [docs/arquitectura.md](docs/arquitectura.md) | Cómo está organizado el código y por qué |
+| [docs/seguridad.md](docs/seguridad.md) | Controles de seguridad implementados |
+| [docs/observabilidad.md](docs/observabilidad.md) | Qué se registra en Firebase y cómo |
+| [docs/ci-cd.md](docs/ci-cd.md) | Pipelines de integración continua |
