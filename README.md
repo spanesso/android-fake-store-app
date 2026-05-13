@@ -69,6 +69,30 @@ Más detalles en [docs/seguridad.md](docs/seguridad.md).
 
 ---
 
+## Gestión de vistas
+
+Las pantallas están construidas con **Jetpack Compose**, el sistema de UI declarativa moderno de Android. En lugar de describir cómo se ve la pantalla paso a paso, se declara el estado que debe mostrar y Compose se encarga de actualizarla automáticamente cuando ese estado cambia.
+
+Cada pantalla sigue un patrón de tres piezas:
+
+- **UiState** — describe qué debe mostrar la pantalla en cada momento: cargando, contenido listo o error. La pantalla simplemente lee este estado y se dibuja en consecuencia.
+- **UiEvent** — representa las acciones del usuario: pulsar un botón, hacer scroll, pedir reintentar. La pantalla envía eventos al ViewModel y nunca toma decisiones por su cuenta.
+- **UiEffect** — efectos puntuales que ocurren una sola vez: navegar a otra pantalla, mostrar un mensaje de error breve. Se separan del estado para evitar que se repitan al girar el dispositivo.
+
+Esto garantiza que las pantallas sean completamente pasivas: no deciden nada, solo muestran lo que el ViewModel les dice y reportan lo que hace el usuario.
+
+---
+
+## Gestión de imágenes
+
+Las imágenes del catálogo se cargan con **Coil**, una librería de carga de imágenes optimizada para Kotlin y Compose.
+
+- **Caché en dos niveles** — la imagen se descarga una vez y se guarda primero en memoria (rápida, se pierde al cerrar la app) y luego en disco (persiste entre sesiones). Las siguientes veces que se muestra el producto, la imagen aparece al instante sin consumir datos.
+- **Placeholder con efecto shimmer** — mientras la imagen se carga, la tarjeta muestra una animación de brillo que indica actividad sin mostrar espacios vacíos.
+- **Liberación automática de memoria** — cuando una tarjeta sale de pantalla, Coil libera la imagen de memoria para que la app no consuma más recursos de los necesarios.
+
+---
+
 ## Sistema de diseño
 
 La interfaz está construida sobre un sistema de diseño propio llamado **Mango Design System** que unifica la identidad visual en toda la app:
