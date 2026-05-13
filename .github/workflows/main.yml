@@ -220,8 +220,7 @@ jobs:
             --app app/build/outputs/apk/dev/debug/app-dev-debug.apk \
             --test app/build/outputs/apk/androidTest/dev/debug/app-dev-debug-androidTest.apk \
             --device model=oriole,version=33,locale=es,orientation=portrait \
-            --timeout 5m \
-            --results-bucket gs://${{ vars.FIREBASE_TEST_RESULTS_BUCKET || 'firebase-test-results' }}
+            --timeout 5m
 
   # ─────────────────────────────────────────────
   # Distribución a QA con Firebase App Distribution
@@ -252,8 +251,8 @@ jobs:
         run: echo "$FIREBASE_GOOGLE_SERVICES_JSON" > app/google-services.json
       - name: Dar permisos al wrapper
         run: chmod +x gradlew
-      - name: Compilar APK staging debug
-        run: ./gradlew assembleStagingDebug
+      - name: Compilar APK dev debug
+        run: ./gradlew assembleDevDebug
       - name: Autenticar con Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -263,7 +262,7 @@ jobs:
       - name: Distribuir a grupo qa-internal
         run: |
           firebase appdistribution:distribute \
-            app/build/outputs/apk/staging/debug/app-staging-debug.apk \
+            app/build/outputs/apk/dev/debug/app-dev-debug.apk \
             --app "${{ vars.FIREBASE_APP_ID }}" \
             --groups "qa-internal" \
             --release-notes "Commit: ${{ github.sha }} | ${{ github.event.head_commit.message }}"
