@@ -35,15 +35,7 @@ import com.mango.fakestore.core.designsystem.theme.MangoSpacing
 import com.mango.fakestore.core.designsystem.theme.MangoTextStyles
 import com.mango.fakestore.core.designsystem.theme.MangoTheme
 
-data class MangoProductCardData(
-    val title: String,
-    val price: String,
-    val imagenUrl: String = "",
-    val descripcion: String = "",
-    val categoria: String = "",
-    val puntuacion: Float = 0f,
-    val numVotaciones: Int = 0,
-)
+private const val CARD_ASPECT_RATIO = 0.75f
 
 @Composable
 fun MangoProductCard(
@@ -68,7 +60,7 @@ private fun ProductCardShimmer() {
     Box(
         Modifier
             .fillMaxWidth()
-            .aspectRatio(3f / 4f),
+            .aspectRatio(CARD_ASPECT_RATIO),
     ) {
         MangoLoadingIndicator(
             MangoLoadingVariant.Shimmer,
@@ -100,7 +92,7 @@ private fun ProductCardImage(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(3f / 4f),
+                .aspectRatio(CARD_ASPECT_RATIO),
         )
         if (onFavoritoClick != null) {
             MangoIconButton(

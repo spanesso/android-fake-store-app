@@ -41,7 +41,6 @@ class PerfilViewModelTest {
         private const val CODIGO_POSTAL = "12926-3874"
     }
 
-
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 

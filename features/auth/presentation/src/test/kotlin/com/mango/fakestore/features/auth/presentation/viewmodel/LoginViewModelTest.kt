@@ -5,9 +5,9 @@ import arrow.core.Either
 import com.google.common.truth.Truth.assertThat
 import com.mango.fakestore.core.analytics.EventTracker
 import com.mango.fakestore.core.analytics.Telemetry
+import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.error.UiError
 import com.mango.fakestore.core.error.mapper.DomainErrorToUiErrorMapper
-import com.mango.fakestore.core.error.DomainError
 import com.mango.fakestore.core.testing.CoroutineTestRule
 import com.mango.fakestore.features.auth.domain.model.SesionUsuario
 import com.mango.fakestore.features.auth.domain.usecase.SeleccionarUsuario
@@ -18,7 +18,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 

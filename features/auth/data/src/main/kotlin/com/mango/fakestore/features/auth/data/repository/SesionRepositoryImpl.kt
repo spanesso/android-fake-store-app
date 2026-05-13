@@ -26,7 +26,13 @@ class SesionRepositoryImpl @Inject constructor(
         safeApiCall { authApi.obtenerUsuario(userId) }.flatMap { dto ->
             safeDbCall { perfilDao.insertarPerfil(dto.toEntity()) }.flatMap {
                 safeDbCall {
-                    dataStore.saveSession(SessionData(accessToken = null, refreshToken = null, userId = userId.toString()))
+                    dataStore.saveSession(
+                        SessionData(
+                            accessToken = null,
+                            refreshToken = null,
+                            userId = userId.toString(),
+                        ),
+                    )
                     SesionUsuario(userId = userId, activa = true)
                 }
             }

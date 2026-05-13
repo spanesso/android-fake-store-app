@@ -24,6 +24,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val TOTAL_USUARIOS = 10
+
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val seleccionarUsuario: SeleccionarUsuario,
@@ -32,7 +34,7 @@ class LoginViewModel @Inject constructor(
     private val errorMapper: DomainErrorToUiErrorMapper,
 ) : ViewModel() {
 
-    private val listaUsuarios = (1..10).map { id ->
+    private val listaUsuarios = (1..TOTAL_USUARIOS).map { id ->
         UsuarioSeleccionUi(id = id, etiqueta = "Usuario $id")
     }
 

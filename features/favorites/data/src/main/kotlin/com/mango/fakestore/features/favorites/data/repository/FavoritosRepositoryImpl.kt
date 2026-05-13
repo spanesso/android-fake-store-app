@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-
 class FavoritosRepositoryImpl @Inject constructor(
     private val dao: FavoritosDao,
     private val dataStore: MangoDataStore,

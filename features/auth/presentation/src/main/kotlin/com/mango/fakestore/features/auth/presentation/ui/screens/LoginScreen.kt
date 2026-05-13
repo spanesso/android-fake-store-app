@@ -1,6 +1,5 @@
 package com.mango.fakestore.features.auth.presentation.ui.screens
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,6 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,15 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import com.mango.fakestore.core.designsystem.component.MangoButton
 import com.mango.fakestore.core.designsystem.component.MangoButtonState
-import com.mango.fakestore.core.designsystem.component.MangoButtonVariant
 import com.mango.fakestore.core.designsystem.component.MangoErrorState
 import com.mango.fakestore.core.designsystem.component.MangoIcon
 import com.mango.fakestore.core.designsystem.component.MangoLoadingIndicator
@@ -49,6 +46,8 @@ import com.mango.fakestore.features.auth.presentation.model.UsuarioSeleccionUi
 import com.mango.fakestore.features.auth.presentation.state.LoginUiEvent
 import com.mango.fakestore.features.auth.presentation.state.LoginUiState
 import com.mango.fakestore.core.error.R as ErrorR
+
+private const val TOTAL_USUARIOS = 10
 
 @Composable
 fun LoginScreen(
@@ -251,7 +250,7 @@ private fun LoginErrorContent(
 
 // region Previews
 
-private val listaUsuarios = (1..10).map { UsuarioSeleccionUi(id = it, etiqueta = "Usuario $it") }
+private val listaUsuarios = (1..TOTAL_USUARIOS).map { UsuarioSeleccionUi(id = it, etiqueta = "Usuario $it") }
 
 private val errorNoConexion = UiError(
     messageRes = ErrorR.string.error_red_sin_conexion,
@@ -276,12 +275,6 @@ private fun LoginLoadingPreview() {
 @Composable
 private fun LoginErrorPreview() {
     MangoTheme { LoginScreen(uiState = LoginUiState.Error(errorNoConexion), onEvent = {}) }
-}
-
-@Preview(name = "Login Idle - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun LoginIdleOscuroPreview() {
-    MangoTheme { LoginScreen(uiState = LoginUiState.Idle(listaUsuarios), onEvent = {}) }
 }
 
 // endregion
