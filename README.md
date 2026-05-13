@@ -1,7 +1,5 @@
 # Mango Fake Store
 
-[![CI](https://github.com/spanesso/android-fake-store-app/actions/workflows/sonar-main.yml/badge.svg?branch=main)](https://github.com/spanesso/android-fake-store-app/actions/workflows/sonar-main.yml)
-[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=spanesso_android-fake-store-app&metric=alert_status)](https://sonarcloud.io/project/overview?id=spanesso_android-fake-store-app)
 [![Android](https://img.shields.io/badge/Android-24%2B-green.svg)](https://developer.android.com/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-blue.svg)](https://kotlinlang.org/)
 
