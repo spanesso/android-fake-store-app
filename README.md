@@ -5,11 +5,12 @@
 [![Android](https://img.shields.io/badge/Android-24%2B-green.svg)](https://developer.android.com/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-blue.svg)](https://kotlinlang.org/)
 
-<img src="docs/diagrama.png" width="100%" alt="Diagrama de arquitectura"/>
-
-<p align="center">
-  <img src="docs/video.gif" width="35%" alt="Demo de la aplicación"/>
-</p>
+<table>
+  <tr>
+    <td width="65%" valign="top"><img src="docs/diagrama.png" width="100%" alt="Diagrama de arquitectura"/></td>
+    <td width="35%" valign="middle" align="center"><img src="docs/video.gif" width="100%" alt="Demo de la aplicación"/></td>
+  </tr>
+</table>
 
 Aplicación Android de catálogo de moda construida con las mismas exigencias de calidad de una app de producción real. Consume la [Fake Store API](https://fakestoreapi.com/) y está diseñada para demostrar arquitectura profesional, seguridad, diseño y calidad de código en Android moderno.
 
