@@ -120,7 +120,7 @@ Más detalles en [docs/observabilidad.md](docs/observabilidad.md).
 
 La calidad se verifica de forma automática en cada cambio:
 
-- **334 tests unitarios** que cubren casos de uso, repositorios, ViewModels y mappers de error
+- **350+ tests** que cubren casos de uso, repositorios, ViewModels, mappers de error y pantallas Compose
 - **Detekt** — análisis estático de código Kotlin que detecta problemas de estilo y complejidad
 - **Kover** — medición de cobertura de tests por módulo
 - **SonarCloud** — informe centralizado de calidad y seguridad en cada PR
