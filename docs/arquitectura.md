@@ -1,32 +1,88 @@
-# Arquitectura del proyecto Mango Fake Store
+# Arquitectura de la aplicación
 
-Este documento es el mapa de capas y módulos del proyecto. Se mantiene sincronizado con §3
-y §4 del prompt maestro (`prompt.txt` del proyecto externo). Cualquier desviación se
-documenta en un ADR.
+Este documento explica cómo está organizado el código de Mango Fake Store: por qué está dividido en piezas separadas, qué hace cada pieza y cómo se relacionan entre sí.
 
-## Visión general
+---
 
-La aplicación sigue **Clean Architecture estricta + MVVM** con tres capas separadas por
-feature (`data`, `domain`, `presentation`) y un conjunto transversal de módulos `:core:*`.
-Las dependencias apuntan hacia el dominio: `data` y `presentation` nunca se conocen entre
-sí; ambas dependen de `domain`. La comunicación entre módulos pasa exclusivamente por
-interfaces publicadas en `:features:*:api`.
+## La idea central: separación de responsabilidades
+
+Imagina un restaurante:
+
+- **La sala** (lo que ve el cliente) muestra los platos y toma nota del pedido.
+- **La cocina** sabe exactamente cómo preparar cada plato; no necesita saber cómo está decorada la sala.
+- **Los proveedores** entregan los ingredientes; la cocina les exige ciertos estándares pero no les importa qué marca de silla tienen en la sala.
+
+En esta app, el código funciona igual:
+
+| Restaurante | App | Qué hace |
+|---|---|---|
+| La sala | **Presentation** | Muestra la pantalla al usuario y captura sus acciones |
+| La cocina | **Domain** | Contiene las reglas de negocio (qué pasa cuando añades un favorito, etc.) |
+| Los proveedores | **Data** | Habla con la API de internet y la base de datos del teléfono |
+
+La cocina no sabe si la sala es bonita o fea — solo recibe pedidos y devuelve platos. Los proveedores no saben cómo cocina la cocina — solo entregan ingredientes según se les pide. Esa independencia hace que cualquier parte pueda cambiarse sin romper las demás.
+
+---
+
+## Módulos: las piezas del código
+
+La app está dividida en módulos independientes. Hay dos grupos principales:
+
+### Módulos de funcionalidades (`:features:*`)
+
+Cada pantalla o flujo de la app tiene su propio conjunto de módulos:
+
+| Funcionalidad | Qué contiene |
+|---|---|
+| **auth** | Pantalla de selección de usuario / login |
+| **products** | Listado de productos de la tienda |
+| **favorites** | Lista de productos marcados como favoritos |
+| **profile** | Perfil del usuario con sus datos y botón de cerrar sesión |
+
+Cada funcionalidad se divide a su vez en cuatro capas:
+
+```
+features/auth/
+├── api/          ← Lo que otras funcionalidades pueden usar de auth
+├── domain/       ← Las reglas: "¿qué ocurre al iniciar sesión?"
+├── data/         ← Cómo se guarda la sesión y se llama a la API
+└── presentation/ ← La pantalla que ve el usuario
+```
+
+### Módulos compartidos (`:core:*`)
+
+Son herramientas que usan todas las funcionalidades. No tienen pantallas propias.
+
+| Módulo | Para qué sirve |
+|---|---|
+| `:core:design-system` | Botones, colores, tipografía y otros componentes visuales de la marca Mango |
+| `:core:ui` | Componentes auxiliares de pantalla: pantalla de carga, pantalla de error, banner sin internet |
+| `:core:network` | Configuración de las llamadas a internet (reintentos, seguridad TLS, detección de red) |
+| `:core:database` | Base de datos local del teléfono, cifrada con contraseña |
+| `:core:datastore` | Almacenamiento seguro de la sesión del usuario |
+| `:core:error` | Cómo se clasifican y muestran los errores al usuario |
+| `:core:analytics` | Registro de eventos (Firebase: qué productos se ven, cuándo falla algo) |
+| `:core:security` | Detección de dispositivos comprometidos (root, Frida), protección de pantalla |
+| `:core:common` | Utilidades de Kotlin reutilizables en toda la app |
+| `:core:testing` | Herramientas para escribir y ejecutar pruebas automáticas |
+
+---
 
 ## Diagrama global de módulos
 
 ```mermaid
 flowchart TB
-  app([:app])
+  app([:app — punto de entrada])
 
-  subgraph features
+  subgraph features [Funcionalidades]
     direction LR
-    auth_pres[:features:auth:presentation]
-    products_pres[:features:products:presentation]
-    favorites_pres[:features:favorites:presentation]
-    profile_pres[:features:profile:presentation]
+    auth[:features:auth]
+    products[:features:products]
+    favorites[:features:favorites]
+    profile[:features:profile]
   end
 
-  subgraph cores [Modulos :core:*]
+  subgraph cores [Módulos compartidos :core:*]
     direction LR
     ds[:core:design-system]
     cui[:core:ui]
@@ -45,176 +101,105 @@ flowchart TB
   features --> cores
 ```
 
-## Diagrama de capas por feature
+`:app` es el módulo raíz: ensambla todo y arranca la aplicación. Las funcionalidades usan los módulos compartidos pero **nunca** se usan entre sí directamente (para eso existe `:features:X:api`).
+
+---
+
+## Cómo fluye una acción del usuario
+
+Ejemplo: el usuario pulsa "Añadir a favoritos" en la lista de productos.
+
+```
+Usuario toca el botón
+        ↓
+Pantalla (ProductosScreen) notifica al ViewModel
+        ↓
+ViewModel llama al caso de uso (ToggleFavorito)
+        ↓
+ToggleFavorito habla con el Repositorio (interfaz)
+        ↓
+RepositoryImpl guarda en Room (base de datos local)
+        ↓
+El resultado sube de vuelta: RepositoryImpl → UseCase → ViewModel → Pantalla
+        ↓
+La pantalla muestra el corazón relleno ❤️
+```
+
+En ningún paso la pantalla habla directamente con la base de datos, ni la base de datos sabe cómo se ve la pantalla.
+
+---
+
+## Diagrama de capas por funcionalidad
 
 ```mermaid
 flowchart TB
-  subgraph presentation [features:X:presentation]
-    Route[Route Composable] --> Screen[Screen Composable puro]
-    Route --> ViewModel
-    ViewModel --> UseCase
+  subgraph presentation [Capa: Pantalla]
+    Route[Route — instancia el ViewModel] --> Screen[Screen — composable puro con UI]
+    Route --> ViewModel[ViewModel — lógica de pantalla]
+    ViewModel --> UseCase[Caso de uso]
   end
-  subgraph domain [features:X:domain]
-    UseCase --> RepoInterface[Repository interface]
-    Entities
-    Errors[X Error sealed]
+  subgraph domain [Capa: Reglas de negocio]
+    UseCase --> RepoInterface[Interfaz de Repositorio]
+    Entities[Modelos de datos]
   end
-  subgraph data [features:X:data]
-    RepoImpl[Repository impl] -.implementa.-> RepoInterface
-    RepoImpl --> Retrofit[Retrofit API]
-    RepoImpl --> Room[Room DAO]
-    Retrofit --> ErrorMapper[X ErrorMapper]
-    Room --> ErrorMapper
-  end
-  subgraph api [features:X:api]
-    Contracts[Interfaces y modelos publicos]
+  subgraph data [Capa: Datos]
+    RepoImpl[Repositorio implementado] -.implementa.-> RepoInterface
+    RepoImpl --> Api[API REST Retrofit]
+    RepoImpl --> Dao[Base de datos Room]
   end
 
-  presentation -.consume.-> api
-  domain --> api
+  presentation -.consume contratos de.-> api_module[:features:X:api]
+  domain --> api_module
   data --> domain
-  domain --> CoreError[:core:error]
-  domain --> CoreCommon[:core:common]
 ```
 
-## Matriz de dependencias permitidas
+---
 
-| Origen ↓ \\ Destino → | `:app` | `features:*:presentation` | `features:*:data` | `features:*:domain` | `features:*:api` | `:core:design-system` | `:core:ui` | `:core:common` | `:core:error` | `:core:network` | `:core:database` | `:core:datastore` | `:core:analytics` | `:core:security` | `:core:testing` |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `:app` | — | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | test |
-| `features:*:presentation` | ❌ | — | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | test |
-| `features:*:data` | ❌ | ❌ | — | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | test |
-| `features:*:domain` | ❌ | ❌ | ❌ | — | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | test |
-| `features:*:api` | ❌ | ❌ | ❌ | ❌ | — | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | test |
-| `:core:design-system` | ❌ | ❌ | ❌ | ❌ | ❌ | — | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | test |
-| `:core:ui` | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | — | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | test |
-| `:core:analytics` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | — | ❌ | test |
-| `:core:network` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | — | ❌ | ❌ | ✅ | ❌ | test |
-| `:core:database` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | — | ❌ | ✅ | ✅ | test |
-| `:core:datastore` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | — | ❌ | ✅ | test |
-| `:core:security` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | — | test |
-| `:core:common` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | test |
-| `:core:error` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | — | ❌ | ❌ | ❌ | ❌ | ❌ | test |
-| `:core:testing` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
+## Reglas de dependencia
 
-Leyenda:
-- ✅ = puede depender.
-- ❌ = prohibido por diseño; introducirla rompe Clean Architecture.
-- `test` = únicamente como `testImplementation`/`testFixtures`.
-- "—" = mismo módulo.
+Las capas tienen reglas estrictas sobre quién puede hablar con quién. Esto evita que el código se vuelva un enredo con el tiempo.
 
-Esta matriz se verifica con Konsist (`:core:testing`) y con el skill `validar-arquitectura`.
+**Regla principal**: las dependencias siempre van hacia el interior (hacia `domain`). La pantalla conoce las reglas de negocio; las reglas de negocio no saben nada de pantallas.
 
-## Responsabilidades por módulo
-
-### `:app`
-
-Ensambla la aplicación, declara `Application` con Hilt, aloja el `NavHost` raíz, configura
-`MangoOfflineBanner` global y `CoroutineExceptionHandler` raíz. No contiene lógica de feature.
-
-### Modulos `:core:*`
-
-| Módulo | Capa Android | Responsabilidad |
+| Si eres... | Puedes usar... | No puedes usar... |
 |---|---|---|
-| `:core:common` | Kotlin puro | Dispatchers, helpers `Either`, extensions Kotlin transversales. |
-| `:core:error` | Kotlin puro | `DomainError` sealed, `UiError`, `ErrorMapper` base, `safeApiCall`/`safeDbCall`, contratos de reportería. |
-| `:core:design-system` | Android + Compose | Tokens (colores, tipografía, espaciado, formas, motion) y componentes Mango (`MangoButton`, `MangoErrorState`, etc.). |
-| `:core:ui` | Android + Compose | Utilidades Compose: modifiers, extensions, previews, composables auxiliares (`LoadingContent`, `EmptyContent`, `ErrorContent`). |
-| `:core:network` | Android | OkHttp/Retrofit base, interceptors, certificate pinning, `NetworkErrorMapper`, `ConnectivityObserver`, retry con backoff. |
-| `:core:database` | Android | Room base, encriptación SQLCipher, migrations, `DatabaseErrorMapper`. |
-| `:core:datastore` | Android | DataStore Preferences cifrado para tokens/preferencias. |
-| `:core:analytics` | Android | Interfaz `Telemetry`, `EventTracker`, impls Firebase y Console. |
-| `:core:security` | Android | Biometría, anti-screenshot, root detection, secret obfuscation. |
-| `:core:testing` | Kotlin puro | Utilidades de test (fakes, rules, dispatchers test, builders, tests Konsist). |
+| La pantalla (`presentation`) | `domain`, `api`, `core:design-system`, `core:ui`, `core:analytics` | `data` de cualquier feature |
+| Las reglas (`domain`) | `core:common`, `core:error` | Nada de Android, nada de pantallas |
+| Los datos (`data`) | `domain`, `core:network`, `core:database`, `core:datastore` | `presentation` |
+| `:app` | `presentation` de cada feature, todos los `core:*` | `data` o `domain` directamente |
 
-### Modulos `:features:*`
+---
 
-Cada feature (`auth`, `products`, `favorites`, `profile`) tiene cuatro submódulos:
+## Manejo de errores
 
-| Submódulo | Capa Android | Responsabilidad |
-|---|---|---|
-| `:features:X:api` | Kotlin puro | Contratos públicos (interfaces de UseCase y modelos públicos). |
-| `:features:X:domain` | Kotlin puro | Casos de uso, entidades, errores específicos (`XError`), interfaz de repositorio. |
-| `:features:X:data` | Android + Hilt | Repositorio impl, Retrofit/Room, DTOs/Entities (internal), mappers, `XErrorMapper`. |
-| `:features:X:presentation` | Android + Compose + Hilt | ViewModels, `UiState`/`UiEvent`/`UiEffect`, Composables `Route`+`Screen`, previews. |
+Todos los errores siguen el mismo camino:
 
-## Convention plugins
+1. La API o la base de datos lanza una excepción → `safeApiCall` / `safeDbCall` la captura y la convierte en `DomainError` (tipo concreto: sin red, servidor caído, no encontrado, etc.).
+2. El caso de uso devuelve `Either<DomainError, Resultado>` — nunca lanza excepciones.
+3. El ViewModel mapea `DomainError` a `UiError` con un mensaje localizado en el idioma del teléfono.
+4. La pantalla muestra ese `UiError` a través de `MangoErrorState` o `MangoSnackbar`.
 
-El módulo `build-logic/` expone 8 convention plugins que centralizan la configuración Gradle:
+La pantalla **nunca** recibe un `Throwable` ni un mensaje de error en inglés del servidor.
 
-- `mango.android.application` (para `:app`)
-- `mango.android.library` (para módulos Android library)
-- `mango.android.feature` (atajo para presentation: library + compose + hilt)
-- `mango.kotlin.library` (para módulos Kotlin puros)
-- `mango.android.hilt` (añade Hilt + KSP)
-- `mango.android.compose` (habilita Compose y enlaza el BOM)
-- `mango.detekt` (Detekt con config compartida)
-- `mango.kover` (Kover por módulo, agregado en root)
+---
 
-## Manejo de errores transversal
+## Automatización de la calidad
 
-Detalle completo en `docs/manejo-errores.md` (pendiente) y en el ADR `docs/adr/0001-manejo-errores.md`.
+| Herramienta | Qué verifica |
+|---|---|
+| **Detekt** | Estilo de código, complejidad, imports, nombres |
+| **Kover** | Cobertura de tests por módulo |
+| **SonarCloud** | Quality gate centralizado en cada PR |
+| **Konsist** (`:core:testing`) | Que las reglas de arquitectura se cumplen automáticamente en cada build |
 
-Resumen: toda función pública de `domain` y de `data` retorna `Either<DomainError, T>` (Arrow).
-Las excepciones se capturan exclusivamente en `safeApiCall`/`safeDbCall` o en `XErrorMapper`
-del módulo. La UI nunca recibe `Throwable` ni `DomainError`; recibe `UiError` con `messageRes`
-localizado.
+---
 
-## Convenciones de paquetes
+## Pipelines de CI/CD
 
-```
-com.mango.fakestore
-├── app                                  -> :app
-├── core
-│   ├── analytics
-│   ├── common
-│   ├── database
-│   ├── datastore
-│   ├── designsystem                     -> :core:design-system
-│   ├── error
-│   ├── network
-│   ├── security
-│   ├── testing
-│   └── ui
-└── features
-    ├── auth
-    │   ├── api
-    │   ├── data
-    │   ├── domain
-    │   └── presentation
-    ├── favorites
-    │   └── …
-    ├── products
-    │   └── …
-    └── profile
-        └── …
-```
-
-## Cómo extender la arquitectura
-
-1. **Añadir un feature nuevo**: invocar `crear-modulo nombre=<X> tipo=feature` desde una sesión
-   de Claude Code; registrar los 4 submódulos en `settings.gradle.kts`; añadir entrada en esta
-   matriz si introduce dependencias nuevas.
-2. **Añadir un módulo `:core:*`**: invocar `crear-modulo nombre=<X> tipo=core` y justificar en
-   un ADR la necesidad (qué problema transversal resuelve).
-3. **Modificar la matriz de dependencias**: requiere ADR y enmienda en `prompt.txt` +
-   constitución + esta sección.
-
-## CI/CD (ETAPA 9)
-
-Los pipelines de automatización viven en `.github/workflows/`:
-
-| Workflow | Trigger | Propósito |
-|---|---|---|
-| `pr.yml` | Pull Request → `develop`/`main` | Detekt + ktlint + tests unitarios + Kover + assembleDevDebug + SonarCloud (opcional) |
-| `main.yml` | Push a `develop` | Todo lo de `pr.yml` + Firebase Test Lab + Firebase App Distribution (grupo `qa-internal`) |
-| `release.yml` | Push de tag `v*` | `bundleProdRelease` firmado + Google Play Internal Testing + mapping Crashlytics + GitHub Release |
-| `azure-pipelines.yml` | Push/PR opcional | Espejo en Azure Pipelines (referencia, no pipeline principal) |
+| Cuándo | Qué ocurre |
+|---|---|
+| Abres un Pull Request | Lint + tests unitarios + cobertura + build debug + SonarCloud |
+| Haces merge a `develop` | Todo lo anterior + Firebase Test Lab (dispositivos reales) + distribución interna QA |
+| Creas un tag `v*` | Build de release firmado + GitHub Release |
 
 Documentación operacional completa: [`docs/ci-cd.md`](ci-cd.md).
-
-## Mantenimiento
-
-- Este documento se actualiza al cerrar cada ETAPA del prompt maestro (§14).
-- Cualquier desviación entre lo documentado y el código se reporta como bug.
-- Konsist es la red de seguridad automatizada; este documento es la verdad humana.
