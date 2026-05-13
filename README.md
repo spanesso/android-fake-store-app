@@ -16,14 +16,14 @@ Aplicación Android de catálogo de moda construida con las mismas exigencias de
 
 ---
 
-## Qué hace la aplicación
+## Funcionalidades
 
-La app permite a cualquiera de los 10 usuarios disponibles iniciar sesión, explorar el catálogo de productos, guardar sus favoritos y consultar su perfil personal.
+La aplicación ofrece un flujo completo de usuario: autenticación, exploración del catálogo, gestión de favoritos y consulta del perfil personal. Cada funcionalidad opera de forma independiente gracias a la arquitectura modular, garantizando que los cambios en una no afecten al resto.
 
-- **Inicio de sesión** — el usuario elige su cuenta entre los 10 disponibles. La sesión se mantiene al cerrar y reabrir la app.
-- **Catálogo de productos** — lista completa de artículos con imagen, precio, descripción, categoría y puntuación. Las imágenes se descargan una sola vez y quedan guardadas en caché.
-- **Favoritos por usuario** — cada usuario tiene su propia lista de favoritos. Al cambiar de cuenta, los favoritos cambian con ella.
-- **Perfil** — muestra los datos completos del usuario (nombre, email, dirección, teléfono) y permite cerrar sesión.
+- **Autenticación** — el sistema soporta diez cuentas de usuario independientes. El usuario selecciona su cuenta al iniciar y la sesión se preserva automáticamente entre ejecuciones de la aplicación.
+- **Catálogo de productos** — presenta el inventario completo con imagen, título, precio, descripción, categoría y valoración. Las imágenes se descargan una única vez y se almacenan en caché en memoria y en disco, eliminando descargas redundantes en sesiones posteriores.
+- **Favoritos por usuario** — cada cuenta mantiene su propia lista de favoritos de forma aislada en la base de datos local. Al cambiar de sesión, la lista se actualiza automáticamente reflejando los favoritos del nuevo usuario.
+- **Perfil** — expone los datos completos del usuario obtenidos desde la API (nombre, email, dirección y teléfono) y ofrece la opción de cerrar sesión de forma segura.
 
 ---
 
@@ -147,6 +147,18 @@ Cada cambio en el repositorio pasa por un pipeline automático en GitHub Actions
 | `release.yml` | Al crear un tag `v*` | Build de release firmado |
 
 Más detalles en [docs/ci-cd.md](docs/ci-cd.md).
+
+---
+
+## Proceso de desarrollo
+
+El proyecto fue desarrollado siguiendo **Spec-Driven Development**, un flujo de trabajo que antepone la especificación y el diseño a la implementación. Cada funcionalidad pasó por las siguientes etapas antes de escribir una sola línea de código:
+
+1. **Especificación** (`spec.md`) — descripción de la funcionalidad en términos de valor para el usuario, sin detalles de implementación.
+2. **Plan técnico** (`plan.md`) — decisiones de arquitectura, módulos a crear, dependencias y contratos entre capas.
+3. **Tareas** (`tasks.md`) — desglose en pasos atómicos y ordenados, con criterios de aceptación verificables para cada uno.
+
+Este enfoque garantizó que cada decisión técnica estuvo justificada antes de ejecutarse, reduciendo el retrabajo y manteniendo la coherencia arquitectónica a lo largo de las catorce etapas del proyecto.
 
 ---
 
