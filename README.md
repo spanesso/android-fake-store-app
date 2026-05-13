@@ -10,6 +10,7 @@
   </tr>
 </table>
 
+
 Aplicación Android de catálogo de moda construida con las mismas exigencias de calidad de una app de producción real. Consume la [Fake Store API](https://fakestoreapi.com/) y está diseñada para demostrar arquitectura profesional, seguridad, diseño y calidad de código en Android moderno.
 
 ---
