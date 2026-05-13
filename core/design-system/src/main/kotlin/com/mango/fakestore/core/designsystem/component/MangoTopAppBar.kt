@@ -66,17 +66,20 @@ fun MangoTopAppBar(
 }
 
 @Preview(name = "TopAppBar - Claro", showBackground = true)
-@Composable private fun TopBarPreview() {
+@Composable
+private fun TopBarPreview() {
     MangoTheme { MangoTopAppBar("Tienda") }
 }
 
 @Preview(name = "TopAppBar - Oscuro", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable private fun TopBarDarkPreview() {
+@Composable
+private fun TopBarDarkPreview() {
     MangoTheme { MangoTopAppBar("Tienda") }
 }
 
 @Preview(name = "TopAppBar - Con acciones", showBackground = true)
-@Composable private fun TopBarActionsPreview() {
+@Composable
+private fun TopBarActionsPreview() {
     MangoTheme {
         MangoTopAppBar(
             title = "Favoritos",
